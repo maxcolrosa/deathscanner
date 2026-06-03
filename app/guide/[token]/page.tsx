@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 import { after } from "next/server";
 import { getOrderByToken, type OrderRow } from "@/lib/guide/orders";
 import { generateGuide } from "@/lib/guide/generate";
+import { GuideBuildingScreen } from "@/components/guide/guide-building-screen";
+import { GuideView } from "@/components/guide/guide-view";
 
 export const dynamic = "force-dynamic";
 
@@ -19,8 +21,7 @@ export default async function GuideTokenPage({
   if (!order) notFound();
 
   if (order.status === "ready" && order.guide) {
-    // Replaced by <GuideView /> in Task 11.
-    return <pre>{JSON.stringify(order.guide, null, 2)}</pre>;
+    return <GuideView guide={order.guide} token={token} />;
   }
 
   // Auto-retry a failed or stuck generation in the background (idempotent).
@@ -30,6 +31,5 @@ export default async function GuideTokenPage({
     });
   }
 
-  // Replaced by <GuideBuildingScreen /> in Task 11.
-  return <p>Building your protocol...</p>;
+  return <GuideBuildingScreen token={token} failed={order.status === "failed"} />;
 }
