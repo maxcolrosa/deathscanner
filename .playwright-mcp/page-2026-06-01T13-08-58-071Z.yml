@@ -1,0 +1,65 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]:
+          - generic [ref=e6]: $
+          - text: Money Leak Audit
+        - link "Book free audit" [ref=e7] [cursor=pointer]:
+          - /url: https://cal.com/your-handle/money-leak-audit
+    - generic [ref=e9]:
+      - paragraph [ref=e10]: For freelancers & founders with ADHD
+      - heading "You're leaking money you already earned." [level=1] [ref=e11]
+      - paragraph [ref=e12]: Forgotten invoices. Overdue clients you never chased. A year of deductible receipts you'll never find by April. The ADHD tax isn't a metaphor — it's a number. Let me find yours, free.
+      - generic [ref=e13]:
+        - link "Book my free audit →" [ref=e14] [cursor=pointer]:
+          - /url: https://cal.com/your-handle/money-leak-audit
+        - link "Or get the DIY checklist" [ref=e15] [cursor=pointer]:
+          - /url: "#checklist"
+      - paragraph [ref=e16]: 30 minutes · no software to install · no pitch
+    - generic [ref=e17]:
+      - heading "Three places the money goes" [level=2] [ref=e18]
+      - generic [ref=e19]:
+        - generic [ref=e20]:
+          - text: Unbilled work
+          - heading "Money you earned but never billed" [level=3] [ref=e21]
+          - paragraph [ref=e22]: The deliverable shipped. The invoice never got made. With ADHD that's not laziness — the invoice just fell out of working memory.
+        - generic [ref=e23]:
+          - text: Overdue clients
+          - heading "Invoices sitting past due" [level=3] [ref=e24]
+          - paragraph [ref=e25]: Chasing was never the hard part. Remembering the invoice existed was. I'll list exactly who owes you and what to send them.
+        - generic [ref=e26]:
+          - text: Untracked deductions
+          - heading "A year of receipts you'll never find" [level=3] [ref=e27]
+          - paragraph [ref=e28]: Freelancers miss $1,250–$5,250 a year in tax savings because the receipts never got logged. I'll estimate yours.
+    - generic [ref=e30]:
+      - heading "How the audit works" [level=2] [ref=e31]
+      - generic [ref=e32]:
+        - generic [ref=e33]:
+          - generic [ref=e34]: "01"
+          - heading "Show me a month" [level=3] [ref=e35]
+          - paragraph [ref=e36]: Bring a rough list of finished work, which of it you invoiced, and your business spending. Messy is fine.
+        - generic [ref=e37]:
+          - generic [ref=e38]: "02"
+          - heading "I add up the leak — live" [level=3] [ref=e39]
+          - paragraph [ref=e40]: On a 30-minute call I fill in the numbers while you watch. Unbilled, overdue, and untracked deductions.
+        - generic [ref=e41]:
+          - generic [ref=e42]: "03"
+          - heading "You get your number" [level=3] [ref=e43]
+          - paragraph [ref=e44]: One total, in dollars. If it's small, you're fine and you'll know it. If it's not, you'll wish you'd looked sooner.
+      - link "Grab an audit slot →" [ref=e46] [cursor=pointer]:
+        - /url: https://cal.com/your-handle/money-leak-audit
+    - generic [ref=e47]:
+      - generic [ref=e48]:
+        - heading "Not ready for a call?" [level=2] [ref=e49]
+        - paragraph [ref=e50]: Drop your email and I'll send the same checklist I use in the audit, so you can find your number yourself.
+      - generic [ref=e52]:
+        - generic [ref=e53]:
+          - textbox "First name" [ref=e54]
+          - textbox "Email" [ref=e55]
+        - textbox "What kind of work do you do? (e.g. freelance design)" [ref=e56]
+        - button "Send me the checklist + an audit slot" [ref=e57]
+        - paragraph [ref=e58]: No spam. I'll only email you about your audit.
+    - contentinfo [ref=e59]:
+      - paragraph [ref=e61]: Built by someone with ADHD who got tired of finding $400 invoices they forgot to send. This is an early experiment — the audit is real and free; I'm figuring out if the tool should exist.
+  - alert [ref=e62]

@@ -1,0 +1,330 @@
+- generic [ref=e3]:
+  - navigation [ref=e4]:
+    - generic [ref=e6]:
+      - link "UI UX Pro Max" [ref=e7] [cursor=pointer]:
+        - /url: "#"
+        - img [ref=e8]
+        - generic [ref=e15]: UI UX Pro Max
+      - generic [ref=e16]:
+        - link "Features" [ref=e17] [cursor=pointer]:
+          - /url: "#features"
+        - link "Stacks" [ref=e18] [cursor=pointer]:
+          - /url: "#stacks"
+        - link "Styles" [ref=e19] [cursor=pointer]:
+          - /url: "#styles"
+      - generic [ref=e20]:
+        - button "Switch to light mode" [ref=e21] [cursor=pointer]:
+          - img [ref=e22]
+        - link [ref=e24] [cursor=pointer]:
+          - /url: https://github.com/nextlevelbuilder/ui-ux-pro-max-skill
+          - img [ref=e25]
+  - main [ref=e27]:
+    - generic [ref=e32]:
+      - generic [ref=e33]:
+        - generic [ref=e34]:
+          - img [ref=e36]
+          - generic [ref=e39]: Claude Code
+        - generic [ref=e40]:
+          - img [ref=e42]
+          - generic [ref=e44]: Cursor
+        - generic [ref=e45]:
+          - img [ref=e47]
+          - generic [ref=e49]: Windsurf
+        - generic [ref=e50]:
+          - img [ref=e52]
+          - generic [ref=e55]: Antigravity
+        - generic [ref=e56]:
+          - img [ref=e58]
+          - generic [ref=e61]: GitHub Copilot
+        - generic [ref=e62]:
+          - img [ref=e64]
+          - generic [ref=e70]: Kiro
+        - generic [ref=e71]:
+          - img [ref=e73]
+          - generic [ref=e75]: Codex
+        - generic [ref=e76]:
+          - img [ref=e78]
+          - generic [ref=e82]: Qoder
+      - heading "UI UX Pro Max Design Intelligence" [level=1] [ref=e83]:
+        - text: UI UX Pro Max
+        - text: Design Intelligence
+      - paragraph [ref=e84]: Searchable database of UI styles, color palettes, font pairings, chart types, and UX guidelines. Build beautiful interfaces with AI-powered design recommendations.
+      - generic [ref=e87]:
+        - text: $
+        - text: ▋
+      - generic [ref=e88]:
+        - link "How it Works" [ref=e89] [cursor=pointer]:
+          - /url: "#how-it-works"
+        - link "View Demos" [ref=e90] [cursor=pointer]:
+          - /url: "#styles"
+      - generic [ref=e91]:
+        - generic [ref=e92] [cursor=pointer]:
+          - img [ref=e94]
+          - generic [ref=e96]: "57"
+          - generic [ref=e97]: UI Styles
+        - generic [ref=e98] [cursor=pointer]:
+          - img [ref=e100]
+          - generic [ref=e102]: "95"
+          - generic [ref=e103]: Color Palettes
+        - generic [ref=e104] [cursor=pointer]:
+          - img [ref=e106]
+          - generic [ref=e108]: "56"
+          - generic [ref=e109]: Font Pairings
+        - generic [ref=e110] [cursor=pointer]:
+          - img [ref=e112]
+          - generic [ref=e114]: "8"
+          - generic [ref=e115]: Tech Stacks
+        - generic [ref=e116] [cursor=pointer]:
+          - img [ref=e118]
+          - generic [ref=e120]: "24"
+          - generic [ref=e121]: Chart Types
+        - generic [ref=e122] [cursor=pointer]:
+          - img [ref=e124]
+          - generic [ref=e126]: "29"
+          - generic [ref=e127]: Landing Patterns
+    - generic [ref=e129]:
+      - generic [ref=e130]:
+        - heading "Everything You Need for Beautiful UI" [level=2] [ref=e131]
+        - paragraph [ref=e132]: Comprehensive design intelligence at your fingertips. Search, discover, and implement stunning interfaces with AI-powered recommendations.
+      - generic [ref=e133]:
+        - generic [ref=e134] [cursor=pointer]:
+          - img [ref=e136]
+          - heading "Design Styles" [level=3] [ref=e138]
+          - paragraph [ref=e139]: Glassmorphism, Neumorphism, Minimalism, Brutalism, Aurora UI, and 45+ more styles with colors, effects, and framework compatibility.
+          - generic [ref=e140]:
+            - generic [ref=e141]: Glassmorphism
+            - generic [ref=e142]: Dark Mode
+            - generic [ref=e143]: Motion-Driven
+        - generic [ref=e144] [cursor=pointer]:
+          - img [ref=e146]
+          - heading "Color Palettes" [level=3] [ref=e148]
+          - paragraph [ref=e149]: Product-specific color systems for SaaS, E-commerce, Healthcare, Fintech, and more. Includes Primary, Secondary, CTA, Background, Text, and Border.
+          - generic [ref=e150]:
+            - generic [ref=e151]: SaaS
+            - generic [ref=e152]: Healthcare
+            - generic [ref=e153]: E-commerce
+        - generic [ref=e154] [cursor=pointer]:
+          - img [ref=e156]
+          - heading "Typography" [level=3] [ref=e159]
+          - paragraph [ref=e160]: 50+ font pairings with Google Fonts integration, Tailwind configs, and mood-based recommendations.
+          - generic [ref=e161]:
+            - generic [ref=e162]: Space Grotesk
+            - generic [ref=e163]: Inter
+            - generic [ref=e164]: Playfair
+        - generic [ref=e165] [cursor=pointer]:
+          - img [ref=e167]
+          - heading "Chart Types" [level=3] [ref=e169]
+          - paragraph [ref=e170]: Data visualization recommendations with library suggestions (Chart.js, Recharts, D3.js) and accessibility notes.
+          - generic [ref=e171]:
+            - generic [ref=e172]: Line
+            - generic [ref=e173]: Bar
+            - generic [ref=e174]: Pie
+            - generic [ref=e175]: Heatmap
+        - generic [ref=e176] [cursor=pointer]:
+          - img [ref=e178]
+          - heading "Landing Patterns" [level=3] [ref=e180]
+          - paragraph [ref=e181]: 14 conversion-optimized page structures with CTA placement strategies and color recommendations.
+          - generic [ref=e182]:
+            - generic [ref=e183]: Hero + Features
+            - generic [ref=e184]: Video-First
+            - generic [ref=e185]: Pricing
+        - generic [ref=e186] [cursor=pointer]:
+          - img [ref=e188]
+          - heading "UX Guidelines" [level=3] [ref=e191]
+          - paragraph [ref=e192]: Best practices and anti-patterns for animation, accessibility, z-index, loading states, and more.
+          - generic [ref=e193]:
+            - generic [ref=e194]: Animation
+            - generic [ref=e195]: A11y
+            - generic [ref=e196]: Performance
+    - generic [ref=e198]:
+      - generic [ref=e199]:
+        - heading "8 Tech Stacks Supported" [level=2] [ref=e200]
+        - paragraph [ref=e201]: Framework-specific best practices, patterns, and code examples. Get guidelines tailored to your technology stack.
+      - generic [ref=e202]:
+        - generic [ref=e203] [cursor=pointer]:
+          - img [ref=e205]
+          - heading "React" [level=3] [ref=e207]
+          - paragraph [ref=e208]: State, hooks, performance patterns
+        - generic [ref=e209] [cursor=pointer]:
+          - img [ref=e211]
+          - heading "Next.js" [level=3] [ref=e213]
+          - paragraph [ref=e214]: SSR, routing, API routes
+        - generic [ref=e215] [cursor=pointer]:
+          - img [ref=e217]
+          - heading "Vue" [level=3] [ref=e219]
+          - paragraph [ref=e220]: Composition API, Pinia, Vue Router
+        - generic [ref=e221] [cursor=pointer]:
+          - img [ref=e223]
+          - heading "Svelte" [level=3] [ref=e225]
+          - paragraph [ref=e226]: Runes, stores, SvelteKit
+        - generic [ref=e227] [cursor=pointer]:
+          - img [ref=e229]
+          - heading "SwiftUI" [level=3] [ref=e231]
+          - paragraph [ref=e232]: Views, State, Navigation
+        - generic [ref=e233] [cursor=pointer]:
+          - img [ref=e235]
+          - heading "React Native" [level=3] [ref=e237]
+          - paragraph [ref=e238]: Components, Navigation, Lists
+        - generic [ref=e239] [cursor=pointer]:
+          - img [ref=e241]
+          - heading "Flutter" [level=3] [ref=e243]
+          - paragraph [ref=e244]: Widgets, State, Theming
+        - generic [ref=e245] [cursor=pointer]:
+          - img [ref=e247]
+          - heading "Tailwind" [level=3] [ref=e249]
+          - paragraph [ref=e250]: Utilities, responsive, a11y
+    - generic [ref=e252]:
+      - generic [ref=e253]:
+        - heading "How It Works" [level=2] [ref=e254]
+        - paragraph [ref=e255]: From prompt to production-ready UI in 6 intelligent steps
+      - generic [ref=e256]:
+        - generic [ref=e257]:
+          - generic [ref=e258]:
+            - generic [ref=e259]: "1"
+            - heading "Your Prompt" [level=3] [ref=e260]
+          - generic [ref=e261]: $ Build a landing page for a pet grooming service. Playful and friendly style, with booking CTA.
+        - img [ref=e263]
+        - generic [ref=e265]:
+          - generic [ref=e266]:
+            - generic [ref=e267]: "2"
+            - heading "AI Reasoning" [level=3] [ref=e268]
+          - generic [ref=e269]:
+            - generic [ref=e270]:
+              - generic [ref=e271]: "Product: pet-service"
+              - generic [ref=e272]: "Style: playful, friendly"
+              - generic [ref=e273]: "Page: landing"
+              - generic [ref=e274]: "CTA: booking"
+            - paragraph [ref=e275]: "→ Searching: product, style, typography, color, landing, ux domains..."
+        - img [ref=e277]
+        - generic [ref=e279]:
+          - generic [ref=e280]:
+            - generic [ref=e281]: "3"
+            - heading "Search Design Database" [level=3] [ref=e282]
+          - generic [ref=e283]:
+            - generic [ref=e284]:
+              - generic [ref=e285]: PRODUCT
+              - generic [ref=e286]: Pet Tech App
+            - generic [ref=e287]:
+              - generic [ref=e288]: STYLE
+              - generic [ref=e289]: Micro-interactions
+            - generic [ref=e290]:
+              - generic [ref=e291]: TYPOGRAPHY
+              - generic [ref=e292]: Fredoka + Nunito
+            - generic [ref=e293]:
+              - generic [ref=e294]: LANDING
+              - generic [ref=e295]: Hero + Features + CTA
+            - generic [ref=e296]:
+              - generic [ref=e297]: UX RULE
+              - generic [ref=e298]: Use animations for loading only
+            - generic [ref=e299]:
+              - generic [ref=e300]: COLORS
+              - generic [ref=e301]:
+                - generic [ref=e302]:
+                  - generic: "Primary: #3B82F6"
+                - generic [ref=e304]:
+                  - generic: "Secondary: #60A5FA"
+                - generic [ref=e306]:
+                  - generic: "CTA: #F97316"
+                - generic [ref=e308]:
+                  - generic: "Background: #F8FAFC"
+                - generic [ref=e310]:
+                  - generic: "Text: #1E293B"
+        - img [ref=e313]
+        - generic [ref=e315]:
+          - generic [ref=e316]:
+            - generic [ref=e317]: "4"
+            - heading "Generate Code" [level=3] [ref=e318]
+          - generic [ref=e319]:
+            - generic [ref=e320]: <!-- Pet Grooming Landing -->
+            - generic [ref=e321]: <section class="bg-[#F8FAFC]">
+            - generic [ref=e322]: <h1 class="font-['Fredoka'] text-[#1E293B]">
+            - generic [ref=e323]: Happy Pets, Happy Life
+            - generic [ref=e324]: </h1>
+            - generic [ref=e325]: <button class="bg-[#F97316] hover:bg-[#EA580C]">
+            - generic [ref=e326]: Book Grooming
+            - generic [ref=e327]: </button>
+            - generic [ref=e328]: </section>
+        - img [ref=e330]
+        - generic [ref=e332]:
+          - generic [ref=e333]:
+            - generic [ref=e334]: "5"
+            - heading "Quality Checklist" [level=3] [ref=e335]
+          - generic [ref=e336]:
+            - generic [ref=e337]:
+              - img [ref=e338]
+              - generic [ref=e340]: SVG icons (no emoji)
+            - generic [ref=e341]:
+              - img [ref=e342]
+              - generic [ref=e344]: Hover feedback
+            - generic [ref=e345]:
+              - img [ref=e346]
+              - generic [ref=e348]: Dark mode contrast
+            - generic [ref=e349]:
+              - img [ref=e350]
+              - generic [ref=e352]: Responsive layout
+        - img [ref=e354]
+        - generic [ref=e356]:
+          - generic [ref=e357]:
+            - generic [ref=e358]: "6"
+            - heading "Final Result" [level=3] [ref=e359]
+          - link "Pet Grooming & Spa Demo View Live Demo" [ref=e360] [cursor=pointer]:
+            - /url: /demo/pet-grooming
+            - img "Pet Grooming & Spa Demo" [ref=e361]
+            - generic [ref=e364]:
+              - img [ref=e365]
+              - text: View Live Demo
+    - generic [ref=e376]:
+      - generic [ref=e377]: 🚀
+      - heading "Ready to Build Beautiful Interfaces?" [level=2] [ref=e378]
+      - paragraph [ref=e379]: Get started with UI UX Pro Max skill for Claude Code. Design intelligence at your fingertips.
+      - generic [ref=e380]:
+        - link "Get on GitHub" [ref=e381] [cursor=pointer]:
+          - /url: https://github.com/nextlevelbuilder/ui-ux-pro-max-skill
+          - img [ref=e382]
+          - text: Get on GitHub
+        - link "Learn More" [ref=e384] [cursor=pointer]:
+          - /url: "#features"
+      - generic [ref=e385]:
+        - generic [ref=e386]:
+          - generic [ref=e387]: ✓
+          - generic [ref=e388]: Open Source
+        - generic [ref=e389]:
+          - generic [ref=e390]: ✓
+          - generic [ref=e391]: Claude Code Compatible
+        - generic [ref=e392]:
+          - generic [ref=e393]: ✓
+          - generic [ref=e394]: Production Ready
+  - contentinfo [ref=e395]:
+    - generic [ref=e397]:
+      - generic [ref=e398]:
+        - generic [ref=e399]:
+          - generic [ref=e400]:
+            - img [ref=e401]
+            - generic [ref=e408]: UI UX Pro Max
+          - paragraph [ref=e409]: Design intelligence skill for Claude Code. Searchable database of UI styles, color palettes, font pairings, and UX guidelines.
+          - link "GitHub" [ref=e411] [cursor=pointer]:
+            - /url: https://github.com/nextlevelbuilder/ui-ux-pro-max-skill
+            - img [ref=e412]
+        - generic [ref=e414]:
+          - heading "Resources" [level=4] [ref=e415]
+          - list [ref=e416]:
+            - listitem [ref=e417]:
+              - link "Features" [ref=e418] [cursor=pointer]:
+                - /url: "#features"
+            - listitem [ref=e419]:
+              - link "Tech Stacks" [ref=e420] [cursor=pointer]:
+                - /url: "#stacks"
+            - listitem [ref=e421]:
+              - link "Style Gallery" [ref=e422] [cursor=pointer]:
+                - /url: "#styles"
+        - generic [ref=e423]:
+          - heading "Database" [level=4] [ref=e424]
+          - list [ref=e425]:
+            - listitem [ref=e426]: 57 UI Styles
+            - listitem [ref=e427]: 95 Color Palettes
+            - listitem [ref=e428]: 56 Font Pairings
+            - listitem [ref=e429]: 24 Chart Types
+            - listitem [ref=e430]: 8 Tech Stacks
+      - generic [ref=e431]:
+        - paragraph [ref=e432]: Built with React + Tailwind CSS (by UI UX Pro Max)
+        - paragraph [ref=e433]: A nano project from NextLevelBuilder Core Team
