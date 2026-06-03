@@ -1,5 +1,6 @@
 import { CheckoutButton } from "@/components/checkout-button";
 import { Disclaimer } from "@/components/disclaimer";
+import { SaleCountdown } from "@/components/sale-countdown";
 import { PRODUCT, INCLUDED } from "@/lib/product";
 import type { Outcome, ScanResult } from "@/lib/longevity";
 
@@ -162,6 +163,10 @@ export function GuidePitch({ result }: { result?: ScanResult }) {
                 ${PRODUCT.price}
               </span>
             </div>
+            <span className="mt-1 font-mono text-xs text-monitor-muted">
+              This price is held for{" "}
+              <SaleCountdown className="text-monitor-accent" />
+            </span>
           </div>
           <CheckoutButton />
         </div>

@@ -5,6 +5,8 @@ import { QuizStep } from "@/components/quiz-step";
 import { AnalyzingSequence } from "@/components/analyzing-sequence";
 import { ReportCard } from "@/components/report-card";
 import { GuidePitch } from "@/components/guide-pitch";
+import { SaleCountdown } from "@/components/sale-countdown";
+import { PRODUCT } from "@/lib/product";
 import {
   QUESTIONS,
   getActiveQuestions,
@@ -100,12 +102,18 @@ export default function ScanPage() {
               <>Lock in the years you have.</>
             )}
           </span>
-          <button
-            onClick={scrollToPitch}
-            className="w-full rounded-md bg-monitor-accent px-6 py-2.5 text-sm font-semibold text-monitor-bg transition-colors hover:bg-monitor-accent/90 sm:w-auto"
-          >
-            Get my plan
-          </button>
+          <div className="flex w-full items-center gap-4 sm:w-auto">
+            <span className="hidden font-mono text-xs text-monitor-muted sm:inline">
+              ${PRODUCT.price} today, expires in{" "}
+              <SaleCountdown className="text-monitor-accent" />
+            </span>
+            <button
+              onClick={scrollToPitch}
+              className="w-full rounded-md bg-monitor-accent px-6 py-2.5 text-sm font-semibold text-monitor-bg transition-colors hover:bg-monitor-accent/90 sm:w-auto"
+            >
+              Get my plan
+            </button>
+          </div>
         </div>
       </div>
     </main>

@@ -2,6 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { CountUp } from "@/components/count-up";
+import { SaleCountdown } from "@/components/sale-countdown";
+import { PRODUCT } from "@/lib/product";
 import type { RiskFactor, ScanResult } from "@/lib/longevity";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -92,6 +94,12 @@ export function ReportCard({
             ? `Show me how to reclaim ${years} years`
             : "Show me my plan"}
         </Button>
+        <p className="mt-3 font-mono text-xs leading-relaxed text-monitor-muted">
+          Your full personalized plan is normally{" "}
+          <span className="line-through">${PRODUCT.listPrice}</span>.{" "}
+          <span className="text-monitor-fg">${PRODUCT.price} today</span>, locked in
+          for the next <SaleCountdown className="text-monitor-accent" />.
+        </p>
       </div>
 
       <p className="max-w-[60ch] text-base leading-relaxed text-monitor-fg">
