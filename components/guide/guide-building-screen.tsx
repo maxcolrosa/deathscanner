@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { TESTIMONIALS, TRANSFORMATIONS } from "@/lib/guide/testimonials";
 
-// Isolated pulsing dot — perpetual animation kept in its own component
+// Isolated pulsing dot, perpetual animation kept in its own component
 // so it never causes re-renders in the parent.
 function PulsingDot() {
   return (
