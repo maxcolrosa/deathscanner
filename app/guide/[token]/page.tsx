@@ -24,8 +24,8 @@ export default async function GuideTokenPage({
     return <GuideView guide={order.guide} token={token} />;
   }
 
-  // Auto-retry a failed or stuck generation in the background (idempotent).
-  if (order.status === "failed" || isStale(order)) {
+  // Auto-retry only orphaned/stuck generations in the background (idempotent).
+  if (order.status === "generating" && isStale(order)) {
     after(async () => {
       await generateGuide(token);
     });

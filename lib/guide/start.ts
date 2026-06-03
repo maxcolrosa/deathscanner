@@ -17,3 +17,8 @@ export async function startGuideGeneration(answers: Answers): Promise<{ token: s
   });
   return { token: order.token };
 }
+
+// Manual retry from the building screen's failed state. Idempotent.
+export async function retryGuideGeneration(token: string): Promise<void> {
+  await generateGuide(token);
+}

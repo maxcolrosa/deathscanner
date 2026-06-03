@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { TESTIMONIALS, TRANSFORMATIONS } from "@/lib/guide/testimonials";
+import { retryGuideGeneration } from "@/lib/guide/start";
 
 // Isolated pulsing dot, perpetual animation kept in its own component
 // so it never causes re-renders in the parent.
@@ -55,6 +56,74 @@ function TransformationSlot({ caption }: { caption: string }) {
   );
 }
 
+// Focused failed-state panel - terminal halt aesthetic, consistent with monitor theme.
+function FailedPanel({
+  token,
+  onRetried,
+}: {
+  token: string;
+  onRetried: () => void;
+}) {
+  const [isPending, startTransition] = useTransition();
+
+  function handleRetry() {
+    startTransition(async () => {
+      await retryGuideGeneration(token);
+      onRetried();
+    });
+  }
+
+  return (
+    <div className="relative overflow-hidden rounded-lg border border-monitor-line bg-monitor-panel px-8 py-10">
+      {/* Corner brackets - alert tint */}
+      <div aria-hidden className="pointer-events-none absolute inset-4">
+        <span className="absolute left-0 top-0 block h-5 w-5 border-l border-t border-monitor-alert/40" />
+        <span className="absolute right-0 top-0 block h-5 w-5 border-r border-t border-monitor-alert/40" />
+        <span className="absolute bottom-0 left-0 block h-5 w-5 border-b border-l border-monitor-alert/40" />
+        <span className="absolute bottom-0 right-0 block h-5 w-5 border-b border-r border-monitor-alert/40" />
+      </div>
+
+      <div className="flex flex-col gap-6">
+        {/* Status label */}
+        <div className="flex items-center gap-2.5">
+          <span className="font-mono text-xs text-monitor-alert">[ ! ]</span>
+          <span className="font-mono text-xs uppercase tracking-[0.18em] text-monitor-alert">
+            Generation fault
+          </span>
+        </div>
+
+        {/* Heading + descriptor */}
+        <div className="flex flex-col gap-2">
+          <h1 className="text-2xl font-semibold tracking-tight text-monitor-fg md:text-3xl">
+            Generation hit a snag
+          </h1>
+          <p className="max-w-[52ch] text-base leading-relaxed text-monitor-muted">
+            Something went wrong building your protocol. Your scan data is safe.
+            Hit retry and the system will try again from the top.
+          </p>
+        </div>
+
+        {/* Divider */}
+        <div className="h-px w-full bg-monitor-line" />
+
+        {/* Retry CTA */}
+        <div className="flex items-center gap-5">
+          <button
+            onClick={handleRetry}
+            disabled={isPending}
+            className="inline-flex items-center gap-2 rounded border border-monitor-accent bg-transparent px-5 py-2.5 font-mono text-sm text-monitor-accent transition-colors duration-200 hover:bg-monitor-accent/10 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isPending ? "Retrying..." : "Try again"}
+          </button>
+          <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-monitor-muted/60">
+            {isPending ? "Restarting synthesis" : "Restarts protocol synthesis"}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function GuideBuildingScreen({
   token,
   failed,
@@ -66,6 +135,9 @@ export function GuideBuildingScreen({
   const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
+    // Do not poll when in the failed state - it is terminal until the user retries.
+    if (failed) return;
+
     const tick = setInterval(() => setElapsed((s) => s + 1), 1000);
     const poll = setInterval(async () => {
       try {
@@ -74,7 +146,8 @@ export function GuideBuildingScreen({
         });
         if (!res.ok) return;
         const { status } = (await res.json()) as { status: string };
-        if (status === "ready") router.refresh();
+        // Refresh on ready OR failed so the server re-renders with the correct state.
+        if (status === "ready" || status === "failed") router.refresh();
       } catch {
         // transient; keep polling
       }
@@ -83,9 +156,17 @@ export function GuideBuildingScreen({
       clearInterval(tick);
       clearInterval(poll);
     };
-  }, [token, router]);
+  }, [token, router, failed]);
 
   const pct = Math.min(95, 20 + elapsed * 4);
+
+  if (failed) {
+    return (
+      <main className="mx-auto flex max-w-3xl flex-col gap-14 px-6 pt-20 pb-28">
+        <FailedPanel token={token} onRetried={() => router.refresh()} />
+      </main>
+    );
+  }
 
   return (
     <main className="mx-auto flex max-w-3xl flex-col gap-14 px-6 pt-20 pb-28">
@@ -94,7 +175,7 @@ export function GuideBuildingScreen({
         <div className="flex items-center gap-2.5">
           <PulsingDot />
           <span className="font-mono text-xs uppercase tracking-[0.18em] text-monitor-accent">
-            {failed ? "Rebuilding your protocol" : "Building your protocol"}
+            Building your protocol
           </span>
         </div>
 

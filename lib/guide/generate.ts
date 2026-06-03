@@ -15,8 +15,17 @@ async function produceGuide(answers: Answers): Promise<{ guide: GuideDoc; model:
     return { guide: buildFixtureGuide(result), model: "stub" };
   }
   const { system, user } = buildGuidePrompt(result, answers);
-  const raw = await requestGuide(system, user);
-  return { guide: GuideDocSchema.parse(raw), model: GUIDE_MODEL };
+  let lastError: unknown;
+  // One repair retry: a transient bad response (invalid JSON) gets a second chance.
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const raw = await requestGuide(system, user);
+      return { guide: GuideDocSchema.parse(raw), model: GUIDE_MODEL };
+    } catch (e) {
+      lastError = e;
+    }
+  }
+  throw lastError;
 }
 
 // Idempotent: safe to call again on a failed or stuck order; no-op once ready.

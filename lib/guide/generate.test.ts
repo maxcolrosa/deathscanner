@@ -61,6 +61,20 @@ describe("generateGuide", () => {
     expect(done?.error).toBeTruthy();
   });
 
+  it("retries once when the first model response is invalid, then succeeds", async () => {
+    process.env.ANTHROPIC_API_KEY = "sk-test";
+    delete process.env.GUIDE_STUB;
+    const valid = buildFixtureGuide(computeResult(answers));
+    (requestGuide as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce({ not: "a guide" })
+      .mockResolvedValueOnce(valid);
+    const order = await createOrder(answers);
+    await generateGuide(order.token);
+    const done = await getOrderByToken(order.token);
+    expect(requestGuide).toHaveBeenCalledTimes(2);
+    expect(done?.status).toBe("ready");
+  });
+
   it("is a no-op when the order is already ready", async () => {
     delete process.env.ANTHROPIC_API_KEY;
     const order = await createOrder(answers);
