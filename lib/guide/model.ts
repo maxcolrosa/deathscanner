@@ -13,7 +13,7 @@ export async function requestGuide(system: string, user: string): Promise<unknow
   const anthropic = new Anthropic();
   const res = await anthropic.messages.create({
     model: GUIDE_MODEL,
-    max_tokens: 8000,
+    max_tokens: 16000,
     system: [{ type: "text", text: system, cache_control: { type: "ephemeral" } }],
     tools: [
       {
