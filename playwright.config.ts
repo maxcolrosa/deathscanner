@@ -8,5 +8,11 @@ export default defineConfig({
     url: "http://localhost:3000",
     reuseExistingServer: true,
     timeout: 120000,
+    env: {
+      ...process.env,
+      GUIDE_STUB: "1",
+      SUPABASE_URL: "",
+      SUPABASE_SERVICE_ROLE_KEY: "",
+    },
   },
 });
