@@ -1658,14 +1658,19 @@ git commit -m "feat: wire buy button to guide generation; AI-content disclosure 
 
 - [ ] **Step 1: Force the stub generator in the e2e web server**
 
-In `playwright.config.ts`, update the `webServer` block to inject `GUIDE_STUB`:
+In `playwright.config.ts`, update the `webServer` block to inject `GUIDE_STUB` and force the in-memory order store (blank Supabase env), so the smoke test is hermetic and never writes to the real database. Next does not override already-set `process.env` values from `.env` files, so passing empty strings here wins over `.env.local`:
 ```ts
   webServer: {
     command: "npm run dev",
     url: "http://localhost:3000",
     reuseExistingServer: true,
     timeout: 120000,
-    env: { ...process.env, GUIDE_STUB: "1" },
+    env: {
+      ...process.env,
+      GUIDE_STUB: "1",
+      SUPABASE_URL: "",
+      SUPABASE_SERVICE_ROLE_KEY: "",
+    },
   },
 ```
 
