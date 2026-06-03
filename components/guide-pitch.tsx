@@ -1,6 +1,8 @@
+"use client";
+
 import { CheckoutButton } from "@/components/checkout-button";
-import { Disclaimer } from "@/components/disclaimer";
 import { SaleCountdown } from "@/components/sale-countdown";
+import { useSale } from "@/components/sale-context";
 import { PRODUCT, INCLUDED } from "@/lib/product";
 import type { Outcome, ScanResult } from "@/lib/longevity";
 
@@ -35,6 +37,7 @@ function formatYears(years: number): string {
 }
 
 export function GuidePitch({ result }: { result?: ScanResult }) {
+  const { price, listPrice, expired } = useSale();
   const recoverableYears = result?.recoverableYears ?? 0;
   const outcomes = result?.outcomes?.length ? result.outcomes : GENERIC_OUTCOMES;
   const topRisk = result?.topRisks?.[0];
@@ -153,19 +156,25 @@ export function GuidePitch({ result }: { result?: ScanResult }) {
               Total value <span className="line-through">${PRODUCT.stackValue}</span>
             </span>
             <span className="font-mono text-sm text-monitor-muted">
-              Normally <span className="line-through">${PRODUCT.listPrice}</span>
+              Normally <span className="line-through">${listPrice}</span>
             </span>
             <div className="mt-2 flex items-baseline gap-2">
               <span className="font-mono text-xs uppercase tracking-[0.18em] text-monitor-accent">
                 Today
               </span>
               <span className="font-mono text-6xl tracking-tighter text-monitor-fg">
-                ${PRODUCT.price}
+                ${price}
               </span>
             </div>
             <span className="mt-1 font-mono text-xs text-monitor-muted">
-              This price is held for{" "}
-              <SaleCountdown className="text-monitor-accent" />
+              {expired ? (
+                "The launch price has ended."
+              ) : (
+                <>
+                  This price is held for{" "}
+                  <SaleCountdown className="text-monitor-accent" />
+                </>
+              )}
             </span>
           </div>
           <CheckoutButton />
@@ -179,11 +188,9 @@ export function GuidePitch({ result }: { result?: ScanResult }) {
               : `The hardest part is starting. For less than the cost of a week of takeout, start today.`}
           </p>
           <CheckoutButton
-            label={`Start reclaiming your years for $${PRODUCT.price}`}
+            label={`Start reclaiming your years for $${price}`}
           />
         </div>
-
-        <Disclaimer className="max-w-[60ch]" />
       </div>
     </section>
   );

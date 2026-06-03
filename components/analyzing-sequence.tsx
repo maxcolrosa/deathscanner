@@ -2,51 +2,57 @@
 
 import { useEffect, useState } from "react";
 import { animate, useReducedMotion } from "motion/react";
+import { analysisSignals, type Answers } from "@/lib/longevity";
 
-// Staged, deliberately unhurried log so the analysis reads as real work being
-// done. Mixes AI-model language with clinical/health terminology.
-const STAGES: { label: string; lines: string[] }[] = [
-  {
-    label: "Intake",
-    lines: [
-      "Loading AI longevity model v4.2...",
-      "Normalizing your 11 health markers...",
-      "Validating biometric inputs...",
-    ],
-  },
-  {
-    label: "Risk scoring",
-    lines: [
-      "Scoring cardiovascular and metabolic risk...",
-      "Weighting tobacco, body composition, and activity...",
-      "Estimating your biological age...",
-    ],
-  },
-  {
-    label: "Simulation",
-    lines: [
-      "Cross-referencing 2.1M actuarial mortality records...",
-      "Running 10,000 survival simulations...",
-      "Separating modifiable risk from fixed risk...",
-    ],
-  },
-  {
-    label: "Projection",
-    lines: [
-      "Calibrating the 94% confidence interval...",
-      "Compiling your longevity report...",
-    ],
-  },
+const PHASES = ["Intake", "Risk scoring", "Simulation", "Projection"];
+
+const MIDDLE_POOL = [
+  "Normalizing your health markers...",
+  "Validating biometric inputs...",
+  "Scoring cardiovascular and metabolic risk...",
+  "Estimating your biological age...",
+  "Cross-referencing 2.1M actuarial mortality records...",
+  "Running 10,000 survival simulations...",
+  "Separating modifiable risk from fixed risk...",
+  "Calibrating the confidence interval...",
 ];
 
-const FLAT_LINES = STAGES.flatMap((s) => s.lines);
-const STAGE_OF_LINE = STAGES.flatMap((s) => s.lines.map(() => s.label));
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Built fresh on each mount: the personalized lines vary by user (their answers)
+// and the order is randomized, so two runs never look identical.
+function buildLines(answers: Answers): string[] {
+  const personalized = shuffle(analysisSignals(answers))
+    .slice(0, 3)
+    .map((s) => `Flagging ${s} as a contributor...`);
+  const middle = shuffle(MIDDLE_POOL).slice(0, 4);
+  const body = shuffle([...middle, ...personalized]);
+  return [
+    "Loading AI longevity model v4.2...",
+    ...body,
+    "Compiling your longevity report...",
+  ];
+}
 
 const LINE_INTERVAL_MS = 720;
 const TAIL_MS = 1000;
 
-export function AnalyzingSequence({ onComplete }: { onComplete: () => void }) {
+export function AnalyzingSequence({
+  answers,
+  onComplete,
+}: {
+  answers: Answers;
+  onComplete: () => void;
+}) {
   const reduce = useReducedMotion();
+  const [lines] = useState(() => buildLines(answers));
   const [visibleLines, setVisibleLines] = useState(0);
   const [progress, setProgress] = useState(0);
 
@@ -56,11 +62,11 @@ export function AnalyzingSequence({ onComplete }: { onComplete: () => void }) {
       return;
     }
 
-    const timers = FLAT_LINES.map((_, i) =>
+    const timers = lines.map((_, i) =>
       setTimeout(() => setVisibleLines(i + 1), LINE_INTERVAL_MS * (i + 1))
     );
 
-    const durationS = (LINE_INTERVAL_MS * FLAT_LINES.length + TAIL_MS) / 1000;
+    const durationS = (LINE_INTERVAL_MS * lines.length + TAIL_MS) / 1000;
     const controls = animate(0, 100, {
       duration: durationS,
       ease: "linear",
@@ -72,11 +78,10 @@ export function AnalyzingSequence({ onComplete }: { onComplete: () => void }) {
       timers.forEach(clearTimeout);
       controls.stop();
     };
-  }, [reduce, onComplete]);
+  }, [reduce, onComplete, lines]);
 
-  const currentStage =
-    visibleLines > 0 ? STAGE_OF_LINE[visibleLines - 1] : STAGES[0].label;
-  const shown = FLAT_LINES.slice(0, visibleLines);
+  const phase = PHASES[Math.min(PHASES.length - 1, Math.floor((progress / 100) * PHASES.length))];
+  const shown = lines.slice(0, visibleLines);
 
   return (
     <div className="mx-auto flex min-h-[100dvh] max-w-2xl flex-col justify-center gap-8 px-6 py-16">
@@ -89,10 +94,10 @@ export function AnalyzingSequence({ onComplete }: { onComplete: () => void }) {
         </h2>
       </div>
 
-      <div className="min-h-[260px] rounded-lg border border-monitor-line bg-monitor-panel p-6 font-mono text-sm">
+      <div className="min-h-[280px] rounded-lg border border-monitor-line bg-monitor-panel p-6 font-mono text-sm">
         <div className="mb-4 flex items-center justify-between text-xs text-monitor-muted">
           <span className="uppercase tracking-[0.14em] text-monitor-accent">
-            {currentStage}
+            {phase}
           </span>
           <span>{Math.round(progress)}%</span>
         </div>

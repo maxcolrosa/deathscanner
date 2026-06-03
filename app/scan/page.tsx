@@ -5,8 +5,8 @@ import { QuizStep } from "@/components/quiz-step";
 import { AnalyzingSequence } from "@/components/analyzing-sequence";
 import { ReportCard } from "@/components/report-card";
 import { GuidePitch } from "@/components/guide-pitch";
-import { SaleCountdown } from "@/components/sale-countdown";
-import { PRODUCT } from "@/lib/product";
+import { ResultStickyBar } from "@/components/result-sticky-bar";
+import { SaleProvider } from "@/components/sale-context";
 import {
   QUESTIONS,
   getActiveQuestions,
@@ -75,47 +75,25 @@ export default function ScanPage() {
   }
 
   if (phase === "analyzing") {
-    return <AnalyzingSequence onComplete={handleAnalysisComplete} />;
+    return (
+      <AnalyzingSequence answers={answers} onComplete={handleAnalysisComplete} />
+    );
   }
 
-  const recoverable = result!.recoverableYears;
-
+  // The SaleProvider mounts here, so the countdown starts when the result lands
+  // and resets on refresh or a fresh scan (it is not persisted).
   return (
-    <main className="pb-24">
-      <ReportCard result={result!} onSeePlan={scrollToPitch} />
-      <div ref={pitchRef}>
-        <GuidePitch result={result!} />
-      </div>
-
-      {/* Persistent conversion bar so the offer is always one tap away. */}
-      <div className="fixed inset-x-0 bottom-0 z-50 border-t border-monitor-line bg-monitor-bg/95 backdrop-blur">
-        <div className="mx-auto flex max-w-3xl flex-col items-center gap-3 px-6 py-3 sm:flex-row sm:justify-between">
-          <span className="text-sm text-monitor-fg">
-            {recoverable > 0 ? (
-              <>
-                <span className="font-mono text-monitor-accent">
-                  {recoverable.toFixed(0)} years
-                </span>{" "}
-                are still on the table.
-              </>
-            ) : (
-              <>Lock in the years you have.</>
-            )}
-          </span>
-          <div className="flex w-full items-center gap-4 sm:w-auto">
-            <span className="hidden font-mono text-xs text-monitor-muted sm:inline">
-              ${PRODUCT.price} today, expires in{" "}
-              <SaleCountdown className="text-monitor-accent" />
-            </span>
-            <button
-              onClick={scrollToPitch}
-              className="w-full rounded-md bg-monitor-accent px-6 py-2.5 text-sm font-semibold text-monitor-bg transition-colors hover:bg-monitor-accent/90 sm:w-auto"
-            >
-              Get my plan
-            </button>
-          </div>
+    <SaleProvider>
+      <main className="pb-24">
+        <ReportCard result={result!} onSeePlan={scrollToPitch} />
+        <div ref={pitchRef}>
+          <GuidePitch result={result!} />
         </div>
-      </div>
-    </main>
+        <ResultStickyBar
+          recoverableYears={result!.recoverableYears}
+          onGetPlan={scrollToPitch}
+        />
+      </main>
+    </SaleProvider>
   );
 }

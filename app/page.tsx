@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { MonitorVisual } from "@/components/monitor-visual";
-import { Disclaimer } from "@/components/disclaimer";
 import { cn } from "@/lib/utils";
 
 export default function Home() {
@@ -36,7 +35,6 @@ export default function Home() {
               Takes about 90 seconds
             </span>
           </div>
-          <Disclaimer className="mt-2 max-w-[55ch]" />
         </div>
 
         <MonitorVisual />

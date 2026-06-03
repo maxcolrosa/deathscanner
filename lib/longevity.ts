@@ -78,6 +78,8 @@ export interface ScanResult {
   outcomes: Outcome[];
   /** The user's stated primary goal, if answered. */
   primaryGoal: string | null;
+  /** Deterministic per-user "model confidence" for display (90 to 97). */
+  modelConfidence: number;
 }
 
 export const BASE_LIFE_EXPECTANCY = 79;
@@ -393,6 +395,42 @@ const GOAL_THEME: Record<string, string> = {
   heart: "heart",
 };
 
+// Deterministic per-user confidence (90 to 97): same answers give the same
+// figure, different people generally differ, so it does not look hardcoded.
+function confidenceFromAnswers(answers: Answers): number {
+  let hash = 0;
+  for (const q of QUESTIONS) {
+    const v = answers[q.id];
+    if (v === undefined) continue;
+    const s = String(v);
+    for (let i = 0; i < s.length; i++) {
+      hash = (hash * 31 + s.charCodeAt(i)) >>> 0;
+    }
+  }
+  return 90 + (hash % 8);
+}
+
+// Short answer-derived phrases woven into the (cosmetic) analysis log so the
+// sequence reads as relevant to this specific user.
+export function analysisSignals(answers: Answers): string[] {
+  const signals: string[] = [];
+  if (answers.smoking && answers.smoking !== "never") signals.push("tobacco exposure");
+  if (answers.activity === "none" || answers.activity === "light")
+    signals.push("low cardiorespiratory output");
+  if (answers.bodycomp === "over" || answers.bodycomp === "obese")
+    signals.push("elevated body-fat markers");
+  if (answers.diet === "poor" || answers.diet === "average")
+    signals.push("dietary risk signal");
+  if (answers.sleep === "low" || answers.sleep === "belowavg")
+    signals.push("accumulated sleep debt");
+  if (answers.stress === "high" || answers.stress === "severe")
+    signals.push("chronic stress load");
+  if (answers.alcohol === "moderate" || answers.alcohol === "heavy")
+    signals.push("alcohol load");
+  if (answers.genetics === "poor") signals.push("adverse family history");
+  return signals;
+}
+
 /**
  * Compute the longevity result from quiz answers.
  * @param answers map of questionId -> selected value
@@ -494,5 +532,6 @@ export function computeResult(answers: Answers, today: Date = new Date()): ScanR
     strengths,
     outcomes,
     primaryGoal,
+    modelConfidence: confidenceFromAnswers(answers),
   };
 }

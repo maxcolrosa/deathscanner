@@ -3,6 +3,7 @@ import {
   QUESTIONS,
   computeResult,
   getActiveQuestions,
+  analysisSignals,
   BASE_LIFE_EXPECTANCY,
   MAX_LIFE_EXPECTANCY,
   type Answers,
@@ -96,6 +97,16 @@ describe("getActiveQuestions (branching)", () => {
     expect(getActiveQuestions({ activity: "high" }).map((q) => q.id)).not.toContain(
       "activity_barrier"
     );
+  });
+});
+
+describe("analysisSignals", () => {
+  it("derives answer-specific signals so two profiles differ", () => {
+    const smoker = analysisSignals({ smoking: "heavy", activity: "none" });
+    const clean = analysisSignals({ smoking: "never", activity: "high" });
+    expect(smoker).toContain("tobacco exposure");
+    expect(clean).not.toContain("tobacco exposure");
+    expect(smoker).not.toEqual(clean);
   });
 });
 
@@ -215,6 +226,15 @@ describe("computeResult", () => {
     const result = computeResult(answers, FIXED_TODAY);
     expect(result.outcomes[0].id).toBe("fat");
     expect(result.primaryGoal).toBe("fat");
+  });
+
+  it("produces a per-user model confidence in 90 to 97, deterministically", () => {
+    const answers = buildAnswers(35, 1);
+    const a = computeResult(answers, FIXED_TODAY).modelConfidence;
+    const b = computeResult(answers, FIXED_TODAY).modelConfidence;
+    expect(a).toBe(b);
+    expect(a).toBeGreaterThanOrEqual(90);
+    expect(a).toBeLessThanOrEqual(97);
   });
 
   it("returns one factor per scored, active choice question", () => {

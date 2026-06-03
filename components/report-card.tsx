@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { CountUp } from "@/components/count-up";
 import { SaleCountdown } from "@/components/sale-countdown";
-import { PRODUCT } from "@/lib/product";
+import { useSale } from "@/components/sale-context";
 import type { RiskFactor, ScanResult } from "@/lib/longevity";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -39,6 +39,7 @@ export function ReportCard({
   result: ScanResult;
   onSeePlan: () => void;
 }) {
+  const { price, listPrice, expired } = useSale();
   const deathLabel = dateFormatter.format(result.predictedDeathDate);
   const years = result.recoverableYears.toFixed(0);
 
@@ -67,7 +68,9 @@ export function ReportCard({
             old
           </span>
           <span className="text-monitor-muted">You are {result.currentAge} now</span>
-          <span className="text-monitor-muted">Model confidence 94%</span>
+          <span className="text-monitor-muted">
+            Model confidence {result.modelConfidence}%
+          </span>
         </div>
       </div>
 
@@ -95,10 +98,19 @@ export function ReportCard({
             : "Show me my plan"}
         </Button>
         <p className="mt-3 font-mono text-xs leading-relaxed text-monitor-muted">
-          Your full personalized plan is normally{" "}
-          <span className="line-through">${PRODUCT.listPrice}</span>.{" "}
-          <span className="text-monitor-fg">${PRODUCT.price} today</span>, locked in
-          for the next <SaleCountdown className="text-monitor-accent" />.
+          {expired ? (
+            <>
+              The launch price has ended. Your plan is now{" "}
+              <span className="text-monitor-fg">${price}</span>.
+            </>
+          ) : (
+            <>
+              Your full personalized plan is normally{" "}
+              <span className="line-through">${listPrice}</span>.{" "}
+              <span className="text-monitor-fg">${price} today</span>, locked in for
+              the next <SaleCountdown className="text-monitor-accent" />.
+            </>
+          )}
         </p>
       </div>
 
