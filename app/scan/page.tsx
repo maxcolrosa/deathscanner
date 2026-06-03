@@ -12,6 +12,7 @@ import {
   getActiveQuestions,
   computeResult,
   type Answers,
+  type AnswerValue,
 } from "@/lib/longevity";
 
 type Phase = "quiz" | "analyzing" | "result";
@@ -29,7 +30,7 @@ export default function ScanPage() {
   );
   const question = active[pos] ?? active[0];
 
-  const handleChange = (value: string | number) => {
+  const handleChange = (value: AnswerValue) => {
     setAnswers((prev) => ({ ...prev, [question.id]: value }));
   };
 

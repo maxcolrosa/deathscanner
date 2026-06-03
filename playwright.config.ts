@@ -10,7 +10,7 @@ export default defineConfig({
     timeout: 120000,
     env: {
       ...process.env,
-      GUIDE_STUB: "1",
+      // Force the in-process order store so e2e never touches a real Supabase.
       SUPABASE_URL: "",
       SUPABASE_SERVICE_ROLE_KEY: "",
     },

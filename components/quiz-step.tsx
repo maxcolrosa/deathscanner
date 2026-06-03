@@ -2,16 +2,53 @@
 
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
-import type { QuizQuestion } from "@/lib/longevity";
+import type { AnswerValue, QuizOption, QuizQuestion } from "@/lib/longevity";
+import { toValues } from "@/lib/longevity";
 
 interface QuizStepProps {
   question: QuizQuestion;
   index: number;
   total: number;
-  value: string | number | undefined;
-  onChange: (value: string | number) => void;
+  value: AnswerValue | undefined;
+  onChange: (value: AnswerValue) => void;
   onNext: () => void;
   onBack: () => void;
+}
+
+function CheckMark() {
+  return (
+    <svg
+      aria-hidden
+      width="11"
+      height="11"
+      viewBox="0 0 12 12"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M2 6.5l2.5 2.5L10 3" />
+    </svg>
+  );
+}
+
+function nextMultiValue(
+  options: QuizOption[],
+  selected: string[],
+  toggled: string
+): string[] {
+  const opt = options.find((o) => o.value === toggled);
+  if (selected.includes(toggled)) {
+    return selected.filter((v) => v !== toggled);
+  }
+  // Selecting an exclusive option ("None") clears the rest; selecting any other
+  // option clears whatever exclusive option was set.
+  if (opt?.exclusive) return [toggled];
+  const withoutExclusive = selected.filter(
+    (v) => !options.find((o) => o.value === v)?.exclusive
+  );
+  return [...withoutExclusive, toggled];
 }
 
 export function QuizStep({
@@ -24,14 +61,18 @@ export function QuizStep({
   onBack,
 }: QuizStepProps) {
   const progress = Math.round(((index + 1) / total) * 100);
+  const selected = toValues(value);
 
   const ageValid =
     question.kind === "age" &&
     typeof value === "number" &&
     value >= (question.min ?? 0) &&
     value <= (question.max ?? 200);
-  const choiceValid = question.kind === "choice" && typeof value === "string";
-  const canAdvance = ageValid || choiceValid;
+  const singleChoiceValid =
+    question.kind === "choice" && !question.multi && typeof value === "string";
+  const multiChoiceValid =
+    question.kind === "choice" && Boolean(question.multi) && selected.length >= 1;
+  const canAdvance = ageValid || singleChoiceValid || multiChoiceValid;
 
   return (
     <div className="mx-auto flex min-h-[100dvh] max-w-2xl flex-col justify-center gap-8 px-6 py-16">
@@ -88,6 +129,45 @@ export function QuizStep({
               Enter an age between {question.min} and {question.max}.
             </p>
           ) : null}
+        </div>
+      ) : question.multi ? (
+        // Multi-select: checkbox-style buttons. Each selection is scored (or, for
+        // unscored questions, personalizes the plan). aria-checked exposes state.
+        <div role="group" aria-label={question.prompt} className="flex flex-col gap-3">
+          {question.options!.map((option) => {
+            const isOn = selected.includes(option.value);
+            return (
+              <button
+                key={option.value}
+                type="button"
+                role="checkbox"
+                aria-checked={isOn}
+                onClick={() =>
+                  onChange(nextMultiValue(question.options!, selected, option.value))
+                }
+                className={[
+                  "flex cursor-pointer items-center gap-3 rounded-md border bg-monitor-panel px-4 py-4 text-left text-monitor-fg",
+                  "transition-colors duration-200 active:scale-[0.99]",
+                  isOn
+                    ? "border-monitor-accent bg-monitor-accent/[0.06]"
+                    : "border-monitor-line hover:border-monitor-accent/60",
+                ].join(" ")}
+              >
+                <span
+                  aria-hidden
+                  className={[
+                    "flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[4px] border transition-colors",
+                    isOn
+                      ? "border-monitor-accent bg-monitor-accent text-monitor-bg"
+                      : "border-monitor-line text-transparent",
+                  ].join(" ")}
+                >
+                  <CheckMark />
+                </span>
+                <span>{option.label}</span>
+              </button>
+            );
+          })}
         </div>
       ) : (
         // base-ui RadioGroup: controlled via `value` + `onValueChange`.

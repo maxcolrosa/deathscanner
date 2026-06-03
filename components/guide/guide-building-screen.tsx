@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { TESTIMONIALS } from "@/lib/guide/testimonials";
 import { retryGuideGeneration } from "@/lib/guide/start";
@@ -17,18 +17,25 @@ function PulsingDot() {
   );
 }
 
+// Generation is actually instant. We hold the build screen for a minimum
+// duration so the protocol feels custom-built for this user rather than
+// snapping in. The phases below are paced to land within that window.
+const MIN_BUILD_MS = 8500;
+
 const BUILD_PHASES = [
-  "Analyzing your risk factors",
-  "Designing your training block",
-  "Building your nutrition reset",
+  "Reading your risk profile",
+  "Mapping your recoverable years",
+  "Building your custom workout plan",
+  "Writing your nutrition plan",
   "Personalizing your daily routine",
-  "Writing your first 7 days",
-  "Finalizing your protocol",
+  "Compiling your protocol and PDF",
 ];
 
-function RotatingStatus({ elapsed }: { elapsed: number }) {
-  // Advance one phase every 4 seconds, holding on the last one.
-  const index = Math.min(BUILD_PHASES.length - 1, Math.floor(elapsed / 4));
+function RotatingStatus({ ms }: { ms: number }) {
+  // Advance through every phase across the minimum build window, holding the
+  // last one if generation runs long.
+  const per = MIN_BUILD_MS / BUILD_PHASES.length;
+  const index = Math.min(BUILD_PHASES.length - 1, Math.floor(ms / per));
   return (
     <span className="font-mono text-xs text-monitor-muted">
       {BUILD_PHASES[index]}
@@ -113,13 +120,31 @@ export function GuideBuildingScreen({
   failed?: boolean;
 }) {
   const router = useRouter();
-  const [elapsed, setElapsed] = useState(0);
+  const [ms, setMs] = useState(0);
+  // Generation status, captured from polling. We hold the reveal until both the
+  // guide is ready and the minimum build window has elapsed.
+  const readyRef = useRef<null | "ready" | "failed">(null);
+  const revealedRef = useRef(false);
 
   useEffect(() => {
     // Do not poll when in the failed state - it is terminal until the user retries.
     if (failed) return;
 
-    const tick = setInterval(() => setElapsed((s) => s + 1), 1000);
+    const start = Date.now();
+    const tick = setInterval(() => {
+      const elapsedMs = Date.now() - start;
+      setMs(elapsedMs);
+      // Reveal once the guide is ready AND we have shown the build long enough.
+      if (
+        !revealedRef.current &&
+        readyRef.current === "ready" &&
+        elapsedMs >= MIN_BUILD_MS
+      ) {
+        revealedRef.current = true;
+        router.refresh();
+      }
+    }, 250);
+
     const poll = setInterval(async () => {
       try {
         const res = await fetch(`/api/guide/${token}/status`, {
@@ -127,19 +152,27 @@ export function GuideBuildingScreen({
         });
         if (!res.ok) return;
         const { status } = (await res.json()) as { status: string };
-        // Refresh on ready OR failed so the server re-renders with the correct state.
-        if (status === "ready" || status === "failed") router.refresh();
+        if (status === "ready" || status === "failed") {
+          readyRef.current = status;
+          // A genuine failure should surface immediately, not after the timer.
+          if (status === "failed" && !revealedRef.current) {
+            revealedRef.current = true;
+            router.refresh();
+          }
+        }
       } catch {
         // transient; keep polling
       }
-    }, 2500);
+    }, 1500);
+
     return () => {
       clearInterval(tick);
       clearInterval(poll);
     };
   }, [token, router, failed]);
 
-  const pct = Math.min(95, 20 + elapsed * 4);
+  const elapsed = Math.floor(ms / 1000);
+  const pct = Math.min(96, Math.round((ms / MIN_BUILD_MS) * 88) + 8);
 
   if (failed) {
     return (
@@ -183,7 +216,7 @@ export function GuideBuildingScreen({
               {pct.toFixed(0)}% &nbsp;&bull;&nbsp; {elapsed}s elapsed
             </span>
           </div>
-          <RotatingStatus elapsed={elapsed} />
+          <RotatingStatus ms={ms} />
         </div>
       </div>
 
@@ -207,9 +240,12 @@ export function GuideBuildingScreen({
                 <p className="text-base leading-relaxed text-monitor-fg">
                   &ldquo;{t.quote}&rdquo;
                 </p>
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-                  <span className="font-mono text-xs text-monitor-muted">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <span className="font-mono text-xs font-semibold text-monitor-fg">
                     {t.name}
+                  </span>
+                  <span className="font-mono text-[11px] text-monitor-muted">
+                    {t.meta}
                   </span>
                   <span className="font-mono text-xs text-monitor-accent">
                     {t.detail}

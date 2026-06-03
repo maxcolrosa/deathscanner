@@ -1,4 +1,4 @@
-import type { GuideDoc } from "@/lib/guide/schema";
+import type { DeepDive, GuideDoc } from "@/lib/guide/schema";
 
 /* ─── Design constants ───────────────────────────────────────────────────── */
 // DESIGN_VARIANCE: 8 | MOTION_INTENSITY: 6 (CSS cubic-bezier cascades)
@@ -79,6 +79,37 @@ function Badge({ children }: { children: React.ReactNode }) {
     <span className="inline-flex items-center font-mono text-[11px] text-monitor-accent bg-monitor-accent/8 border border-monitor-accent/20 rounded px-1.5 py-0.5 leading-none">
       {children}
     </span>
+  );
+}
+
+/* ─── Deep-dive block ────────────────────────────────────────────────────── */
+// The recurring "depth" unit: the problem, why it matters, what changes when
+// fixed, then the actions. A left accent rail ties the steps together.
+
+function DeepDiveBlock({ dive }: { dive: DeepDive }) {
+  const steps: { label: string; body: string }[] = [
+    { label: "The problem", body: dive.problem },
+    { label: "Why it matters", body: dive.why },
+    { label: "When you fix it", body: dive.whenFixed },
+  ];
+  return (
+    <div className="overflow-hidden rounded-xl border border-monitor-line bg-monitor-panel">
+      <div className="border-b border-monitor-line px-5 py-4">
+        <h3 className="text-base font-semibold tracking-tight text-monitor-fg">{dive.heading}</h3>
+      </div>
+      <div className="flex flex-col divide-y divide-monitor-line">
+        {steps.map((s) => (
+          <div key={s.label} className="flex flex-col gap-1.5 px-5 py-4">
+            <SubLabel>{s.label}</SubLabel>
+            <p className="text-sm leading-relaxed text-monitor-fg">{s.body}</p>
+          </div>
+        ))}
+        <div className="flex flex-col gap-2 bg-monitor-accent/[0.04] px-5 py-4">
+          <SubLabel>What to do</SubLabel>
+          <Bullets items={dive.actions} />
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -183,6 +214,7 @@ function WeekCard({ w, delay }: { w: GuideDoc["weeks"][number]; delay: number })
 /* ─── Main component ─────────────────────────────────────────────────────── */
 
 export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) {
+  const n = guide.nutritionPlan;
   return (
     <>
       {/* Keyframe injection: fixed pseudo-element, never repaints on scroll */}
@@ -254,7 +286,7 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
             >
               <path d="M7 1v8M4 6l3 3 3-3M1 10v1a2 2 0 002 2h8a2 2 0 002-2v-1" />
             </svg>
-            Download your PDF
+            Download your full PDF
           </a>
         </div>
 
@@ -277,8 +309,21 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
           <Bullets items={guide.outcomes} />
         </Section>
 
+        {/* ── Risk briefings (deep dives) ───────────────────────────────── */}
+        <Section title="Your biggest risks, in depth" index={3}>
+          <p className="max-w-[58ch] text-sm leading-relaxed text-monitor-muted">
+            For each of your largest modifiable risks: what is happening, why it
+            costs you, what improves when you fix it, and exactly what to do.
+          </p>
+          <div className="flex flex-col gap-4">
+            {guide.riskBriefings.map((d, i) => (
+              <DeepDiveBlock key={i} dive={d} />
+            ))}
+          </div>
+        </Section>
+
         {/* ── First 7 days ──────────────────────────────────────────────── */}
-        <Section title="Start here: your first 7 days" index={3}>
+        <Section title="Start here: your first 7 days" index={4}>
           <ol className="flex flex-col gap-0 divide-y divide-monitor-line border border-monitor-line rounded-xl overflow-hidden">
             {guide.next7Days.map((d, i) => (
               <li
@@ -301,8 +346,36 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
           </ol>
         </Section>
 
+        {/* ── How your training works ───────────────────────────────────── */}
+        <Section title="How your training works" index={5}>
+          <DeepDiveBlock dive={guide.training.approach} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-2 rounded-xl border border-monitor-line bg-monitor-panel p-5">
+              <SubLabel>Warm up first, every session</SubLabel>
+              <ul className="mt-1 flex flex-col divide-y divide-monitor-line">
+                {guide.training.warmup.map((m, i) => (
+                  <li key={i} className="flex items-baseline justify-between gap-4 py-2">
+                    <span className="text-sm text-monitor-fg">{m.name}</span>
+                    <span className="font-mono text-[11px] text-monitor-muted shrink-0">{m.detail}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="flex flex-col gap-2 rounded-xl border border-monitor-line bg-monitor-panel p-5">
+              <SubLabel>How to progress</SubLabel>
+              <div className="mt-1">
+                <Bullets items={guide.training.progressionRules} />
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col gap-1.5 rounded-xl border border-monitor-line bg-monitor-accent/[0.04] p-5">
+            <SubLabel>The deload week</SubLabel>
+            <p className="text-sm leading-relaxed text-monitor-fg">{guide.training.deload}</p>
+          </div>
+        </Section>
+
         {/* ── 8-week plan ───────────────────────────────────────────────── */}
-        <Section title="Your 8-week plan" index={4}>
+        <Section title="Your 8-week plan" index={6}>
           <div className="flex flex-col gap-4">
             {guide.weeks.map((w, i) => (
               <WeekCard key={w.week} w={w} delay={i * 50 + 100} />
@@ -311,38 +384,55 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
         </Section>
 
         {/* ── Nutrition plan ────────────────────────────────────────────── */}
-        <Section title="Your nutrition plan" index={5}>
-          <Bullets items={guide.nutritionPlan.principles} />
+        <Section title="Your nutrition plan" index={7}>
+          <DeepDiveBlock dive={n.philosophy} />
 
-          {/* Sample day grid table */}
-          <div className="rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden">
-            <div className="px-5 pt-4 pb-3 border-b border-monitor-line">
-              <SubLabel>A day on the plan</SubLabel>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1.5 rounded-xl border border-monitor-line bg-monitor-panel p-5">
+              <SubLabel>Your protein target</SubLabel>
+              <p className="text-sm leading-relaxed text-monitor-fg">{n.proteinTarget}</p>
             </div>
-            <dl className="flex flex-col divide-y divide-monitor-line">
-              {(
-                [
-                  ["Breakfast", guide.nutritionPlan.sampleDay.breakfast],
-                  ["Lunch", guide.nutritionPlan.sampleDay.lunch],
-                  ["Dinner", guide.nutritionPlan.sampleDay.dinner],
-                  ["Snacks", guide.nutritionPlan.sampleDay.snacks],
-                ] as const
-              ).map(([k, v]) => (
-                <div key={k} className="flex gap-4 px-5 py-3.5">
-                  <dt className="w-20 shrink-0 font-mono text-[10px] uppercase tracking-[0.14em] text-monitor-accent mt-[2px]">
-                    {k}
-                  </dt>
-                  <dd className="text-sm leading-relaxed text-monitor-fg">{v}</dd>
+            <div className="flex flex-col gap-1.5 rounded-xl border border-monitor-line bg-monitor-panel p-5">
+              <SubLabel>Hydration</SubLabel>
+              <p className="text-sm leading-relaxed text-monitor-fg">{n.hydration}</p>
+            </div>
+          </div>
+
+          <Bullets items={n.principles} />
+
+          {/* Sample days */}
+          <div className="flex flex-col gap-4">
+            {n.sampleDays.map((day, di) => (
+              <div key={di} className="rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden">
+                <div className="px-5 pt-4 pb-3 border-b border-monitor-line">
+                  <SubLabel>{day.label}</SubLabel>
                 </div>
-              ))}
-            </dl>
+                <dl className="flex flex-col divide-y divide-monitor-line">
+                  {(
+                    [
+                      ["Breakfast", day.breakfast],
+                      ["Lunch", day.lunch],
+                      ["Dinner", day.dinner],
+                      ["Snacks", day.snacks],
+                    ] as const
+                  ).map(([k, v]) => (
+                    <div key={k} className="flex gap-4 px-5 py-3.5">
+                      <dt className="w-20 shrink-0 font-mono text-[10px] uppercase tracking-[0.14em] text-monitor-accent mt-[2px]">
+                        {k}
+                      </dt>
+                      <dd className="text-sm leading-relaxed text-monitor-fg">{v}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            ))}
           </div>
 
           {/* Swaps */}
           <div className="flex flex-col gap-2">
             <SubLabel>Swaps</SubLabel>
             <div className="flex flex-col gap-1 mt-1">
-              {guide.nutritionPlan.swaps.map((s, i) => (
+              {n.swaps.map((s, i) => (
                 <div key={i} className="flex items-center gap-3 text-sm">
                   <span className="text-monitor-muted line-through">{s.from}</span>
                   <span aria-hidden className="font-mono text-[10px] text-monitor-accent/60">
@@ -354,17 +444,25 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
             </div>
           </div>
 
+          {/* Eating out */}
+          <div className="flex flex-col gap-2">
+            <SubLabel>Eating out without losing the week</SubLabel>
+            <div className="mt-1">
+              <Bullets items={n.eatingOut} />
+            </div>
+          </div>
+
           {/* Staples */}
           <div className="flex flex-col gap-2">
             <SubLabel>Grocery staples</SubLabel>
             <p className="text-sm leading-relaxed text-monitor-fg mt-1">
-              {guide.nutritionPlan.groceryStaples.join(", ")}
+              {n.groceryStaples.join(", ")}
             </p>
           </div>
         </Section>
 
         {/* ── Daily blueprint ───────────────────────────────────────────── */}
-        <Section title="Your daily blueprint" index={6}>
+        <Section title="Your daily blueprint" index={8}>
           <div className="rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden">
             <ul className="flex flex-col divide-y divide-monitor-line">
               {guide.dailyBlueprint.map((b, i) => (
@@ -380,13 +478,18 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
         </Section>
 
         {/* ── Sleep and stress ──────────────────────────────────────────── */}
-        <Section title="Sleep and stress recovery" index={7}>
-          <p className="text-sm leading-relaxed text-monitor-fg">{guide.sleepAndStress.summary}</p>
-          <Bullets items={guide.sleepAndStress.protocol} />
+        <Section title="Sleep and stress recovery" index={9}>
+          <DeepDiveBlock dive={guide.sleepAndStress.briefing} />
+          <div className="flex flex-col gap-2">
+            <SubLabel>Your protocol</SubLabel>
+            <div className="mt-1">
+              <Bullets items={guide.sleepAndStress.protocol} />
+            </div>
+          </div>
         </Section>
 
         {/* ── 10-minute fallback ────────────────────────────────────────── */}
-        <Section title="The 10-minute fallback" index={8}>
+        <Section title="The 10-minute fallback" index={10}>
           <p className="text-sm leading-relaxed text-monitor-fg">{guide.tenMinutePlan.summary}</p>
           <div className="rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden">
             <ul className="flex flex-col divide-y divide-monitor-line">
@@ -400,8 +503,16 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
           </div>
         </Section>
 
+        {/* ── Progress markers ──────────────────────────────────────────── */}
+        <Section title="How to know it is working" index={11}>
+          <p className="max-w-[58ch] text-sm leading-relaxed text-monitor-muted">
+            {guide.progressMarkers.summary}
+          </p>
+          <Bullets items={guide.progressMarkers.markers} />
+        </Section>
+
         {/* ── Troubleshooting ───────────────────────────────────────────── */}
-        <Section title="When it gets hard" index={9}>
+        <Section title="When it gets hard" index={12}>
           <div className="flex flex-col gap-3">
             {guide.troubleshooting.map((t, i) => (
               <div
@@ -419,8 +530,20 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
           </div>
         </Section>
 
+        {/* ── FAQs ──────────────────────────────────────────────────────── */}
+        <Section title="Common questions" index={13}>
+          <div className="flex flex-col divide-y divide-monitor-line rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden">
+            {guide.faqs.map((f, i) => (
+              <div key={i} className="flex flex-col gap-1.5 px-5 py-4">
+                <p className="text-sm font-semibold text-monitor-fg">{f.q}</p>
+                <p className="text-sm leading-relaxed text-monitor-muted">{f.a}</p>
+              </div>
+            ))}
+          </div>
+        </Section>
+
         {/* ── Recalibration ─────────────────────────────────────────────── */}
-        <Section title="Weekly recalibration" index={10}>
+        <Section title="Weekly recalibration" index={14}>
           <p className="text-sm leading-relaxed text-monitor-fg">{guide.recalibration}</p>
         </Section>
 

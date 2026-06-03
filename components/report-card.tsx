@@ -34,6 +34,8 @@ export function ReportCard({ result, answers }: { result: ScanResult; answers: A
   const { price, listPrice, expired } = useSale();
   const deathLabel = dateFormatter.format(result.predictedDeathDate);
   const years = result.recoverableYears.toFixed(0);
+  const belowAverage = result.yearsVsAverage < 0;
+  const vsAverageYears = Math.abs(result.yearsVsAverage).toFixed(1);
 
   return (
     <section className="mx-auto flex max-w-2xl flex-col gap-8 px-6 pt-20 pb-10">
@@ -53,6 +55,31 @@ export function ReportCard({ result, answers }: { result: ScanResult; answers: A
         <div className="mt-2 font-mono text-5xl tracking-tighter text-monitor-alert md:text-6xl">
           {deathLabel}
         </div>
+
+        {/* Population anchor: how far the estimate sits from the average. */}
+        <div
+          className={[
+            "mt-4 inline-flex items-center gap-2 rounded-md border px-3 py-1.5",
+            belowAverage
+              ? "border-monitor-alert/40 bg-monitor-alert/[0.06]"
+              : "border-monitor-accent/40 bg-monitor-accent/[0.06]",
+          ].join(" ")}
+        >
+          <span
+            aria-hidden
+            className={[
+              "block h-1.5 w-1.5 rounded-full",
+              belowAverage ? "bg-monitor-alert" : "bg-monitor-accent",
+            ].join(" ")}
+          />
+          <span className="font-mono text-xs tracking-tight text-monitor-fg">
+            <span className={belowAverage ? "text-monitor-alert" : "text-monitor-accent"}>
+              {vsAverageYears} years {belowAverage ? "below" : "above"}
+            </span>{" "}
+            the average for your age and sex
+          </span>
+        </div>
+
         <div className="mt-5 flex flex-wrap items-baseline gap-x-6 gap-y-2 font-mono text-sm text-monitor-fg">
           <span>
             Around <CountUp to={result.ageAtDeath} className="text-monitor-alert" /> years old
@@ -91,9 +118,10 @@ export function ReportCard({ result, answers }: { result: ScanResult; answers: A
           <div className="flex flex-col justify-center gap-3 px-6 py-6 md:border-r md:border-monitor-accent/20">
             {result.recoverableYears > 0 ? (
               <p className="text-base leading-relaxed text-monitor-fg">
-                That date is not fixed. Reversing your top risks could move it back by roughly{" "}
-                <span className="font-mono text-monitor-accent">{years} years</span>. Your
-                personalized protocol goes after them, in order.
+                That date is not fixed. Fixing your top risks could add back as much as{" "}
+                <span className="font-mono text-monitor-accent">{years} years</span>, and a
+                far better quality of life to live them in. Your personalized protocol goes
+                after them, in order.
               </p>
             ) : (
               <p className="text-base leading-relaxed text-monitor-fg">

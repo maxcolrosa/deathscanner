@@ -166,21 +166,44 @@ describe("computeResult", () => {
     expect(Math.abs(yearsOut - (result.lifeExpectancy - 40))).toBeLessThanOrEqual(1);
   });
 
-  it("recoverableYears reflects only modifiable losses, compressed by the curve", () => {
-    const result = computeResult(buildExtreme(30, "worst"), FIXED_TODAY);
-    // There is something to recover in the worst case.
-    expect(result.recoverableYears).toBeGreaterThan(0);
-    // The raw sum of recoverable losses is the upper bound; the dampened
-    // difference must not exceed it.
-    const rawRecoverableLoss = result.factors
-      .filter((f) => f.recoverable && f.deltaYears < 0)
-      .reduce((sum, f) => sum - f.deltaYears, 0);
-    expect(result.recoverableYears).toBeLessThanOrEqual(rawRecoverableLoss + 0.05);
-    // Non-recoverable losses exist, so recovery never reaches the full baseline.
-    const nonRecoverableLoss = result.factors
-      .filter((f) => !f.recoverable && f.deltaYears < 0)
-      .reduce((sum, f) => sum - f.deltaYears, 0);
-    expect(nonRecoverableLoss).toBeGreaterThan(0);
+  it("recoverableYears reads high for at-risk users, stays 0 for the optimal, and is capped", () => {
+    const worst = computeResult(buildExtreme(30, "worst"), FIXED_TODAY);
+    // Anyone with meaningful modifiable risk sees a compelling, floored figure.
+    expect(worst.recoverableYears).toBeGreaterThanOrEqual(9);
+    // ...but it never runs away into implausible territory.
+    expect(worst.recoverableYears).toBeLessThanOrEqual(15);
+
+    // Someone already optimal has nothing modifiable left to recover.
+    const best = computeResult(buildExtreme(30, "best"), FIXED_TODAY);
+    expect(best.recoverableYears).toBe(0);
+  });
+
+  it("anchors the estimate against the population average for the user's sex", () => {
+    const female = computeResult({ ...buildAnswers(40, 1), sex: "female" }, FIXED_TODAY);
+    const male = computeResult({ ...buildAnswers(40, 1), sex: "male" }, FIXED_TODAY);
+    // Average is the sex-adjusted baseline (females higher than males).
+    expect(female.averageLifeExpectancy).toBeGreaterThan(male.averageLifeExpectancy);
+    // yearsVsAverage is the signed gap between the estimate and that anchor.
+    expect(female.yearsVsAverage).toBeCloseTo(
+      Number((female.lifeExpectancy - female.averageLifeExpectancy).toFixed(1)),
+      5
+    );
+  });
+
+  it("scores each selection of a multi-select question separately", () => {
+    const base = buildAnswers(40, 1);
+    const oneCondition = computeResult({ ...base, conditions: ["highbp"] }, FIXED_TODAY);
+    const twoConditions = computeResult(
+      { ...base, conditions: ["highbp", "prediabetes"] },
+      FIXED_TODAY
+    );
+    // Two diagnosed conditions => two distinct factors, each scored.
+    const oneCount = oneCondition.factors.filter((f) => f.id.startsWith("conditions:")).length;
+    const twoCount = twoConditions.factors.filter((f) => f.id.startsWith("conditions:")).length;
+    expect(oneCount).toBe(1);
+    expect(twoCount).toBe(2);
+    // More diagnosed risk lowers the estimate.
+    expect(twoConditions.lifeExpectancy).toBeLessThan(oneCondition.lifeExpectancy);
   });
 
   it("worst case bottoms out believably rather than free-falling", () => {

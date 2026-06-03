@@ -1,13 +1,14 @@
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 import { TRANSFORMATIONS } from "@/lib/guide/testimonials";
 
-function Frame({ src, label }: { src: string; label: string }) {
+function Frame({ src, label }: { src: StaticImageData; label: string }) {
   return (
     <div className="relative aspect-[3/4] min-w-0 flex-1 overflow-hidden rounded-md border border-monitor-line bg-monitor-bg">
       <Image
         src={src}
         alt={`${label} photo`}
         fill
+        placeholder="blur"
         className="object-cover"
         sizes="(max-width: 640px) 45vw, 180px"
       />

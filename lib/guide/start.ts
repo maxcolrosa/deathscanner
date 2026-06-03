@@ -1,6 +1,5 @@
 "use server";
 
-import { after } from "next/server";
 import { AnswersSchema } from "@/lib/guide/schema";
 import { createOrder } from "@/lib/guide/orders";
 import { generateGuide } from "@/lib/guide/generate";
@@ -9,12 +8,14 @@ import type { Answers } from "@/lib/longevity";
 // Entry point for turning a completed scan into a generated guide. Today it is
 // called by the buy button; in Phase C the Stripe webhook calls the same path
 // after a verified payment.
+//
+// We intentionally do NOT generate here. Generation runs on the first status
+// poll from the building screen, so the order is "generating" when the page
+// first loads and the user sees the (deliberately paced) build experience
+// instead of the guide snapping in instantly.
 export async function startGuideGeneration(answers: Answers): Promise<{ token: string }> {
   const parsed = AnswersSchema.parse(answers) as Answers;
   const order = await createOrder(parsed);
-  after(async () => {
-    await generateGuide(order.token);
-  });
   return { token: order.token };
 }
 

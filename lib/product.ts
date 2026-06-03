@@ -4,9 +4,9 @@ export const PRODUCT = {
   name: "The Second Wind Protocol",
   tagline: "A personalized 8-week protocol built from your scan.",
   /** Live (sale) price the user pays before the countdown ends. */
-  price: 19,
+  price: 9,
   /** Price after the on-page countdown expires. */
-  expiredPrice: 39,
+  expiredPrice: 19,
   /** Anchor: the "normal" price, shown struck through. */
   listPrice: 79,
   /** Anchor: total itemized value of everything included. */

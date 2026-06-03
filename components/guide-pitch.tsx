@@ -57,7 +57,7 @@ export function GuidePitch({
   const subline = !personalized
     ? `${PRODUCT.tagline} A day-by-day plan you will actually follow.`
     : hasYears
-      ? `You just saw your date. Roughly ${formatYears(recoverableYears)} of those years are still recoverable, and they come from habits this protocol is built to change. The date only sticks if you do nothing.`
+      ? `You just saw your date. As much as ${formatYears(recoverableYears)} of those years are still on the table, plus a noticeably better quality of life, and they come from the exact habits this protocol is built to change. The date only sticks if you do nothing.`
       : "You just saw your date. This is the plan to push it later and hold it there.";
 
   return (

@@ -1,4 +1,30 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
+
+// Walk the quiz, picking the first option of each step. The question count is
+// dynamic (branching follow-ups) and questions can be single-select (radios) or
+// multi-select (checkboxes), so we pick whichever control is present and loop
+// until the "Run Scan" button appears.
+async function completeScan(page: Page) {
+  await page.getByLabel("Age").fill("35");
+  await page.getByRole("button", { name: "Next", exact: true }).click();
+
+  for (let i = 0; i < 30; i++) {
+    const radio = page.getByRole("radio").first();
+    const checkbox = page.getByRole("checkbox").first();
+    if (await radio.count()) {
+      await radio.click();
+    } else if (await checkbox.count()) {
+      await checkbox.click();
+    }
+
+    const runScan = page.getByRole("button", { name: /run scan/i });
+    if (await runScan.count()) {
+      await runScan.click();
+      break;
+    }
+    await page.getByRole("button", { name: "Next", exact: true }).click();
+  }
+}
 
 test("full scan flow reaches the report and pitch", async ({ page }) => {
   await page.goto("/");
@@ -8,28 +34,7 @@ test("full scan flow reaches the report and pitch", async ({ page }) => {
 
   await page.getByRole("link", { name: /begin/i }).first().click();
 
-  // Age question
-  await page.getByLabel("Age").fill("35");
-  await page.getByRole("button", { name: "Next", exact: true }).click();
-
-  // Answer each choice question (picking the first option) until the final
-  // step. The question count is dynamic because of branching follow-ups, so we
-  // loop until the "Run Scan" button appears rather than counting.
-  for (let i = 0; i < 25; i++) {
-    await page
-      .getByRole("radiogroup")
-      .first()
-      .getByRole("radio")
-      .first()
-      .click();
-
-    const runScan = page.getByRole("button", { name: /run scan/i });
-    if (await runScan.count()) {
-      await runScan.click();
-      break;
-    }
-    await page.getByRole("button", { name: "Next", exact: true }).click();
-  }
+  await completeScan(page);
 
   // Report appears (waits out the analyzing animation).
   await expect(
@@ -37,6 +42,8 @@ test("full scan flow reaches the report and pitch", async ({ page }) => {
   ).toBeVisible({ timeout: 15000 });
 
   await expect(page.getByText(/estimated date of death/i)).toBeVisible();
+  // The population anchor line is rendered with the estimate.
+  await expect(page.getByText(/the average for your age and sex/i)).toBeVisible();
   await expect(
     page.getByRole("button", { name: /get instant access/i })
   ).toBeVisible();
@@ -46,23 +53,7 @@ test("buying builds and shows the generated guide", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("link", { name: /begin/i }).first().click();
 
-  await page.getByLabel("Age").fill("35");
-  await page.getByRole("button", { name: "Next", exact: true }).click();
-
-  for (let i = 0; i < 25; i++) {
-    await page
-      .getByRole("radiogroup")
-      .first()
-      .getByRole("radio")
-      .first()
-      .click();
-    const runScan = page.getByRole("button", { name: /run scan/i });
-    if (await runScan.count()) {
-      await runScan.click();
-      break;
-    }
-    await page.getByRole("button", { name: "Next", exact: true }).click();
-  }
+  await completeScan(page);
 
   await expect(
     page.getByRole("heading", { name: /your estimated lifespan/i })
@@ -71,22 +62,23 @@ test("buying builds and shows the generated guide", async ({ page }) => {
   // Start checkout via the report's direct CTA (no scroll-jump).
   await page.getByRole("button", { name: /build my plan/i }).first().click();
 
-  // Lands on the guide page. The stub generates fast enough that the building
-  // screen may be skipped and the guide view rendered directly. Wait up to 15s
-  // for either the building-screen h1 or the guide-view h1; then wait for the
-  // final guide view regardless. "Your 8-week plan" is a <span> in SectionLabel,
-  // not a heading element, so we use getByText.
+  // The build is deliberately paced, so the building screen shows first.
   await expect(
-    page.getByRole("heading", { name: /second wind protocol|being written/i })
+    page.getByRole("heading", { name: /being written/i })
   ).toBeVisible({ timeout: 15000 });
+
+  // Then the finished guide renders. "Your 8-week plan" is a <span> in
+  // SectionLabel, not a heading, so target it via text.
   await expect(
     page.getByRole("heading", { name: /second wind protocol/i })
   ).toBeVisible({ timeout: 20000 });
   await expect(
     page.getByText(/your 8-week plan/i)
   ).toBeVisible({ timeout: 20000 });
+  // New depth sections are present.
+  await expect(page.getByText(/your biggest risks, in depth/i)).toBeVisible();
   await expect(
-    page.getByRole("link", { name: /download your pdf/i })
+    page.getByRole("link", { name: /download your full pdf/i })
   ).toBeVisible();
 
   // The PDF actually renders at runtime (exercises @react-pdf renderToBuffer).

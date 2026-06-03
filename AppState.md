@@ -25,7 +25,7 @@ A working parody funnel with a **real, generated product** behind it. End to end
 - Supabase project `xhovvuuamwuwvbvibiau` (orders table live). Secrets are in `.env.local` (gitignored).
 - Higgsfield CLI (`higgsfield` / `higgs`) is installed and authenticated; used at build time to generate the transformation images in `public/transformations/`.
 
-**Quality:** 44 unit tests (`lib/**/*.test.ts`), Playwright smoke (full scan + purchase -> guide -> PDF), clean `tsc`/`lint`/`build`.
+**Quality:** 46 unit tests (`lib/**/*.test.ts`), Playwright smoke (full scan + purchase -> guide -> PDF), clean `tsc`/`lint`/`build`.
 
 Tech: Next.js 16 (App Router) / React 19 / TS / Tailwind v4 / Motion / Geist / shadcn-on-`@base-ui`. See `CLAUDE.md` for stack gotchas (base-ui `Button` has no `asChild`; `RadioGroup` uses `onValueChange`/`data-checked`; zero em-dashes in UI copy; Next 16 docs in `node_modules/next/dist/docs/`).
 
@@ -37,6 +37,8 @@ Tech: Next.js 16 (App Router) / React 19 / TS / Tailwind v4 / Motion / Geist / s
 
 Also not present: auth (access is via the unguessable token URL), email delivery, analytics.
 
+**Brand rename pending.** The app is still named "Longevity Scan" everywhere (including the PDF `BRAND` const); the user is choosing a replacement. Shortlist + available domains are in Claude memory `brand-name-candidates` (Reckon / Mortalis / Span / Hundo, all with free `.co` domains). When chosen, rename across `app/layout.tsx`, `app/page.tsx`, `components/site-footer.tsx`, `components/legal-page.tsx`, the `/privacy` `/terms` `/cookies` titles and `@longevityscan.example` contact emails, and `BRAND` in `components/guide/guide-pdf.tsx`. The product name (`PRODUCT.name`, "The Second Wind Protocol") is separate.
+
 ---
 
 ## 3. Key integration points
@@ -44,8 +46,9 @@ Also not present: auth (access is via the unguessable token URL), email delivery
 - **Checkout seam:** `lib/guide/start.ts` (`startGuideGeneration`) and `lib/guide/generate.ts` (`generateGuide`). Wire Stripe here.
 - **Guide content:** `lib/guide/build-guide.ts` (deterministic engine) + `lib/guide/schema.ts` (`GuideDoc`). To change the guide, edit these; covered by `lib/guide/build-guide.test.ts`.
 - **Order storage:** `lib/guide/orders.ts` (Supabase + in-memory backends) and `lib/supabase/server.ts` (service-role client, server-only).
-- **Price/timer source of truth:** `components/sale-context.tsx` (`useSale()`); `lib/product.ts` holds price (19), expiredPrice (39), listPrice (79), stackValue (294), and `INCLUDED[]`.
-- **Social proof data:** `lib/guide/testimonials.ts` (`TESTIMONIALS`, `TRANSFORMATIONS`); image assets in `public/transformations/`.
+- **Price/timer source of truth:** `components/sale-context.tsx` (`useSale()`); `lib/product.ts` holds price (9), expiredPrice (19), listPrice (79), stackValue (294), and `INCLUDED[]`. Never hardcode price in UI.
+- **Social proof data:** `lib/guide/testimonials.ts` (`TESTIMONIALS` with `quote`/`name`/`meta`/`detail`/`rating`/`verifiedAgo`; `TRANSFORMATIONS`). Transformation images in `public/transformations/` are **static-imported** in `testimonials.ts` (content-hash fingerprinting busts caches on file swap) - do not switch back to string paths. Reviews UI (`components/reviews.tsx`) shows stars, verified-buyer badges, and an aggregate score.
+- **Downloadable PDF:** `components/guide/guide-pdf.tsx` (`@react-pdf/renderer`, dark monitor theme, Geist fonts). Must stay free of `fixed` running headers/footers - react-pdf 4.x crashes with "unsupported number" across the guide's many pages and would 500 the PDF route.
 
 ---
 
