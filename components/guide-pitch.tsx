@@ -4,6 +4,8 @@ import { CheckoutButton } from "@/components/checkout-button";
 import { SaleCountdown } from "@/components/sale-countdown";
 import { useSale } from "@/components/sale-context";
 import { PRODUCT, INCLUDED } from "@/lib/product";
+import { Reviews } from "@/components/reviews";
+import { TransformationsGallery } from "@/components/transformations-gallery";
 import type { Answers, Outcome, ScanResult } from "@/lib/longevity";
 
 // Shown on the standalone /guide page where there is no scan result.
@@ -154,6 +156,10 @@ export function GuidePitch({
             ))}
           </ul>
         </div>
+
+        {/* Social proof: real transformations and reviews, right before the offer */}
+        <TransformationsGallery />
+        <Reviews />
 
         {/* Price anchor + primary CTA */}
         <div className="flex flex-col items-center gap-5 rounded-lg border border-monitor-accent/40 bg-monitor-panel p-8 text-center">

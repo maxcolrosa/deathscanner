@@ -2,8 +2,9 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { TESTIMONIALS, TRANSFORMATIONS } from "@/lib/guide/testimonials";
+import { TESTIMONIALS } from "@/lib/guide/testimonials";
 import { retryGuideGeneration } from "@/lib/guide/start";
+import { TransformationsGallery } from "@/components/transformations-gallery";
 
 // Isolated pulsing dot, perpetual animation kept in its own component
 // so it never causes re-renders in the parent.
@@ -16,43 +17,23 @@ function PulsingDot() {
   );
 }
 
-// Scan-line placeholder for transformation slots
-function TransformationSlot({ caption }: { caption: string }) {
+const BUILD_PHASES = [
+  "Analyzing your risk factors",
+  "Designing your training block",
+  "Building your nutrition reset",
+  "Personalizing your daily routine",
+  "Writing your first 7 days",
+  "Finalizing your protocol",
+];
+
+function RotatingStatus({ elapsed }: { elapsed: number }) {
+  // Advance one phase every 4 seconds, holding on the last one.
+  const index = Math.min(BUILD_PHASES.length - 1, Math.floor(elapsed / 4));
   return (
-    <div className="relative flex aspect-[3/4] flex-col justify-end overflow-hidden rounded-lg border border-monitor-line bg-monitor-panel">
-      {/* Scan-line grid overlay */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(0deg, rgba(46,230,201,0.035) 0px, rgba(46,230,201,0.035) 1px, transparent 1px, transparent 8px), repeating-linear-gradient(90deg, rgba(46,230,201,0.02) 0px, rgba(46,230,201,0.02) 1px, transparent 1px, transparent 32px)",
-        }}
-      />
-      {/* Corner brackets */}
-      <div aria-hidden className="pointer-events-none absolute inset-3">
-        <span className="absolute left-0 top-0 block h-4 w-4 border-l border-t border-monitor-accent/40" />
-        <span className="absolute right-0 top-0 block h-4 w-4 border-r border-t border-monitor-accent/40" />
-        <span className="absolute bottom-0 left-0 block h-4 w-4 border-b border-l border-monitor-accent/40" />
-        <span className="absolute bottom-0 right-0 block h-4 w-4 border-b border-r border-monitor-accent/40" />
-      </div>
-      {/* Center label */}
-      <div
-        aria-hidden
-        className="absolute inset-0 flex flex-col items-center justify-center gap-2"
-      >
-        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-monitor-accent/40">
-          awaiting
-        </span>
-        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-monitor-accent/40">
-          image data
-        </span>
-      </div>
-      {/* Caption bar */}
-      <div className="relative z-10 border-t border-monitor-line bg-monitor-panel/80 px-3 py-2">
-        <span className="font-mono text-[11px] text-monitor-muted">{caption}</span>
-      </div>
-    </div>
+    <span className="font-mono text-xs text-monitor-muted">
+      {BUILD_PHASES[index]}
+      <span className="text-monitor-accent">...</span>
+    </span>
   );
 }
 
@@ -202,25 +183,12 @@ export function GuideBuildingScreen({
               {pct.toFixed(0)}% &nbsp;&bull;&nbsp; {elapsed}s elapsed
             </span>
           </div>
+          <RotatingStatus elapsed={elapsed} />
         </div>
       </div>
 
-      {/* ── Transformation placeholders ── */}
-      <section className="flex flex-col gap-5">
-        <div className="flex items-center justify-between">
-          <h2 className="font-mono text-xs uppercase tracking-[0.18em] text-monitor-muted">
-            Real results from the protocol
-          </h2>
-          <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-monitor-muted/50">
-            Before / After
-          </span>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-3">
-          {TRANSFORMATIONS.map((t, i) => (
-            <TransformationSlot key={i} caption={t.caption} />
-          ))}
-        </div>
-      </section>
+      {/* ── Transformations gallery ── */}
+      <TransformationsGallery />
 
       {/* ── Testimonials ── */}
       <section className="flex flex-col gap-5">

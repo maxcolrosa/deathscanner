@@ -7,7 +7,7 @@ import {
   markFailed,
   __clearMemory,
 } from "@/lib/guide/orders";
-import { buildFixtureGuide } from "@/lib/guide/fixture";
+import { buildGuide } from "@/lib/guide/build-guide";
 import { computeResult } from "@/lib/longevity";
 
 // No Supabase env in the test process -> in-memory backend.
@@ -36,7 +36,7 @@ describe("orders store (in-memory)", () => {
 
   it("marks an order ready with a guide", async () => {
     const order = await createOrder(answers);
-    const guide = buildFixtureGuide(computeResult(answers));
+    const guide = buildGuide(computeResult(answers), answers);
     await markReady(order.token, guide, "stub");
     const fetched = await getOrderByToken(order.token);
     expect(fetched?.status).toBe("ready");
