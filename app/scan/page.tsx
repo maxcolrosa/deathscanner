@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { QuizStep } from "@/components/quiz-step";
 import { AnalyzingSequence } from "@/components/analyzing-sequence";
 import { ReportCard } from "@/components/report-card";
@@ -20,8 +20,6 @@ export default function ScanPage() {
   const [phase, setPhase] = useState<Phase>("quiz");
   const [currentId, setCurrentId] = useState(QUESTIONS[0].id);
   const [answers, setAnswers] = useState<Answers>({});
-  const pitchRef = useRef<HTMLDivElement>(null);
-
   // The visible question list adapts to answers (branching follow-ups appear
   // and disappear as the user answers their triggers).
   const active = useMemo(() => getActiveQuestions(answers), [answers]);
@@ -56,10 +54,6 @@ export default function ScanPage() {
     [phase, answers]
   );
 
-  const scrollToPitch = () => {
-    pitchRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
   if (phase === "quiz") {
     return (
       <QuizStep
@@ -85,14 +79,9 @@ export default function ScanPage() {
   return (
     <SaleProvider>
       <main className="pb-24">
-        <ReportCard result={result!} onSeePlan={scrollToPitch} />
-        <div ref={pitchRef}>
-          <GuidePitch result={result!} answers={answers} />
-        </div>
-        <ResultStickyBar
-          recoverableYears={result!.recoverableYears}
-          onGetPlan={scrollToPitch}
-        />
+        <ReportCard result={result!} answers={answers} />
+        <GuidePitch result={result!} answers={answers} />
+        <ResultStickyBar recoverableYears={result!.recoverableYears} answers={answers} />
       </main>
     </SaleProvider>
   );

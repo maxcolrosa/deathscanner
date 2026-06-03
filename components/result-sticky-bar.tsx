@@ -2,18 +2,18 @@
 
 import { useSale } from "@/components/sale-context";
 import { SaleCountdown } from "@/components/sale-countdown";
+import { useCheckout } from "@/components/use-checkout";
+import type { Answers } from "@/lib/longevity";
 
-// Persistent conversion bar on the result page. Reads the shared sale state so
-// its price and timer match the rest of the page (and the raised price once the
-// countdown expires).
 export function ResultStickyBar({
   recoverableYears,
-  onGetPlan,
+  answers,
 }: {
   recoverableYears: number;
-  onGetPlan: () => void;
+  answers: Answers;
 }) {
   const { price, expired } = useSale();
+  const { start, pending } = useCheckout(answers);
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 border-t border-monitor-line bg-monitor-bg/95 backdrop-blur">
@@ -36,16 +36,16 @@ export function ResultStickyBar({
               <>${price} now</>
             ) : (
               <>
-                ${price} today, expires in{" "}
-                <SaleCountdown className="text-monitor-accent" />
+                ${price} today, expires in <SaleCountdown className="text-monitor-accent" />
               </>
             )}
           </span>
           <button
-            onClick={onGetPlan}
-            className="w-full rounded-md bg-monitor-accent px-6 py-2.5 text-sm font-semibold text-monitor-bg transition-colors hover:bg-monitor-accent/90 sm:w-auto"
+            onClick={start}
+            disabled={pending}
+            className="w-full rounded-md bg-monitor-accent px-6 py-2.5 text-sm font-semibold text-monitor-bg transition-colors hover:bg-monitor-accent/90 disabled:opacity-70 sm:w-auto"
           >
-            Get my plan
+            {pending ? "Building..." : "Build my plan"}
           </button>
         </div>
       </div>
