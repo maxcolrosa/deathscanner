@@ -23,7 +23,7 @@ export function QuizStep({
   onNext,
   onBack,
 }: QuizStepProps) {
-  const progress = Math.round((index / total) * 100);
+  const progress = Math.round(((index + 1) / total) * 100);
 
   const ageValid =
     question.kind === "age" &&
@@ -103,7 +103,7 @@ export function QuizStep({
               key={option.value}
               className="flex cursor-pointer items-center gap-3 rounded-md border border-monitor-line bg-monitor-panel px-4 py-4 text-monitor-fg transition-colors hover:border-monitor-accent/60 has-[data-checked]:border-monitor-accent"
             >
-              <RadioGroupItem value={option.value} />
+              <RadioGroupItem value={option.value} aria-label={option.label} />
               <span>{option.label}</span>
             </label>
           ))}

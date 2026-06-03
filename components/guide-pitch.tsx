@@ -39,12 +39,11 @@ export function GuidePitch({ recoverableYears }: { recoverableYears: number }) {
           </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-3">
+        {/* One instrument-style readout panel split into cells (grouped with
+            dividers, not three floating equal cards). */}
+        <div className="grid divide-y divide-monitor-line rounded-lg border border-monitor-line bg-monitor-panel sm:grid-cols-3 sm:divide-x sm:divide-y-0">
           {BENEFITS.map((b) => (
-            <div
-              key={b.stat}
-              className="rounded-lg border border-monitor-line bg-monitor-panel p-5"
-            >
+            <div key={b.stat} className="p-5">
               <div className="font-mono text-2xl tracking-tighter text-monitor-accent">
                 {b.stat}
               </div>
