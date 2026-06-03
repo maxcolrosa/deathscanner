@@ -85,6 +85,12 @@ export const MIN_AGE = 18;
 export const MAX_AGE = 99;
 export const MAX_LIFE_EXPECTANCY = 102;
 
+// Negative factors are summed then passed through a diminishing-returns curve so
+// that a profile where everything is bad does not stack linearly into an
+// implausibly early death. The penalty asymptotically approaches NEG_CAP.
+const NEG_CAP = 22;
+const NEG_SCALE = 18;
+
 export const QUESTIONS: QuizQuestion[] = [
   {
     id: "age",
@@ -277,6 +283,28 @@ function round1(value: number): number {
   return Math.round(value * 10) / 10;
 }
 
+/** Diminishing-returns penalty for stacked negative factors. */
+function dampenedPenalty(negMagnitude: number): number {
+  return NEG_CAP * (1 - Math.exp(-negMagnitude / NEG_SCALE));
+}
+
+/**
+ * Project life expectancy from positive and negative contributions.
+ * Positives add linearly; negatives are compressed so the worst case bottoms
+ * out around BASE - NEG_CAP rather than free-falling.
+ */
+function projectLifeExpectancy(
+  positive: number,
+  negativeMagnitude: number,
+  age: number
+): number {
+  return clamp(
+    BASE_LIFE_EXPECTANCY + positive - dampenedPenalty(negativeMagnitude),
+    age + 0.5,
+    MAX_LIFE_EXPECTANCY
+  );
+}
+
 function isScored(q: QuizQuestion): boolean {
   return q.scored !== false;
 }
@@ -398,10 +426,22 @@ export function computeResult(answers: Answers, today: Date = new Date()): ScanR
   }
 
   const totalDelta = round1(rawDelta);
-  const lifeExpectancyExact = clamp(
-    BASE_LIFE_EXPECTANCY + rawDelta,
-    currentAge + 0.5,
-    MAX_LIFE_EXPECTANCY
+
+  const positive = factors
+    .filter((f) => f.deltaYears > 0)
+    .reduce((sum, f) => sum + f.deltaYears, 0);
+  const negativeMagnitude = factors
+    .filter((f) => f.deltaYears < 0)
+    .reduce((sum, f) => sum - f.deltaYears, 0);
+  // Magnitude of only the negatives the user cannot change (sex, family history).
+  const fixedNegativeMagnitude = factors
+    .filter((f) => f.deltaYears < 0 && !f.recoverable)
+    .reduce((sum, f) => sum - f.deltaYears, 0);
+
+  const lifeExpectancyExact = projectLifeExpectancy(
+    positive,
+    negativeMagnitude,
+    currentAge
   );
   const lifeExpectancy = round1(lifeExpectancyExact);
   const ageAtDeath = Math.floor(lifeExpectancy);
@@ -409,10 +449,15 @@ export function computeResult(answers: Answers, today: Date = new Date()): ScanR
   const yearsRemaining = Math.max(0.5, lifeExpectancyExact - currentAge);
   const predictedDeathDate = addFractionalYears(today, yearsRemaining);
 
+  // Years recoverable = the gain from neutralizing every modifiable negative,
+  // measured through the same dampened curve so it stays consistent.
+  const improvedLifeExpectancy = projectLifeExpectancy(
+    positive,
+    fixedNegativeMagnitude,
+    currentAge
+  );
   const recoverableYears = round1(
-    factors
-      .filter((f) => f.recoverable && f.deltaYears < 0)
-      .reduce((sum, f) => sum - f.deltaYears, 0)
+    Math.max(0, improvedLifeExpectancy - lifeExpectancyExact)
   );
 
   const topRisks = factors

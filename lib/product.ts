@@ -13,10 +13,34 @@ export const PRODUCT = {
 
 // Itemized value stack. Sum of `value` equals PRODUCT.stackValue.
 export const INCLUDED = [
-  { label: "The 8-week Second Wind training plan", value: 79 },
-  { label: "The metabolic reset nutrition system", value: 69 },
-  { label: "Sleep and stress recovery protocol", value: 49 },
-  { label: "Daily longevity habit tracker", value: 29 },
-  { label: "Private member community access", value: 39 },
-  { label: "Lifetime updates and new protocols", value: 29 },
+  {
+    label: "Your custom 8-week plan, built from your scan",
+    note: "Targets your highest-impact risks first, in order.",
+    value: 89,
+  },
+  {
+    label: "The metabolic reset: exactly what to eat",
+    note: "No counting, no guesswork. Just a list and a rhythm.",
+    value: 69,
+  },
+  {
+    label: "Sleep and stress recovery system",
+    note: "Get your nights and your nervous system back.",
+    value: 49,
+  },
+  {
+    label: "The 10-minute daily routine",
+    note: "Short enough that 'no time' stops being the reason.",
+    value: 39,
+  },
+  {
+    label: "Weekly recalibration as you improve",
+    note: "The plan tightens as your numbers move.",
+    value: 29,
+  },
+  {
+    label: "A private community doing the same thing",
+    note: "The accountability that makes it stick.",
+    value: 19,
+  },
 ] as const;

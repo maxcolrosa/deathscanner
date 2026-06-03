@@ -11,6 +11,24 @@ const GENERIC_OUTCOMES: Outcome[] = [
   { id: "longevity", label: "Move your projected date in the right direction" },
 ];
 
+const STEPS = [
+  {
+    n: "1",
+    title: "Your scan found the risks",
+    body: "We already know the exact factors pulling your projection down.",
+  },
+  {
+    n: "2",
+    title: "We turn them into a daily plan",
+    body: "An 8-week protocol that targets your highest-impact risks first.",
+  },
+  {
+    n: "3",
+    title: "You reverse them, your date moves",
+    body: "Change the inputs and the model that judged you changes its answer.",
+  },
+];
+
 function formatYears(years: number): string {
   return (Math.round(years * 10) / 10).toFixed(0);
 }
@@ -18,20 +36,22 @@ function formatYears(years: number): string {
 export function GuidePitch({ result }: { result?: ScanResult }) {
   const recoverableYears = result?.recoverableYears ?? 0;
   const outcomes = result?.outcomes?.length ? result.outcomes : GENERIC_OUTCOMES;
+  const topRisk = result?.topRisks?.[0];
   const personalized = Boolean(result);
+  const hasYears = recoverableYears > 0;
 
   const headline = outcomes[0]?.label ?? "Add years back to your life";
 
   const subline = !personalized
     ? `${PRODUCT.tagline} A day-by-day plan you will actually follow.`
-    : recoverableYears > 0
-      ? `Built from your scan to reclaim the ${formatYears(recoverableYears)} years your habits are costing you, starting with what moves the needle most for you.`
-      : `Built from your scan to push you toward the top of your range and keep you there.`;
+    : hasYears
+      ? `You just saw your date. Roughly ${formatYears(recoverableYears)} of those years are still recoverable, and they come from habits this protocol is built to change. The date only sticks if you do nothing.`
+      : "You just saw your date. This is the plan to push it later and hold it there.";
 
   return (
     <section className="border-t border-monitor-line px-6 py-20">
       <div className="mx-auto flex max-w-3xl flex-col gap-12">
-        {/* Results-based hook */}
+        {/* Loss-aversion hook + results headline */}
         <div className="flex flex-col gap-3">
           <span className="font-mono text-xs uppercase tracking-[0.18em] text-monitor-accent">
             Your personalized protocol
@@ -39,15 +59,15 @@ export function GuidePitch({ result }: { result?: ScanResult }) {
           <h2 className="text-4xl font-semibold tracking-tight text-monitor-fg md:text-5xl">
             {headline}
           </h2>
-          <p className="max-w-[55ch] text-lg leading-relaxed text-monitor-muted">
+          <p className="max-w-[58ch] text-lg leading-relaxed text-monitor-muted">
             {subline}
           </p>
         </div>
 
-        {/* Concrete, results-based outcomes derived from their answers */}
+        {/* What they actually get out of it, derived from their answers */}
         <div className="flex flex-col gap-3">
           <h3 className="font-mono text-xs uppercase tracking-[0.18em] text-monitor-muted">
-            What 8 weeks will do for you
+            What 8 weeks will change for you
           </h3>
           <ul className="flex flex-col divide-y divide-monitor-line rounded-lg border border-monitor-line bg-monitor-panel">
             {outcomes.map((outcome) => (
@@ -61,18 +81,62 @@ export function GuidePitch({ result }: { result?: ScanResult }) {
           </ul>
         </div>
 
+        {/* Personalization: this plan is about them, not a generic course */}
+        <div className="rounded-lg border border-monitor-line bg-monitor-panel p-6">
+          <h3 className="font-mono text-xs uppercase tracking-[0.18em] text-monitor-muted">
+            Built from your scan
+          </h3>
+          <p className="mt-3 text-base leading-relaxed text-monitor-fg">
+            {personalized && topRisk
+              ? `Your plan leads with ${topRisk.category.toLowerCase()}, the single biggest drag on your projection, then works down your list in order of impact. Nothing generic. Nothing you do not need.`
+              : "Every plan is ordered by impact: the factors costing you the most years get fixed first. Nothing generic, nothing you do not need."}
+          </p>
+        </div>
+
+        {/* Belief: why this actually moves the number */}
+        <div className="flex flex-col gap-3">
+          <h3 className="font-mono text-xs uppercase tracking-[0.18em] text-monitor-muted">
+            How it works
+          </h3>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {STEPS.map((step) => (
+              <div
+                key={step.n}
+                className="flex flex-col gap-2 rounded-lg border border-monitor-line bg-monitor-panel p-5"
+              >
+                <span className="font-mono text-2xl tracking-tighter text-monitor-accent">
+                  {step.n}
+                </span>
+                <span className="text-sm font-semibold text-monitor-fg">
+                  {step.title}
+                </span>
+                <span className="text-sm leading-relaxed text-monitor-muted">
+                  {step.body}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Value stack */}
         <div className="flex flex-col gap-3">
           <h3 className="font-mono text-xs uppercase tracking-[0.18em] text-monitor-muted">
-            Everything inside
+            Everything you get
           </h3>
           <ul className="flex flex-col divide-y divide-monitor-line rounded-lg border border-monitor-line bg-monitor-panel">
             {INCLUDED.map((item) => (
               <li
                 key={item.label}
-                className="flex items-center justify-between gap-4 px-5 py-4"
+                className="flex items-start justify-between gap-4 px-5 py-4"
               >
-                <span className="text-sm text-monitor-fg">{item.label}</span>
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm font-semibold text-monitor-fg">
+                    {item.label}
+                  </span>
+                  <span className="text-sm leading-relaxed text-monitor-muted">
+                    {item.note}
+                  </span>
+                </div>
                 <span className="shrink-0 font-mono text-sm text-monitor-muted">
                   ${item.value}
                 </span>
@@ -102,8 +166,17 @@ export function GuidePitch({ result }: { result?: ScanResult }) {
           <CheckoutButton />
         </div>
 
-        {/* Final CTA */}
-        <CheckoutButton label={`Start reclaiming your years for $${PRODUCT.price}`} />
+        {/* Motivating close + final CTA */}
+        <div className="flex flex-col items-center gap-5 text-center">
+          <p className="max-w-[48ch] text-lg leading-relaxed text-monitor-fg">
+            {hasYears
+              ? `The date you saw assumes you change nothing. For less than the cost of a week of takeout, change something.`
+              : `The hardest part is starting. For less than the cost of a week of takeout, start today.`}
+          </p>
+          <CheckoutButton
+            label={`Start reclaiming your years for $${PRODUCT.price}`}
+          />
+        </div>
 
         <Disclaimer className="max-w-[60ch]" />
       </div>

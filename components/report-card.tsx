@@ -27,7 +27,7 @@ function buildNarrative(result: ScanResult): string {
   const tail = strength
     ? ` Your ${strength.category.toLowerCase()} is the main thing pulling the other way.`
     : "";
-  return `Most of the gap between you and the average comes down to two things: ${drivers}. The rest of your profile is close to baseline.${tail}`;
+  return `Most of the gap between you and the average comes down to two things: ${drivers}. The rest of your profile is closer to baseline.${tail}`;
 }
 
 export function ReportCard({
@@ -38,9 +38,10 @@ export function ReportCard({
   onSeePlan: () => void;
 }) {
   const deathLabel = dateFormatter.format(result.predictedDeathDate);
+  const years = result.recoverableYears.toFixed(0);
 
   return (
-    <section className="mx-auto flex max-w-2xl flex-col gap-10 px-6 py-20">
+    <section className="mx-auto flex max-w-2xl flex-col gap-8 px-6 pt-20 pb-10">
       <div className="flex flex-col gap-2">
         <span className="font-mono text-xs uppercase tracking-[0.18em] text-monitor-alert">
           AI analysis complete
@@ -68,7 +69,32 @@ export function ReportCard({
         </div>
       </div>
 
-      <p className="max-w-[60ch] text-lg leading-relaxed text-monitor-fg">
+      {/* Conversion hook kept above the fold: the offer is visible without scrolling. */}
+      <div className="rounded-lg border border-monitor-accent/40 bg-monitor-panel p-6">
+        {result.recoverableYears > 0 ? (
+          <p className="text-lg leading-relaxed text-monitor-fg">
+            That date is not fixed. The model estimates that reversing your top
+            risks could move it back by roughly{" "}
+            <span className="font-mono text-monitor-accent">{years} years</span>.
+            Here is the plan that goes after them.
+          </p>
+        ) : (
+          <p className="text-lg leading-relaxed text-monitor-fg">
+            Your risks are already low. Here is the plan to push you toward the top
+            of your range and hold it there.
+          </p>
+        )}
+        <Button
+          onClick={onSeePlan}
+          className="mt-4 bg-monitor-accent text-monitor-bg hover:bg-monitor-accent/90"
+        >
+          {result.recoverableYears > 0
+            ? `Show me how to reclaim ${years} years`
+            : "Show me my plan"}
+        </Button>
+      </div>
+
+      <p className="max-w-[60ch] text-base leading-relaxed text-monitor-fg">
         {buildNarrative(result)}
       </p>
 
@@ -120,30 +146,6 @@ export function ReportCard({
           </ul>
         </div>
       ) : null}
-
-      <div className="rounded-lg border border-monitor-accent/40 bg-monitor-panel p-6">
-        {result.recoverableYears > 0 ? (
-          <p className="text-lg leading-relaxed text-monitor-fg">
-            The model estimates that reversing your top risks could move your
-            projected date back by roughly{" "}
-            <span className="font-mono text-monitor-accent">
-              {result.recoverableYears.toFixed(0)} years
-            </span>
-            . None of those risks are fixed.
-          </p>
-        ) : (
-          <p className="text-lg leading-relaxed text-monitor-fg">
-            Your risks are already low. The protocol can help you push toward the
-            top of your range and hold it there.
-          </p>
-        )}
-        <Button
-          onClick={onSeePlan}
-          className="mt-4 bg-monitor-accent text-monitor-bg hover:bg-monitor-accent/90"
-        >
-          Show me my plan
-        </Button>
-      </div>
     </section>
   );
 }

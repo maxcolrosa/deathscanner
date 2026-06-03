@@ -155,17 +155,28 @@ describe("computeResult", () => {
     expect(Math.abs(yearsOut - (result.lifeExpectancy - 40))).toBeLessThanOrEqual(1);
   });
 
-  it("recoverableYears only counts losses from recoverable factors", () => {
+  it("recoverableYears reflects only modifiable losses, compressed by the curve", () => {
     const result = computeResult(buildExtreme(30, "worst"), FIXED_TODAY);
-    const recoverableLoss = result.factors
+    // There is something to recover in the worst case.
+    expect(result.recoverableYears).toBeGreaterThan(0);
+    // The raw sum of recoverable losses is the upper bound; the dampened
+    // difference must not exceed it.
+    const rawRecoverableLoss = result.factors
       .filter((f) => f.recoverable && f.deltaYears < 0)
       .reduce((sum, f) => sum - f.deltaYears, 0);
-    expect(result.recoverableYears).toBeCloseTo(recoverableLoss, 5);
+    expect(result.recoverableYears).toBeLessThanOrEqual(rawRecoverableLoss + 0.05);
+    // Non-recoverable losses exist, so recovery never reaches the full baseline.
     const nonRecoverableLoss = result.factors
       .filter((f) => !f.recoverable && f.deltaYears < 0)
       .reduce((sum, f) => sum - f.deltaYears, 0);
     expect(nonRecoverableLoss).toBeGreaterThan(0);
-    expect(result.recoverableYears).toBeLessThan(recoverableLoss + nonRecoverableLoss);
+  });
+
+  it("worst case bottoms out believably rather than free-falling", () => {
+    // Even with every modifiable factor maxed out, a mid-life adult should not be
+    // projected to die almost immediately.
+    const result = computeResult(buildExtreme(45, "worst"), FIXED_TODAY);
+    expect(result.lifeExpectancy).toBeGreaterThanOrEqual(55);
   });
 
   it("topRisks lists the biggest reversible losses, worst first, max 3", () => {
