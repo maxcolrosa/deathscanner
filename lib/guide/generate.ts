@@ -5,13 +5,13 @@ import { buildFixtureGuide } from "@/lib/guide/fixture";
 import { getOrderByToken, markReady, markFailed } from "@/lib/guide/orders";
 import { requestGuide, GUIDE_MODEL } from "@/lib/guide/model";
 
-function useStub(): boolean {
+function stubEnabled(): boolean {
   return !process.env.ANTHROPIC_API_KEY || process.env.GUIDE_STUB === "1";
 }
 
 async function produceGuide(answers: Answers): Promise<{ guide: GuideDoc; model: string }> {
   const result = computeResult(answers);
-  if (useStub()) {
+  if (stubEnabled()) {
     return { guide: buildFixtureGuide(result), model: "stub" };
   }
   const { system, user } = buildGuidePrompt(result, answers);
