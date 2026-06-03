@@ -1,7 +1,5 @@
 import { test, expect } from "@playwright/test";
 
-const CHOICE_QUESTIONS = 9;
-
 test("full scan flow reaches the report and pitch", async ({ page }) => {
   await page.goto("/");
   await expect(
@@ -14,19 +12,23 @@ test("full scan flow reaches the report and pitch", async ({ page }) => {
   await page.getByLabel("Age").fill("35");
   await page.getByRole("button", { name: "Next", exact: true }).click();
 
-  // Answer each choice question by picking the first option.
-  for (let i = 0; i < CHOICE_QUESTIONS; i++) {
-    // Scope to the radiogroup and pick the first radio option to avoid
-    // strict-mode ambiguity when multiple radios are present.
+  // Answer each choice question (picking the first option) until the final
+  // step. The question count is dynamic because of branching follow-ups, so we
+  // loop until the "Run Scan" button appears rather than counting.
+  for (let i = 0; i < 25; i++) {
     await page
       .getByRole("radiogroup")
       .first()
       .getByRole("radio")
       .first()
       .click();
-    const isLast = i === CHOICE_QUESTIONS - 1;
-    const label = isLast ? /run scan/i : "Next";
-    await page.getByRole("button", { name: label, exact: !isLast }).click();
+
+    const runScan = page.getByRole("button", { name: /run scan/i });
+    if (await runScan.count()) {
+      await runScan.click();
+      break;
+    }
+    await page.getByRole("button", { name: "Next", exact: true }).click();
   }
 
   // Report appears (waits out the analyzing animation).

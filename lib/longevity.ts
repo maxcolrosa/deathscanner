@@ -4,8 +4,9 @@
 // randomness. Same inputs + same `today` => same output.
 //
 // Factor weights are decimals loosely grounded in real epidemiology so the
-// estimate and its breakdown read as credible (heavy smoking ~ -9 yrs, chronic
-// stress ~ -1.8 yrs, etc.) rather than cartoonish.
+// estimate reads as credible. The quiz supports conditional follow-up questions
+// (branching) and an unscored goal question, which drive a personalized,
+// results-based pitch downstream.
 
 export type QuestionKind = "age" | "choice";
 
@@ -15,7 +16,7 @@ export interface QuizOption {
   label: string;
   /** Years added (positive) or subtracted (negative) from the baseline. */
   yearsDelta: number;
-  /** One-line clinical rationale shown in the report breakdown. */
+  /** One-line clinical rationale (used for the report's driver explanations). */
   detail: string;
 }
 
@@ -29,6 +30,10 @@ export interface QuizQuestion {
   category: string;
   /** Whether losses from this factor are modifiable (reversible via the guide). */
   recoverable: boolean;
+  /** If false, the answer is collected for personalization but never scored. */
+  scored?: boolean;
+  /** Conditional display: only shown when this returns true for current answers. */
+  showIf?: (answers: Answers) => boolean;
   /** Present when kind === "choice". */
   options?: QuizOption[];
   /** Present when kind === "age". */
@@ -46,25 +51,33 @@ export interface RiskFactor {
   deltaYears: number;
   recoverable: boolean;
   detail: string;
+  /** Qualitative impact band derived from the magnitude of deltaYears. */
+  impact: "high" | "moderate" | "minor";
+}
+
+export interface Outcome {
+  id: string;
+  label: string;
 }
 
 export interface ScanResult {
   currentAge: number;
-  /** National-average baseline the model starts from. */
   baseLifeExpectancy: number;
   /** Final estimate, one decimal. */
   lifeExpectancy: number;
-  /** Whole-year age at death (floor of lifeExpectancy). */
   ageAtDeath: number;
-  /** Specific projected month/year. */
   predictedDeathDate: Date;
-  /** Sum of all factor adjustments, one decimal. */
   totalDelta: number;
   factors: RiskFactor[];
-  /** Years of loss attributable to modifiable factors, one decimal. */
   recoverableYears: number;
-  /** The biggest reversible losses, worst first (max 3) for personalization. */
-  topRecoverable: RiskFactor[];
+  /** Biggest modifiable losses, worst first (max 3). */
+  topRisks: RiskFactor[];
+  /** Strongest protective factors, best first (max 2). */
+  strengths: RiskFactor[];
+  /** Concrete, results-based outcomes derived from the answers (max 4). */
+  outcomes: Outcome[];
+  /** The user's stated primary goal, if answered. */
+  primaryGoal: string | null;
 }
 
 export const BASE_LIFE_EXPECTANCY = 79;
@@ -91,18 +104,8 @@ export const QUESTIONS: QuizQuestion[] = [
     category: "Biological sex",
     recoverable: false,
     options: [
-      {
-        value: "female",
-        label: "Female",
-        yearsDelta: 2.4,
-        detail: "Females carry a higher baseline life expectancy.",
-      },
-      {
-        value: "male",
-        label: "Male",
-        yearsDelta: -2.4,
-        detail: "Males carry a lower baseline life expectancy.",
-      },
+      { value: "female", label: "Female", yearsDelta: 2.4, detail: "Females carry a higher baseline life expectancy." },
+      { value: "male", label: "Male", yearsDelta: -2.4, detail: "Males carry a lower baseline life expectancy." },
     ],
   },
   {
@@ -113,30 +116,25 @@ export const QUESTIONS: QuizQuestion[] = [
     category: "Tobacco use",
     recoverable: true,
     options: [
-      {
-        value: "never",
-        label: "Never used",
-        yearsDelta: 0.4,
-        detail: "Non-users retain full baseline pulmonary and vascular function.",
-      },
-      {
-        value: "former",
-        label: "Quit over a year ago",
-        yearsDelta: -1.2,
-        detail: "Risk falls sharply after quitting but does not fully reset.",
-      },
-      {
-        value: "light",
-        label: "Occasional or light use",
-        yearsDelta: -3.5,
-        detail: "Even light use elevates cardiovascular and cancer risk.",
-      },
-      {
-        value: "heavy",
-        label: "Daily, half a pack or more",
-        yearsDelta: -9.2,
-        detail: "Heavy smoking is the largest single modifiable loss of years.",
-      },
+      { value: "never", label: "Never used", yearsDelta: 0.4, detail: "Non-users retain full baseline pulmonary and vascular function." },
+      { value: "former", label: "Quit over a year ago", yearsDelta: -1.2, detail: "Risk falls sharply after quitting but does not fully reset." },
+      { value: "light", label: "Occasional or light use", yearsDelta: -3.5, detail: "Even light use elevates cardiovascular and cancer risk." },
+      { value: "heavy", label: "Daily, half a pack or more", yearsDelta: -9.2, detail: "Heavy smoking is the largest single modifiable loss of years." },
+    ],
+  },
+  {
+    // Branching follow-up: only relevant if they use tobacco at all.
+    id: "smoking_years",
+    kind: "choice",
+    prompt: "How long have you used tobacco?",
+    helper: "Cumulative exposure compounds the risk.",
+    category: "Tobacco exposure",
+    recoverable: true,
+    showIf: (a) => typeof a.smoking === "string" && a.smoking !== "never",
+    options: [
+      { value: "under5", label: "Less than 5 years", yearsDelta: -0.4, detail: "Shorter exposure means more of the damage is still reversible." },
+      { value: "5to15", label: "5 to 15 years", yearsDelta: -1.3, detail: "Sustained exposure has begun to accumulate measurable risk." },
+      { value: "over15", label: "More than 15 years", yearsDelta: -2.4, detail: "Long-term exposure compounds cardiovascular and pulmonary damage." },
     ],
   },
   {
@@ -147,30 +145,10 @@ export const QUESTIONS: QuizQuestion[] = [
     category: "Body composition",
     recoverable: true,
     options: [
-      {
-        value: "lean",
-        label: "Lean and physically fit",
-        yearsDelta: 1.6,
-        detail: "Healthy body fat and muscle mass lower metabolic and cardiac risk.",
-      },
-      {
-        value: "healthy",
-        label: "Healthy weight",
-        yearsDelta: 0.8,
-        detail: "A normal weight range is protective.",
-      },
-      {
-        value: "over",
-        label: "Carrying some excess weight",
-        yearsDelta: -1.9,
-        detail: "Excess adiposity raises cardiovascular and metabolic load.",
-      },
-      {
-        value: "obese",
-        label: "Significantly overweight",
-        yearsDelta: -4.6,
-        detail: "Obesity is linked to diabetes, hypertension, and shorter lifespan.",
-      },
+      { value: "lean", label: "Lean and physically fit", yearsDelta: 1.6, detail: "Healthy body fat and muscle mass lower metabolic and cardiac risk." },
+      { value: "healthy", label: "Healthy weight", yearsDelta: 0.8, detail: "A normal weight range is protective." },
+      { value: "over", label: "Carrying some excess weight", yearsDelta: -1.9, detail: "Excess adiposity raises cardiovascular and metabolic load." },
+      { value: "obese", label: "Significantly overweight", yearsDelta: -4.6, detail: "Obesity is linked to diabetes, hypertension, and shorter lifespan." },
     ],
   },
   {
@@ -181,30 +159,27 @@ export const QUESTIONS: QuizQuestion[] = [
     category: "Physical activity",
     recoverable: true,
     options: [
-      {
-        value: "none",
-        label: "Rarely or never",
-        yearsDelta: -3.9,
-        detail: "A sedentary lifestyle rivals smoking in mortality impact.",
-      },
-      {
-        value: "light",
-        label: "1 to 2 days a week",
-        yearsDelta: -1.2,
-        detail: "Some activity helps but falls short of protective thresholds.",
-      },
-      {
-        value: "moderate",
-        label: "3 to 4 days a week",
-        yearsDelta: 1.8,
-        detail: "Meets the activity guidelines associated with longer life.",
-      },
-      {
-        value: "high",
-        label: "5 or more days a week",
-        yearsDelta: 3.2,
-        detail: "High cardiorespiratory fitness strongly predicts longevity.",
-      },
+      { value: "none", label: "Rarely or never", yearsDelta: -3.9, detail: "A sedentary lifestyle rivals smoking in mortality impact." },
+      { value: "light", label: "1 to 2 days a week", yearsDelta: -1.2, detail: "Some activity helps but falls short of protective thresholds." },
+      { value: "moderate", label: "3 to 4 days a week", yearsDelta: 1.8, detail: "Meets the activity guidelines associated with longer life." },
+      { value: "high", label: "5 or more days a week", yearsDelta: 3.2, detail: "High cardiorespiratory fitness strongly predicts longevity." },
+    ],
+  },
+  {
+    // Branching follow-up: only when activity is low, to personalize the plan.
+    id: "activity_barrier",
+    kind: "choice",
+    prompt: "What gets in the way of training?",
+    helper: "Your plan is built around this.",
+    category: "Training barrier",
+    recoverable: false,
+    scored: false,
+    showIf: (a) => a.activity === "none" || a.activity === "light",
+    options: [
+      { value: "time", label: "I never have the time", yearsDelta: 0, detail: "Time-efficient sessions." },
+      { value: "motivation", label: "I struggle to stay motivated", yearsDelta: 0, detail: "Accountability and momentum." },
+      { value: "injury", label: "Past injury or pain", yearsDelta: 0, detail: "Low-impact progressions." },
+      { value: "howto", label: "I never learned how", yearsDelta: 0, detail: "Guided, step-by-step start." },
     ],
   },
   {
@@ -215,30 +190,10 @@ export const QUESTIONS: QuizQuestion[] = [
     category: "Diet quality",
     recoverable: true,
     options: [
-      {
-        value: "poor",
-        label: "Mostly processed and fast food",
-        yearsDelta: -3.4,
-        detail: "Processed-heavy diets drive inflammation and metabolic disease.",
-      },
-      {
-        value: "average",
-        label: "A mix of fresh and processed",
-        yearsDelta: -0.6,
-        detail: "An average diet still leaves measurable risk on the table.",
-      },
-      {
-        value: "good",
-        label: "Mostly whole foods",
-        yearsDelta: 1.6,
-        detail: "Whole-food diets reduce cardiovascular and metabolic risk.",
-      },
-      {
-        value: "excellent",
-        label: "Whole foods, low sugar, high vegetable",
-        yearsDelta: 2.7,
-        detail: "Mediterranean-style eating is consistently linked to longevity.",
-      },
+      { value: "poor", label: "Mostly processed and fast food", yearsDelta: -3.4, detail: "Processed-heavy diets drive inflammation and metabolic disease." },
+      { value: "average", label: "A mix of fresh and processed", yearsDelta: -0.6, detail: "An average diet still leaves measurable risk on the table." },
+      { value: "good", label: "Mostly whole foods", yearsDelta: 1.6, detail: "Whole-food diets reduce cardiovascular and metabolic risk." },
+      { value: "excellent", label: "Whole foods, low sugar, high vegetable", yearsDelta: 2.7, detail: "Mediterranean-style eating is consistently linked to longevity." },
     ],
   },
   {
@@ -249,30 +204,10 @@ export const QUESTIONS: QuizQuestion[] = [
     category: "Alcohol intake",
     recoverable: true,
     options: [
-      {
-        value: "none",
-        label: "I do not drink",
-        yearsDelta: 0.4,
-        detail: "Avoiding alcohol avoids related liver and cardiovascular risk.",
-      },
-      {
-        value: "light",
-        label: "A few drinks a week",
-        yearsDelta: -0.4,
-        detail: "Light drinking carries a small but real risk.",
-      },
-      {
-        value: "moderate",
-        label: "Most days",
-        yearsDelta: -3.2,
-        detail: "Regular drinking elevates liver, heart, and cancer risk.",
-      },
-      {
-        value: "heavy",
-        label: "Heavily, most days",
-        yearsDelta: -6.1,
-        detail: "Heavy drinking sharply raises mortality across multiple systems.",
-      },
+      { value: "none", label: "I do not drink", yearsDelta: 0.4, detail: "Avoiding alcohol avoids related liver and cardiovascular risk." },
+      { value: "light", label: "A few drinks a week", yearsDelta: -0.4, detail: "Light drinking carries a small but real risk." },
+      { value: "moderate", label: "Most days", yearsDelta: -3.2, detail: "Regular drinking elevates liver, heart, and cancer risk." },
+      { value: "heavy", label: "Heavily, most days", yearsDelta: -6.1, detail: "Heavy drinking sharply raises mortality across multiple systems." },
     ],
   },
   {
@@ -283,30 +218,10 @@ export const QUESTIONS: QuizQuestion[] = [
     category: "Sleep",
     recoverable: true,
     options: [
-      {
-        value: "low",
-        label: "Less than 5 hours",
-        yearsDelta: -3.1,
-        detail: "Chronic short sleep raises cardiovascular and metabolic risk.",
-      },
-      {
-        value: "belowavg",
-        label: "5 to 6 hours",
-        yearsDelta: -1.3,
-        detail: "Slightly low sleep accumulates measurable risk over time.",
-      },
-      {
-        value: "optimal",
-        label: "7 to 8 hours",
-        yearsDelta: 1.3,
-        detail: "Optimal sleep supports cardiovascular and immune health.",
-      },
-      {
-        value: "high",
-        label: "More than 9 hours",
-        yearsDelta: -0.9,
-        detail: "Consistently long sleep can signal underlying issues.",
-      },
+      { value: "low", label: "Less than 5 hours", yearsDelta: -3.1, detail: "Chronic short sleep raises cardiovascular and metabolic risk." },
+      { value: "belowavg", label: "5 to 6 hours", yearsDelta: -1.3, detail: "Slightly low sleep accumulates measurable risk over time." },
+      { value: "optimal", label: "7 to 8 hours", yearsDelta: 1.3, detail: "Optimal sleep supports cardiovascular and immune health." },
+      { value: "high", label: "More than 9 hours", yearsDelta: -0.9, detail: "Consistently long sleep can signal underlying issues." },
     ],
   },
   {
@@ -317,30 +232,10 @@ export const QUESTIONS: QuizQuestion[] = [
     category: "Chronic stress",
     recoverable: true,
     options: [
-      {
-        value: "low",
-        label: "Low and well managed",
-        yearsDelta: 1.0,
-        detail: "Low chronic stress supports cardiovascular health.",
-      },
-      {
-        value: "moderate",
-        label: "Manageable most days",
-        yearsDelta: -0.5,
-        detail: "Moderate stress carries a small ongoing cost.",
-      },
-      {
-        value: "high",
-        label: "Frequently high",
-        yearsDelta: -1.8,
-        detail: "Chronic high stress elevates cortisol and cardiovascular load.",
-      },
-      {
-        value: "severe",
-        label: "Constant, with poor recovery",
-        yearsDelta: -3.1,
-        detail: "Sustained severe stress is linked to measurable mortality risk.",
-      },
+      { value: "low", label: "Low and well managed", yearsDelta: 1.0, detail: "Low chronic stress supports cardiovascular health." },
+      { value: "moderate", label: "Manageable most days", yearsDelta: -0.5, detail: "Moderate stress carries a small ongoing cost." },
+      { value: "high", label: "Frequently high", yearsDelta: -1.8, detail: "Chronic high stress elevates cortisol and cardiovascular load." },
+      { value: "severe", label: "Constant, with poor recovery", yearsDelta: -3.1, detail: "Sustained severe stress is linked to measurable mortality risk." },
     ],
   },
   {
@@ -351,24 +246,25 @@ export const QUESTIONS: QuizQuestion[] = [
     category: "Family history",
     recoverable: false,
     options: [
-      {
-        value: "poor",
-        label: "Early deaths from heart disease or cancer",
-        yearsDelta: -3.1,
-        detail: "A family history of early disease raises baseline risk.",
-      },
-      {
-        value: "mixed",
-        label: "About average",
-        yearsDelta: -0.4,
-        detail: "A typical family history is roughly neutral.",
-      },
-      {
-        value: "strong",
-        label: "Many relatives lived into their 90s",
-        yearsDelta: 3.0,
-        detail: "Exceptional family longevity is strongly heritable.",
-      },
+      { value: "poor", label: "Early deaths from heart disease or cancer", yearsDelta: -3.1, detail: "A family history of early disease raises baseline risk." },
+      { value: "mixed", label: "About average", yearsDelta: -0.4, detail: "A typical family history is roughly neutral." },
+      { value: "strong", label: "Many relatives lived into their 90s", yearsDelta: 3.0, detail: "Exceptional family longevity is strongly heritable." },
+    ],
+  },
+  {
+    // Unscored: collected to tailor the results-based pitch, never affects the estimate.
+    id: "goal",
+    kind: "choice",
+    prompt: "What would you most like to improve?",
+    helper: "We tailor your protocol to this.",
+    category: "Goal",
+    recoverable: false,
+    scored: false,
+    options: [
+      { value: "fat", label: "Lose body fat", yearsDelta: 0, detail: "Fat loss focus." },
+      { value: "strength", label: "Build strength and muscle", yearsDelta: 0, detail: "Strength focus." },
+      { value: "energy", label: "More energy and better sleep", yearsDelta: 0, detail: "Energy focus." },
+      { value: "heart", label: "Protect my heart and live longer", yearsDelta: 0, detail: "Longevity focus." },
     ],
   },
 ];
@@ -379,6 +275,26 @@ function clamp(value: number, min: number, max: number): number {
 
 function round1(value: number): number {
   return Math.round(value * 10) / 10;
+}
+
+function isScored(q: QuizQuestion): boolean {
+  return q.scored !== false;
+}
+
+function isActive(q: QuizQuestion, answers: Answers): boolean {
+  return !q.showIf || q.showIf(answers);
+}
+
+/** The ordered list of questions to show given the current answers (branching). */
+export function getActiveQuestions(answers: Answers): QuizQuestion[] {
+  return QUESTIONS.filter((q) => isActive(q, answers));
+}
+
+function impactOf(deltaYears: number): RiskFactor["impact"] {
+  const m = Math.abs(deltaYears);
+  if (m >= 3) return "high";
+  if (m >= 1.5) return "moderate";
+  return "minor";
 }
 
 /** Add a fractional number of years to a date, resolved to month precision. */
@@ -397,6 +313,58 @@ function toNumber(value: string | number | undefined): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+// Concrete, results-based outcomes keyed off specific answers. Each candidate
+// carries a weight (rough relevance) and a goal "theme" for goal-aligned ranking.
+function deriveOutcomes(answers: Answers): { result: Outcome; theme: string; weight: number }[] {
+  const out: { result: Outcome; theme: string; weight: number }[] = [];
+  const add = (id: string, label: string, theme: string, weight: number) =>
+    out.push({ result: { id, label }, theme, weight });
+
+  switch (answers.bodycomp) {
+    case "obese": add("fat", "Lose around 9 kg of body fat", "fat", 9); break;
+    case "over": add("fat", "Lose around 5 kg of body fat", "fat", 6); break;
+    case "healthy": add("muscle", "Build lean, visible muscle", "strength", 2); break;
+    case "lean": add("muscle", "Add strength to an already lean frame", "strength", 1); break;
+  }
+  switch (answers.activity) {
+    case "none": add("cardio", "Rebuild your cardiovascular fitness from the ground up", "heart", 8); break;
+    case "light": add("cardio", "Sharpen your cardiovascular fitness", "heart", 5); break;
+    default: add("cardio", "Push your fitness toward the top percentile", "heart", 2);
+  }
+  switch (answers.diet) {
+    case "poor": add("energy", "Stabilize your energy and blood sugar", "energy", 6); break;
+    case "average": add("energy", "Clean up the part of your diet that actually matters", "energy", 3); break;
+  }
+  switch (answers.sleep) {
+    case "low": add("sleep", "Add 1 to 2 hours of restorative sleep", "energy", 6); break;
+    case "belowavg": add("sleep", "Deepen and extend your sleep", "energy", 4); break;
+  }
+  switch (answers.stress) {
+    case "severe": add("stress", "Bring your chronic stress back under control", "energy", 6); break;
+    case "high": add("stress", "Lower your day-to-day stress load", "energy", 4); break;
+  }
+  switch (answers.alcohol) {
+    case "heavy": add("liver", "Cut the alcohol load on your liver and heart", "heart", 6); break;
+    case "moderate": add("liver", "Reduce alcohol's drag on your recovery", "heart", 3); break;
+  }
+  switch (answers.smoking) {
+    case "heavy": add("lungs", "Start reversing smoking-related cardiovascular damage", "heart", 7); break;
+    case "light":
+    case "former": add("lungs", "Protect and rebuild lung and vascular function", "heart", 3); break;
+  }
+
+  // Always include a baseline longevity outcome so the list is never empty.
+  add("longevity", "Move your projected date in the right direction", "heart", 0.5);
+  return out;
+}
+
+const GOAL_THEME: Record<string, string> = {
+  fat: "fat",
+  strength: "strength",
+  energy: "energy",
+  heart: "heart",
+};
+
 /**
  * Compute the longevity result from quiz answers.
  * @param answers map of questionId -> selected value
@@ -414,7 +382,7 @@ export function computeResult(answers: Answers, today: Date = new Date()): ScanR
   let rawDelta = 0;
 
   for (const q of QUESTIONS) {
-    if (q.kind !== "choice") continue;
+    if (q.kind !== "choice" || !isScored(q) || !isActive(q, answers)) continue;
     const selectedValue = answers[q.id];
     const option = q.options!.find((o) => o.value === selectedValue) ?? q.options![0];
     rawDelta += option.yearsDelta;
@@ -425,6 +393,7 @@ export function computeResult(answers: Answers, today: Date = new Date()): ScanR
       deltaYears: option.yearsDelta,
       recoverable: q.recoverable,
       detail: option.detail,
+      impact: impactOf(option.yearsDelta),
     });
   }
 
@@ -446,10 +415,26 @@ export function computeResult(answers: Answers, today: Date = new Date()): ScanR
       .reduce((sum, f) => sum - f.deltaYears, 0)
   );
 
-  const topRecoverable = factors
+  const topRisks = factors
     .filter((f) => f.recoverable && f.deltaYears < 0)
     .sort((a, b) => a.deltaYears - b.deltaYears)
     .slice(0, 3);
+
+  const strengths = factors
+    .filter((f) => f.deltaYears > 0)
+    .sort((a, b) => b.deltaYears - a.deltaYears)
+    .slice(0, 2);
+
+  const primaryGoal =
+    typeof answers.goal === "string" ? answers.goal : null;
+  const goalTheme = primaryGoal ? GOAL_THEME[primaryGoal] : undefined;
+
+  const outcomes = deriveOutcomes(answers)
+    .map((o) => ({ ...o, weight: o.weight + (goalTheme && o.theme === goalTheme ? 5 : 0) }))
+    .sort((a, b) => b.weight - a.weight)
+    .filter((o, i, arr) => arr.findIndex((x) => x.result.id === o.result.id) === i)
+    .slice(0, 4)
+    .map((o) => o.result);
 
   return {
     currentAge,
@@ -460,6 +445,9 @@ export function computeResult(answers: Answers, today: Date = new Date()): ScanR
     totalDelta,
     factors,
     recoverableYears,
-    topRecoverable,
+    topRisks,
+    strengths,
+    outcomes,
+    primaryGoal,
   };
 }

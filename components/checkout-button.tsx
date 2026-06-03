@@ -22,8 +22,7 @@ export function CheckoutButton({
         {label}
       </Button>
       <p className="font-mono text-xs text-monitor-muted">
-        One-time payment. Instant access. {PRODUCT.guaranteeDays}-day money-back
-        guarantee.
+        One-time payment. Instant access. Yours to keep.
       </p>
       {clicked ? (
         <p className="font-mono text-xs text-monitor-alert">

@@ -1,60 +1,69 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { QuizStep } from "@/components/quiz-step";
 import { AnalyzingSequence } from "@/components/analyzing-sequence";
 import { ReportCard } from "@/components/report-card";
 import { GuidePitch } from "@/components/guide-pitch";
-import { QUESTIONS, computeResult, type Answers } from "@/lib/longevity";
+import {
+  QUESTIONS,
+  getActiveQuestions,
+  computeResult,
+  type Answers,
+} from "@/lib/longevity";
 
 type Phase = "quiz" | "analyzing" | "result";
 
 export default function ScanPage() {
   const [phase, setPhase] = useState<Phase>("quiz");
-  const [stepIndex, setStepIndex] = useState(0);
+  const [currentId, setCurrentId] = useState(QUESTIONS[0].id);
   const [answers, setAnswers] = useState<Answers>({});
   const pitchRef = useRef<HTMLDivElement>(null);
 
-  const question = QUESTIONS[stepIndex];
-
-  const handleChange = useCallback(
-    (value: string | number) => {
-      setAnswers((prev) => ({ ...prev, [question.id]: value }));
-    },
-    [question.id]
+  // The visible question list adapts to answers (branching follow-ups appear
+  // and disappear as the user answers their triggers).
+  const active = useMemo(() => getActiveQuestions(answers), [answers]);
+  const pos = Math.max(
+    0,
+    active.findIndex((q) => q.id === currentId)
   );
+  const question = active[pos] ?? active[0];
 
-  const handleNext = useCallback(() => {
-    if (stepIndex < QUESTIONS.length - 1) {
-      setStepIndex((i) => i + 1);
+  const handleChange = (value: string | number) => {
+    setAnswers((prev) => ({ ...prev, [question.id]: value }));
+  };
+
+  const handleNext = () => {
+    const idx = active.findIndex((q) => q.id === currentId);
+    if (idx < active.length - 1) {
+      setCurrentId(active[idx + 1].id);
     } else {
       setPhase("analyzing");
     }
-  }, [stepIndex]);
+  };
 
-  const handleBack = useCallback(() => {
-    setStepIndex((i) => Math.max(0, i - 1));
-  }, []);
+  const handleBack = () => {
+    const idx = active.findIndex((q) => q.id === currentId);
+    if (idx > 0) setCurrentId(active[idx - 1].id);
+  };
 
-  const handleAnalysisComplete = useCallback(() => {
-    setPhase("result");
-  }, []);
+  const handleAnalysisComplete = () => setPhase("result");
 
   const result = useMemo(
     () => (phase === "result" ? computeResult(answers) : null),
     [phase, answers]
   );
 
-  const scrollToPitch = useCallback(() => {
+  const scrollToPitch = () => {
     pitchRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, []);
+  };
 
   if (phase === "quiz") {
     return (
       <QuizStep
         question={question}
-        index={stepIndex}
-        total={QUESTIONS.length}
+        index={pos}
+        total={active.length}
         value={answers[question.id]}
         onChange={handleChange}
         onNext={handleNext}
