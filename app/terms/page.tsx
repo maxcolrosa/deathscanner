@@ -48,6 +48,14 @@ export default function TermsPage() {
         countdown offers are marketing and may change. Purchasing is handled by our
         payment provider; their terms also apply at checkout.
       </p>
+      <h2>Testimonials and imagery</h2>
+      <p>
+        Reviews, testimonials, and before and after transformation images shown
+        anywhere on this site, including while a protocol is being prepared, are{" "}
+        <strong>illustrative and AI-generated</strong>. They do not depict real
+        customers, real people, or real results, and they are not a guarantee of
+        any outcome.
+      </p>
 
       <h2>No warranty and limitation of liability</h2>
       <p>

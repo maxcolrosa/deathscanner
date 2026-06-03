@@ -1,31 +1,60 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useSale } from "@/components/sale-context";
+import { startGuideGeneration } from "@/lib/guide/start";
+import type { Answers } from "@/lib/longevity";
 
-// Placeholder checkout. To go live, replace the click handler with a Stripe
-// Checkout Session redirect or a Payment Link. This is the only file that
-// must change. The displayed price follows the on-page sale timer.
-export function CheckoutButton({ label }: { label?: string }) {
+// When `answers` is provided (the result page), clicking starts real guide
+// generation and redirects to the tokenized guide URL. Phase C will swap the
+// action for a Stripe Checkout redirect that calls the same generation path.
+// Without `answers` (the generic /guide page), it keeps the placeholder message.
+export function CheckoutButton({ label, answers }: { label?: string; answers?: Answers }) {
   const { price } = useSale();
-  const [clicked, setClicked] = useState(false);
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
+  const [error, setError] = useState(false);
+  const [placeholder, setPlaceholder] = useState(false);
   const text = label ?? `Get instant access for $${price}`;
+
+  const onClick = () => {
+    if (!answers) {
+      setPlaceholder(true);
+      return;
+    }
+    setError(false);
+    startTransition(async () => {
+      try {
+        const { token } = await startGuideGeneration(answers);
+        router.push(`/guide/${token}`);
+      } catch {
+        setError(true);
+      }
+    });
+  };
 
   return (
     <div className="flex flex-col items-center gap-3">
       <Button
-        onClick={() => setClicked(true)}
-        className="w-full bg-monitor-accent px-8 py-7 text-base font-semibold text-monitor-bg hover:bg-monitor-accent/90"
+        onClick={onClick}
+        disabled={pending}
+        className="w-full bg-monitor-accent px-8 py-7 text-base font-semibold text-monitor-bg hover:bg-monitor-accent/90 disabled:opacity-70"
       >
-        {text}
+        {pending ? "Building your protocol..." : text}
       </Button>
       <p className="font-mono text-xs text-monitor-muted">
         One-time payment. Instant access. Yours to keep.
       </p>
-      {clicked ? (
+      {placeholder ? (
         <p className="font-mono text-xs text-monitor-alert">
-          Checkout is not wired up yet. This is where Stripe would take your money.
+          Run your scan first so we can build your personalized protocol.
+        </p>
+      ) : null}
+      {error ? (
+        <p className="font-mono text-xs text-monitor-alert">
+          Something went wrong starting your plan. Please try again.
         </p>
       ) : null}
     </div>

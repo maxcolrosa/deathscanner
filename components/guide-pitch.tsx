@@ -4,7 +4,7 @@ import { CheckoutButton } from "@/components/checkout-button";
 import { SaleCountdown } from "@/components/sale-countdown";
 import { useSale } from "@/components/sale-context";
 import { PRODUCT, INCLUDED } from "@/lib/product";
-import type { Outcome, ScanResult } from "@/lib/longevity";
+import type { Answers, Outcome, ScanResult } from "@/lib/longevity";
 
 // Shown on the standalone /guide page where there is no scan result.
 const GENERIC_OUTCOMES: Outcome[] = [
@@ -36,7 +36,13 @@ function formatYears(years: number): string {
   return (Math.round(years * 10) / 10).toFixed(0);
 }
 
-export function GuidePitch({ result }: { result?: ScanResult }) {
+export function GuidePitch({
+  result,
+  answers,
+}: {
+  result?: ScanResult;
+  answers?: Answers;
+}) {
   const { price, listPrice, expired } = useSale();
   const recoverableYears = result?.recoverableYears ?? 0;
   const outcomes = result?.outcomes?.length ? result.outcomes : GENERIC_OUTCOMES;
@@ -177,7 +183,7 @@ export function GuidePitch({ result }: { result?: ScanResult }) {
               )}
             </span>
           </div>
-          <CheckoutButton />
+          <CheckoutButton answers={answers} />
         </div>
 
         {/* Motivating close + final CTA */}
@@ -189,6 +195,7 @@ export function GuidePitch({ result }: { result?: ScanResult }) {
           </p>
           <CheckoutButton
             label={`Start reclaiming your years for $${price}`}
+            answers={answers}
           />
         </div>
       </div>

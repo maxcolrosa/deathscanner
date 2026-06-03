@@ -87,7 +87,7 @@ export default function ScanPage() {
       <main className="pb-24">
         <ReportCard result={result!} onSeePlan={scrollToPitch} />
         <div ref={pitchRef}>
-          <GuidePitch result={result!} />
+          <GuidePitch result={result!} answers={answers} />
         </div>
         <ResultStickyBar
           recoverableYears={result!.recoverableYears}
