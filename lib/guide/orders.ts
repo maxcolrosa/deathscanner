@@ -25,7 +25,16 @@ function memoryEnabled(): boolean {
 
 // In-process store for local dev, tests, and e2e. NOT shared across serverless
 // instances; production must configure Supabase.
-const memory = new Map<string, OrderRow>();
+//
+// Uses globalThis so the Map is shared across Turbopack's separate SSR and
+// route-handler module runtime contexts in dev mode (they each get a fresh
+// module instance but share the same globalThis object).
+declare const globalThis: { __orderMemory?: Map<string, OrderRow> };
+if (!globalThis.__orderMemory) {
+  globalThis.__orderMemory = new Map<string, OrderRow>();
+}
+const memory: Map<string, OrderRow> = globalThis.__orderMemory;
+
 export function __clearMemory(): void {
   memory.clear();
 }
