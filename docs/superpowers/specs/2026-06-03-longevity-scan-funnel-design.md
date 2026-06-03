@@ -41,7 +41,8 @@ clear this is entertainment, not medical advice.
 | Price point | **Low ticket ($9–$19)** placeholder |
 | Output | Specific **death date** (age-anchored) + recoverable years |
 | Checkout | **Placeholder** Buy button; Stripe wired later |
-| Stack | Next.js App Router + TypeScript + Tailwind + shadcn/ui |
+| Visual theme | **Dark "diagnostic monitor"** — near-black, glowing teal/green, red flatline reveal |
+| Stack | Next.js App Router + TypeScript + Tailwind v4 + shadcn/ui + Motion |
 
 ## Architecture
 
@@ -107,15 +108,38 @@ Each non-age option carries a `yearsDelta` and a `recoverable` flag.
 → `computeResult(answers)` → `ScanResult` → `ReportCard` + `GuidePitch`.
 All state is ephemeral client state; nothing persisted in v1.
 
-## Visual direction (mock-clinical)
+## Visual direction (mock-clinical — "dark diagnostic monitor")
 
-- Sterile white / slate surfaces; one accent color that shifts to **warning amber/red**
-  on the death reveal for dramatic effect.
-- Monospace for "data"/report numbers; clean sans for body copy.
-- shadcn/ui primitives: Card, Progress, Button, RadioGroup, Badge.
-- UI work runs through the design-taste frontend workflow at build time (per global config).
-  Note: if the `design-taste-frontend` skill is unavailable in this environment, fall back
-  to `vercel:shadcn` guidance + deliberate visual taste, and flag the gap.
+Locked via the `design-taste-frontend` skill. **Design read:** parody mock-clinical
+longevity-assessment funnel for a general consumer audience, sterile medical-instrument
+language that deadpans into a sales pivot.
+
+- **Theme (LOCKED):** dark "patient monitor in a dim room." One theme for the whole page
+  (Page Theme Lock) — near-black slate base, glowing teal/green readouts, red "flatline"
+  alert state for the death reveal. No light-mode sections mid-page.
+- **Dials:** `DESIGN_VARIANCE: 5` · `MOTION_INTENSITY: 6` · `VISUAL_DENSITY: 5`.
+- **Color:** near-black slate base (no pure `#000`); **one locked brand accent: clinical
+  teal/cyan**, used identically across all sections (Color Consistency Lock). A **semantic
+  warning state (amber→red)** is reserved strictly for death/risk data (allowed
+  semantic-state exception, not a second brand color). No AI-purple.
+- **Type:** `Geist` + `Geist Mono` via `next/font`. **Mono carries every number/readout**
+  (life expectancy, death date, risk deltas) for the instrument feel.
+- **Motion (all motivated, honor `prefers-reduced-motion`):** scanning line + typing
+  pseudo-medical log lines + metric count-ups during "analyzing"; count-up on the final
+  age/date reveal; risk bars animate in. Implement with Motion (`motion/react`); isolate in
+  `'use client'` leaf components.
+- **Components:** shadcn/ui primitives (Button, Progress, RadioGroup, Badge), customized to
+  the dark-monitor aesthetic — never shipped in default state. Cards used only where
+  elevation communicates real hierarchy.
+- **Per-screen:** hero = asymmetric split (deadpan headline + CTA / instrument gauge visual);
+  quiz = full-screen one-question steps with a "vitals/scan" progress meter; analyzing =
+  full-screen instrument readout; report = dramatic mono date + age reveal, red-flatline
+  risk breakdown, recoverable-years callout → CTA; guide pitch = personalized hook, varied
+  benefit layout (not 3 equal cards), price, placeholder Buy button.
+- **AI-tell guardrails (from the skill):** zero em-dashes in any UI copy; eyebrow restraint
+  (≤ ceil(sections/3)); no scroll cues; no decorative status dots; no div-based fake
+  screenshots (generate or source real instrument imagery); hero ≤ 2-line headline + ≤ 20-word
+  subtext with CTA above the fold.
 
 ## Error handling
 
