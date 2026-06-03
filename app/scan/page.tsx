@@ -71,7 +71,7 @@ export default function ScanPage() {
     <main>
       <ReportCard result={result!} onSeePlan={scrollToPitch} />
       <div ref={pitchRef}>
-        <GuidePitch recoverableYears={result!.recoverableYears} />
+        <GuidePitch result={result!} />
       </div>
     </main>
   );

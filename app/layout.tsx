@@ -5,9 +5,9 @@ import { SiteFooter } from "@/components/site-footer";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "The Longevity Scan",
+  title: "The Longevity Scan — AI Longevity Assessment",
   description:
-    "A clinical-grade longevity assessment. (It is a parody. It predicts nothing.)",
+    "An AI longevity model that estimates your date of death from your lifestyle. (It is a parody. It predicts nothing.)",
 };
 
 export default function RootLayout({

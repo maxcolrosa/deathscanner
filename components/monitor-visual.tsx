@@ -10,8 +10,8 @@ export function MonitorVisual() {
   return (
     <div className="rounded-lg border border-monitor-line bg-monitor-panel p-6">
       <div className="flex items-center justify-between font-mono text-xs text-monitor-muted">
-        <span>LIVE TRACE</span>
-        <span className="text-monitor-accent">vitals nominal</span>
+        <span>AI MODEL v4.2</span>
+        <span className="text-monitor-accent">active</span>
       </div>
 
       <svg

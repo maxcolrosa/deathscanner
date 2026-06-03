@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import { animate, useReducedMotion } from "motion/react";
 
 const LOG_LINES = [
-  "Initializing biometric intake...",
-  "Cross-referencing actuarial tables...",
-  "Analyzing metabolic markers...",
-  "Estimating cellular wear...",
-  "Compiling mortality projection...",
+  "Loading AI longevity model v4.2...",
+  "Encoding your lifestyle biomarkers...",
+  "Cross-referencing 2.1M actuarial records...",
+  "Running neural mortality estimate...",
+  "Calibrating confidence interval...",
+  "Finalizing your projection...",
 ];
 
 const LINE_INTERVAL_MS = 600;
@@ -47,10 +48,10 @@ export function AnalyzingSequence({ onComplete }: { onComplete: () => void }) {
     <div className="mx-auto flex min-h-[100dvh] max-w-2xl flex-col justify-center gap-8 px-6 py-16">
       <div className="flex flex-col gap-2">
         <span className="font-mono text-xs uppercase tracking-[0.18em] text-monitor-accent">
-          Analyzing
+          AI analysis
         </span>
         <h2 className="text-3xl font-semibold tracking-tight text-monitor-fg">
-          Running your longevity scan
+          Running your longevity model
         </h2>
       </div>
 

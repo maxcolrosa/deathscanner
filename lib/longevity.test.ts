@@ -9,8 +9,7 @@ import {
 
 const FIXED_TODAY = new Date("2026-06-03T00:00:00.000Z");
 
-// Helper: build an answers object by picking an option index for each choice
-// question and a given age.
+// Build answers by picking an option index for each choice question.
 function buildAnswers(age: number, optionIndex: number): Answers {
   const answers: Answers = {};
   for (const q of QUESTIONS) {
@@ -25,7 +24,7 @@ function buildAnswers(age: number, optionIndex: number): Answers {
   return answers;
 }
 
-// Pick the worst (most negative) and best (most positive) option per question.
+// Pick the worst (most negative) or best (most positive) option per question.
 function buildExtreme(age: number, kind: "worst" | "best"): Answers {
   const answers: Answers = {};
   for (const q of QUESTIONS) {
@@ -46,10 +45,14 @@ describe("QUESTIONS config", () => {
     expect(QUESTIONS[0].kind).toBe("age");
   });
 
-  it("every choice question has at least 2 options", () => {
+  it("every choice question has at least 2 options, each with a clinical detail", () => {
     for (const q of QUESTIONS) {
       if (q.kind === "choice") {
         expect(q.options!.length).toBeGreaterThanOrEqual(2);
+        expect(q.category.length).toBeGreaterThan(0);
+        for (const opt of q.options!) {
+          expect(opt.detail.length).toBeGreaterThan(0);
+        }
       }
     }
   });
@@ -59,6 +62,12 @@ describe("QUESTIONS config", () => {
       (q) => q.kind === "choice" && !q.recoverable
     );
     expect(nonRecoverable.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("marks biological sex as non-recoverable", () => {
+    const sex = QUESTIONS.find((q) => q.id === "sex");
+    expect(sex).toBeDefined();
+    expect(sex!.recoverable).toBe(false);
   });
 });
 
@@ -72,11 +81,17 @@ describe("computeResult", () => {
     expect(a.recoverableYears).toBe(b.recoverableYears);
   });
 
+  it("exposes the national baseline it starts from", () => {
+    const result = computeResult(buildAnswers(35, 0), FIXED_TODAY);
+    expect(result.baseLifeExpectancy).toBe(BASE_LIFE_EXPECTANCY);
+  });
+
   it("best-case answers push life expectancy up and recoverableYears to 0", () => {
     const result = computeResult(buildExtreme(30, "best"), FIXED_TODAY);
     expect(result.lifeExpectancy).toBeGreaterThan(BASE_LIFE_EXPECTANCY);
     expect(result.lifeExpectancy).toBeLessThanOrEqual(MAX_LIFE_EXPECTANCY);
     expect(result.recoverableYears).toBe(0);
+    expect(result.topRecoverable).toHaveLength(0);
   });
 
   it("worst-case answers lower life expectancy and produce positive recoverableYears", () => {
@@ -85,19 +100,27 @@ describe("computeResult", () => {
     expect(result.recoverableYears).toBeGreaterThan(0);
   });
 
-  it("clamps life expectancy to at least currentAge + 1", () => {
-    // A 100-year-old with the worst lifestyle would otherwise score below 100.
-    const result = computeResult(buildExtreme(100, "worst"), FIXED_TODAY);
-    expect(result.lifeExpectancy).toBeGreaterThanOrEqual(101);
-    expect(result.predictedDeathDate.getFullYear()).toBeGreaterThan(2026);
+  it("supports fractional (decimal) life-expectancy estimates", () => {
+    // The realistic model uses decimal weights, so the estimate is rarely an integer.
+    const result = computeResult(buildExtreme(30, "worst"), FIXED_TODAY);
+    expect(Number.isInteger(result.lifeExpectancy)).toBe(false);
   });
 
-  it("computes the death date as today plus (lifeExpectancy - age) years", () => {
-    const answers = buildAnswers(40, 1);
-    const result = computeResult(answers, FIXED_TODAY);
-    const expectedYear =
-      FIXED_TODAY.getFullYear() + (result.lifeExpectancy - 40);
-    expect(result.predictedDeathDate.getFullYear()).toBe(expectedYear);
+  it("clamps life expectancy to at least currentAge and projects a future date", () => {
+    const result = computeResult(buildExtreme(99, "worst"), FIXED_TODAY);
+    expect(result.lifeExpectancy).toBeGreaterThanOrEqual(99);
+    expect(result.predictedDeathDate.getTime()).toBeGreaterThan(
+      FIXED_TODAY.getTime()
+    );
+  });
+
+  it("projects the death date roughly (lifeExpectancy - age) years out", () => {
+    const result = computeResult(buildAnswers(40, 1), FIXED_TODAY);
+    const yearsOut =
+      result.predictedDeathDate.getFullYear() - FIXED_TODAY.getFullYear();
+    const expected = result.lifeExpectancy - 40;
+    // Month rounding can shift the calendar year by up to 1.
+    expect(Math.abs(yearsOut - expected)).toBeLessThanOrEqual(1);
   });
 
   it("recoverableYears only counts losses from recoverable factors", () => {
@@ -105,8 +128,8 @@ describe("computeResult", () => {
     const recoverableLoss = result.factors
       .filter((f) => f.recoverable && f.deltaYears < 0)
       .reduce((sum, f) => sum - f.deltaYears, 0);
-    expect(result.recoverableYears).toBe(recoverableLoss);
-    // A non-recoverable negative factor must NOT be included.
+    expect(result.recoverableYears).toBeCloseTo(recoverableLoss, 5);
+    // Non-recoverable losses (e.g. sex, family history) must be excluded.
     const nonRecoverableLoss = result.factors
       .filter((f) => !f.recoverable && f.deltaYears < 0)
       .reduce((sum, f) => sum - f.deltaYears, 0);
@@ -116,9 +139,30 @@ describe("computeResult", () => {
     );
   });
 
-  it("returns one factor per choice question", () => {
+  it("topRecoverable lists the biggest reversible losses, worst first, max 3", () => {
+    const result = computeResult(buildExtreme(30, "worst"), FIXED_TODAY);
+    expect(result.topRecoverable.length).toBeGreaterThan(0);
+    expect(result.topRecoverable.length).toBeLessThanOrEqual(3);
+    for (const f of result.topRecoverable) {
+      expect(f.recoverable).toBe(true);
+      expect(f.deltaYears).toBeLessThan(0);
+    }
+    // Sorted ascending (most negative first).
+    for (let i = 1; i < result.topRecoverable.length; i++) {
+      expect(result.topRecoverable[i - 1].deltaYears).toBeLessThanOrEqual(
+        result.topRecoverable[i].deltaYears
+      );
+    }
+  });
+
+  it("returns one factor per choice question, each with category and detail", () => {
     const choiceCount = QUESTIONS.filter((q) => q.kind === "choice").length;
     const result = computeResult(buildAnswers(35, 0), FIXED_TODAY);
     expect(result.factors).toHaveLength(choiceCount);
+    for (const f of result.factors) {
+      expect(f.category.length).toBeGreaterThan(0);
+      expect(f.detail.length).toBeGreaterThan(0);
+      expect(f.answerLabel.length).toBeGreaterThan(0);
+    }
   });
 });

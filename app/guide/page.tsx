@@ -11,7 +11,7 @@ export default function GuidePage() {
           You do not need a death scan to start. You just need to start.
         </p>
       </div>
-      <GuidePitch recoverableYears={0} />
+      <GuidePitch />
     </main>
   );
 }

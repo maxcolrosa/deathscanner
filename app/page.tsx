@@ -10,7 +10,7 @@ export default function Home() {
       <section className="mx-auto grid min-h-[100dvh] max-w-7xl items-center gap-12 py-20 lg:grid-cols-2">
         <div className="flex flex-col gap-6">
           <span className="font-mono text-xs uppercase tracking-[0.18em] text-monitor-accent">
-            Longevity Scan
+            AI Longevity Scan
           </span>
           <h1 className="text-5xl font-semibold leading-[1.05] tracking-tighter text-monitor-fg md:text-6xl">
             Find out when
@@ -18,8 +18,9 @@ export default function Home() {
             you will die.
           </h1>
           <p className="max-w-[48ch] text-base leading-relaxed text-monitor-muted">
-            A clinical-grade longevity assessment. Answer eight questions and our
-            instrument will estimate your expiry date with unearned confidence.
+            Our AI longevity model weighs your lifestyle against millions of
+            actuarial records to estimate your date of death. Then it shows you how
+            to move it.
           </p>
           <div className="flex flex-wrap items-center gap-4">
             <Link
@@ -29,10 +30,10 @@ export default function Home() {
                 "bg-monitor-accent text-monitor-bg hover:bg-monitor-accent/90"
               )}
             >
-              Begin Assessment
+              Begin AI Assessment
             </Link>
             <span className="font-mono text-xs text-monitor-muted">
-              Takes about 60 seconds
+              Takes about 90 seconds
             </span>
           </div>
           <Disclaimer className="mt-2 max-w-[55ch]" />
