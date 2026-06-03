@@ -6,7 +6,7 @@ test("full scan flow reaches the report and pitch", async ({ page }) => {
     page.getByRole("heading", { name: /find out when/i })
   ).toBeVisible();
 
-  await page.getByRole("link", { name: /begin/i }).click();
+  await page.getByRole("link", { name: /begin/i }).first().click();
 
   // Age question
   await page.getByLabel("Age").fill("35");
@@ -44,7 +44,7 @@ test("full scan flow reaches the report and pitch", async ({ page }) => {
 
 test("buying builds and shows the generated guide", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("link", { name: /begin/i }).click();
+  await page.getByRole("link", { name: /begin/i }).first().click();
 
   await page.getByLabel("Age").fill("35");
   await page.getByRole("button", { name: "Next", exact: true }).click();
@@ -68,8 +68,8 @@ test("buying builds and shows the generated guide", async ({ page }) => {
     page.getByRole("heading", { name: /your estimated lifespan/i })
   ).toBeVisible({ timeout: 15000 });
 
-  // Start checkout (the first buy CTA).
-  await page.getByRole("button", { name: /get instant access/i }).first().click();
+  // Start checkout via the report's direct CTA (no scroll-jump).
+  await page.getByRole("button", { name: /build my plan/i }).first().click();
 
   // Lands on the guide page. The stub generates fast enough that the building
   // screen may be skipped and the guide view rendered directly. Wait up to 15s
