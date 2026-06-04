@@ -68,15 +68,9 @@ export function TransformationsGallery({
               <span className="text-sm font-semibold tracking-tight text-monitor-fg">
                 {t.name}
               </span>
-              <div className="flex items-center gap-2">
-                <span className="font-mono text-[10px] text-monitor-muted">
-                  {t.weeks}&nbsp;wk
-                </span>
-                <span className="h-3 w-px bg-monitor-line" aria-hidden />
-                <span className="font-mono text-xs font-medium text-monitor-accent">
-                  {t.stat}
-                </span>
-              </div>
+              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-monitor-muted">
+                Verified
+              </span>
             </div>
           </div>
         ))}

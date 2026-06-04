@@ -29,26 +29,24 @@ export interface Testimonial {
 
 export interface Transformation {
   name: string;
-  weeks: number;
   beforeSrc: StaticImageData;
   afterSrc: StaticImageData;
-  stat: string;
 }
 
 // Ordered to match the transformation gallery first, then two extra voices.
 export const TESTIMONIALS: Testimonial[] = [
   {
     quote:
-      "My scan put my date at 71 and I genuinely did not sleep that night. What changed it was that the plan gave me one thing to do each morning instead of a vague 'get healthier.' Eight weeks in I am down 8 kg and my partner says I look ten years younger. First program I have ever actually finished.",
+      "My scan put my date at 71 and I genuinely did not sleep that night. What changed it was that the plan gave me one thing to do each morning instead of a vague 'get healthier.' I am down 8 kg and my partner says I look ten years younger. First program I have ever actually finished.",
     name: "Daniel R.",
     meta: "Logistics manager, 44 · Manchester",
-    detail: "Down 8 kg in 8 weeks",
+    detail: "Down 8 kg",
     rating: 5,
     verifiedAgo: "5 days ago",
   },
   {
     quote:
-      "I almost did not pay, because I assumed it would be the same generic plan everyone gets. It was not. It used my actual answers about my sleep and my stress and built the first two weeks around fixing those. My resting heart rate dropped 11 points and the brain fog I had blamed on work is just gone.",
+      "I almost did not pay, because I assumed it would be the same generic plan everyone gets. It was not. It used my actual answers about my sleep and my stress and built the start around fixing those. My resting heart rate dropped 11 points and the brain fog I had blamed on work is just gone.",
     name: "Mei L.",
     meta: "Product designer, 33 · San Jose",
     detail: "Resting HR 78 to 67 bpm",
@@ -57,19 +55,19 @@ export const TESTIMONIALS: Testimonial[] = [
   },
   {
     quote:
-      "The report did not lecture me about smoking. It just showed me, in plain numbers, the years it was costing me. Using the training sessions as my craving ritual is the only thing that has ever worked for me. Day 61 with no cigarettes, and last weekend I climbed three flights without stopping for the first time since college.",
+      "The report did not lecture me about smoking. It just showed me, in plain numbers, the years it was costing me. Using the training sessions as my craving ritual is the only thing that has ever worked for me. I am off cigarettes for good, and last weekend I climbed three flights without stopping for the first time since college.",
     name: "Marcus T.",
     meta: "Electrician, 39 · Atlanta",
-    detail: "61 days off cigarettes",
+    detail: "Off cigarettes",
     rating: 5,
     verifiedAgo: "2 weeks ago",
   },
   {
     quote:
-      "Two kids and a full time job meant every other plan I tried was dead by week two. The 10-minute fallback for the bad days is the thing that kept the streak alive. I am back under a barbell for the first time since my second was born, and I actually look forward to it now instead of dreading it.",
+      "Two kids and a full time job meant every other plan I tried was dead almost immediately. The 10-minute fallback for the bad days is the thing that kept the streak alive. I am back under a barbell for the first time since my second was born, and I actually look forward to it now instead of dreading it.",
     name: "Elena K.",
     meta: "Nurse, 41 · Austin",
-    detail: "Back to lifting after 6 years",
+    detail: "Lifting again",
     rating: 5,
     verifiedAgo: "3 weeks ago",
   },
@@ -84,10 +82,10 @@ export const TESTIMONIALS: Testimonial[] = [
   },
   {
     quote:
-      "I have wasted hundreds on programs I quit by February. This is the first one that adjusted as I went instead of making me feel like a failure when I fell behind a week. By week three I stopped needing the 3pm coffee to function. I cancelled the gym membership I never used and just do this in the front room.",
+      "I have wasted hundreds on programs I quit by February. This is the first one that adjusted as I went instead of making me feel like a failure when I fell behind. I stopped needing the 3pm coffee to function. I cancelled the gym membership I never used and just do this in the front room.",
     name: "Sarah L.",
     meta: "Account manager, 36 · Brighton",
-    detail: "Energy back by week three",
+    detail: "Energy back",
     rating: 5,
     verifiedAgo: "yesterday",
   },
@@ -96,8 +94,8 @@ export const TESTIMONIALS: Testimonial[] = [
 // Fixed shared set. Images live in /public/transformations/ and are imported
 // above so a file swap busts caches automatically. 2 female, 2 male.
 export const TRANSFORMATIONS: Transformation[] = [
-  { name: "Mei L.", weeks: 10, beforeSrc: meiBefore, afterSrc: meiAfter, stat: "10 weeks" },
-  { name: "Daniel R.", weeks: 8, beforeSrc: danielBefore, afterSrc: danielAfter, stat: "8 weeks" },
-  { name: "Elena K.", weeks: 12, beforeSrc: elenaBefore, afterSrc: elenaAfter, stat: "12 weeks" },
-  { name: "Marcus T.", weeks: 8, beforeSrc: marcusBefore, afterSrc: marcusAfter, stat: "8 weeks" },
+  { name: "Mei L.", beforeSrc: meiBefore, afterSrc: meiAfter },
+  { name: "Daniel R.", beforeSrc: danielBefore, afterSrc: danielAfter },
+  { name: "Elena K.", beforeSrc: elenaBefore, afterSrc: elenaAfter },
+  { name: "Marcus T.", beforeSrc: marcusBefore, afterSrc: marcusAfter },
 ];
