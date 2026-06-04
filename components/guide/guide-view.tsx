@@ -1,4 +1,4 @@
-import type { DeepDive, GuideDoc } from "@/lib/guide/schema";
+import type { DeepDive, GuideDoc, YourNumbers } from "@/lib/guide/schema";
 
 /* ─── Design constants ───────────────────────────────────────────────────── */
 // DESIGN_VARIANCE: 8 | MOTION_INTENSITY: 6 (CSS cubic-bezier cascades)
@@ -107,6 +107,128 @@ function DeepDiveBlock({ dive }: { dive: DeepDive }) {
         <div className="flex flex-col gap-2 bg-monitor-accent/[0.04] px-5 py-4">
           <SubLabel>What to do</SubLabel>
           <Bullets items={dive.actions} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Download icon (shared) ─────────────────────────────────────────────── */
+
+function DownloadIcon() {
+  return (
+    <svg
+      aria-hidden
+      width="14"
+      height="14"
+      viewBox="0 0 14 14"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M7 1v8M4 6l3 3 3-3M1 10v1a2 2 0 002 2h8a2 2 0 002-2v-1" />
+    </svg>
+  );
+}
+
+/* ─── Your kit downloads block ───────────────────────────────────────────── */
+
+function DownloadKit({ token }: { token: string }) {
+  return (
+    <div className="mt-1 flex flex-col gap-3">
+      {/* Primary: workbook (accent button, full-width on mobile) */}
+      <a
+        href={`/guide/${token}/download/workbook`}
+        download
+        className="inline-flex w-full sm:w-fit items-center justify-center gap-2.5 rounded-lg bg-monitor-accent px-7 py-3.5 text-sm font-semibold text-monitor-bg transition-all duration-200 hover:bg-monitor-accent/90 active:scale-[0.97]"
+      >
+        <DownloadIcon />
+        Download your workbook PDF
+      </a>
+      <p className="text-xs text-monitor-muted max-w-[46ch]">
+        The full personalized workbook - 8-week plan, training, nutrition, your numbers dashboard, and four bonus playbooks.
+      </p>
+
+      {/* Secondary downloads: tracker pack + quick-start */}
+      <div className="flex flex-col sm:flex-row gap-2 pt-1">
+        <a
+          href={`/guide/${token}/download/trackers`}
+          download
+          className="inline-flex items-center justify-center gap-2 rounded-lg border border-monitor-line bg-monitor-panel px-5 py-2.5 text-xs font-medium text-monitor-fg transition-colors duration-200 hover:border-monitor-accent/40 hover:text-monitor-accent"
+        >
+          <DownloadIcon />
+          Printable tracker pack
+        </a>
+        <a
+          href={`/guide/${token}/download/quickstart`}
+          download
+          className="inline-flex items-center justify-center gap-2 rounded-lg border border-monitor-line bg-monitor-panel px-5 py-2.5 text-xs font-medium text-monitor-fg transition-colors duration-200 hover:border-monitor-accent/40 hover:text-monitor-accent"
+        >
+          <DownloadIcon />
+          One-page quick-start
+        </a>
+      </div>
+      <p className="text-xs text-monitor-muted/60">
+        Tracker pack: workout log, habit grid, shopping list. Quick-start: your first 7 days on one page.
+      </p>
+    </div>
+  );
+}
+
+/* ─── Your numbers section ───────────────────────────────────────────────── */
+
+function YourNumbersSection({ yourNumbers }: { yourNumbers: YourNumbers }) {
+  const { reclaimedYearsHeadline, summary, metrics, milestones } = yourNumbers;
+  return (
+    <div className="flex flex-col gap-5">
+      {/* Headline + summary */}
+      <div className="flex flex-col gap-2 rounded-xl border border-monitor-accent/30 bg-monitor-accent/[0.06] p-5">
+        <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-monitor-accent">
+          Your estimated starting point
+        </span>
+        <p className="text-xl font-semibold tracking-tight text-monitor-fg leading-snug">
+          {reclaimedYearsHeadline}
+        </p>
+        <p className="text-sm leading-relaxed text-monitor-muted mt-1">{summary}</p>
+      </div>
+
+      {/* Metrics table */}
+      <div className="rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden">
+        <div className="px-5 py-3 border-b border-monitor-line">
+          <SubLabel>Estimated bands and targets</SubLabel>
+        </div>
+        <ul className="flex flex-col divide-y divide-monitor-line">
+          {metrics.map((m, i) => (
+            <li key={i} className="grid grid-cols-1 sm:grid-cols-[1.5fr_1fr_1fr] gap-0">
+              <div className="px-5 py-3.5 flex flex-col gap-0.5">
+                <span className="text-sm font-medium text-monitor-fg">{m.label}</span>
+                <span className="text-xs text-monitor-muted">{m.how}</span>
+              </div>
+              <div className="px-5 py-3.5 sm:border-l border-t sm:border-t-0 border-monitor-line flex flex-col gap-0.5">
+                <SubLabel>Starting band</SubLabel>
+                <span className="text-sm text-monitor-fg mt-0.5">{m.startingBand}</span>
+              </div>
+              <div className="px-5 py-3.5 sm:border-l border-t sm:border-t-0 border-monitor-line flex flex-col gap-0.5">
+                <SubLabel>8-week target</SubLabel>
+                <span className="text-sm text-monitor-accent mt-0.5">{m.target}</span>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Milestones */}
+      <div className="flex flex-col gap-2">
+        <SubLabel>What to expect, week by week</SubLabel>
+        <div className="flex flex-col gap-0 divide-y divide-monitor-line rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden mt-1">
+          {milestones.map((ms, i) => (
+            <div key={i} className="flex items-start gap-4 px-5 py-3.5">
+              <Badge>{ms.week}</Badge>
+              <p className="text-sm leading-relaxed text-monitor-fg">{ms.marker}</p>
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -244,26 +366,8 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
             {guide.intro}
           </p>
 
-          {/* CTA */}
-          <a
-            href={`/guide/${token}/pdf`}
-            className="mt-1 inline-flex w-full sm:w-fit items-center justify-center gap-2.5 rounded-lg bg-monitor-accent px-7 py-3.5 text-sm font-semibold text-monitor-bg transition-all duration-200 hover:bg-monitor-accent/90 active:scale-[0.97]"
-          >
-            <svg
-              aria-hidden
-              width="14"
-              height="14"
-              viewBox="0 0 14 14"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M7 1v8M4 6l3 3 3-3M1 10v1a2 2 0 002 2h8a2 2 0 002-2v-1" />
-            </svg>
-            Download your full PDF
-          </a>
+          {/* Kit downloads block */}
+          <DownloadKit token={token} />
         </div>
 
         {/* ── Where you stand ───────────────────────────────────────────── */}
@@ -280,13 +384,18 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
           </div>
         </Section>
 
+        {/* ── Your numbers ──────────────────────────────────────────────── */}
+        <Section title="Your numbers" index={2}>
+          <YourNumbersSection yourNumbers={guide.yourNumbers} />
+        </Section>
+
         {/* ── Outcomes ──────────────────────────────────────────────────── */}
-        <Section title="What these 8 weeks deliver" index={2}>
+        <Section title="What these 8 weeks deliver" index={3}>
           <Bullets items={guide.outcomes} />
         </Section>
 
         {/* ── Risk briefings (deep dives) ───────────────────────────────── */}
-        <Section title="Your biggest risks, in depth" index={3}>
+        <Section title="Your biggest risks, in depth" index={4}>
           <p className="max-w-[58ch] text-sm leading-relaxed text-monitor-muted">
             For each of your largest modifiable risks: what is happening, why it
             costs you, what improves when you fix it, and exactly what to do.
@@ -299,7 +408,7 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
         </Section>
 
         {/* ── First 7 days ──────────────────────────────────────────────── */}
-        <Section title="Start here: your first 7 days" index={4}>
+        <Section title="Start here: your first 7 days" index={5}>
           <ol className="flex flex-col gap-0 divide-y divide-monitor-line border border-monitor-line rounded-xl overflow-hidden">
             {guide.next7Days.map((d, i) => (
               <li
@@ -323,7 +432,7 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
         </Section>
 
         {/* ── How your training works ───────────────────────────────────── */}
-        <Section title="How your training works" index={5}>
+        <Section title="How your training works" index={6}>
           <DeepDiveBlock dive={guide.training.approach} />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col gap-2 rounded-xl border border-monitor-line bg-monitor-panel p-5">
@@ -393,7 +502,7 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
         </Section>
 
         {/* ── 8-week plan ───────────────────────────────────────────────── */}
-        <Section title="Your 8-week plan" index={6}>
+        <Section title="Your 8-week plan" index={7}>
           <div className="flex flex-col gap-4">
             {guide.weeks.map((w, i) => (
               <WeekCard key={w.week} w={w} delay={i * 50 + 100} />
@@ -402,7 +511,7 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
         </Section>
 
         {/* ── Nutrition plan ────────────────────────────────────────────── */}
-        <Section title="Your nutrition plan" index={7}>
+        <Section title="Your nutrition plan" index={8}>
           <DeepDiveBlock dive={n.philosophy} />
 
           {/* Plate formula: visually distinct callout block */}
@@ -494,7 +603,7 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
         </Section>
 
         {/* ── Daily blueprint ───────────────────────────────────────────── */}
-        <Section title="Your daily blueprint" index={8}>
+        <Section title="Your daily blueprint" index={9}>
           <div className="rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden">
             <ul className="flex flex-col divide-y divide-monitor-line">
               {guide.dailyBlueprint.map((b, i) => (
@@ -510,7 +619,7 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
         </Section>
 
         {/* ── Sleep and stress ──────────────────────────────────────────── */}
-        <Section title="Sleep and stress recovery" index={9}>
+        <Section title="Sleep and stress recovery" index={10}>
           <DeepDiveBlock dive={guide.sleepAndStress.briefing} />
           <div className="flex flex-col gap-2">
             <SubLabel>Your protocol</SubLabel>
@@ -521,7 +630,7 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
         </Section>
 
         {/* ── 10-minute fallback ────────────────────────────────────────── */}
-        <Section title="The 10-minute fallback" index={10}>
+        <Section title="The 10-minute fallback" index={11}>
           <p className="text-sm leading-relaxed text-monitor-fg">{guide.tenMinutePlan.summary}</p>
           <div className="rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden">
             <ul className="flex flex-col divide-y divide-monitor-line">
@@ -536,7 +645,7 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
         </Section>
 
         {/* ── Progress markers ──────────────────────────────────────────── */}
-        <Section title="How to know it is working" index={11}>
+        <Section title="How to know it is working" index={12}>
           <p className="max-w-[58ch] text-sm leading-relaxed text-monitor-muted">
             {guide.progressMarkers.summary}
           </p>
@@ -544,7 +653,7 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
         </Section>
 
         {/* ── Troubleshooting ───────────────────────────────────────────── */}
-        <Section title="When it gets hard" index={12}>
+        <Section title="When it gets hard" index={13}>
           <div className="flex flex-col gap-3">
             {guide.troubleshooting.map((t, i) => (
               <div
@@ -563,7 +672,7 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
         </Section>
 
         {/* ── FAQs ──────────────────────────────────────────────────────── */}
-        <Section title="Common questions" index={13}>
+        <Section title="Common questions" index={14}>
           <div className="flex flex-col divide-y divide-monitor-line rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden">
             {guide.faqs.map((f, i) => (
               <div key={i} className="flex flex-col gap-1.5 px-5 py-4">
@@ -574,8 +683,20 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
           </div>
         </Section>
 
+        {/* ── Bonus playbooks ───────────────────────────────────────────── */}
+        <Section title="Bonus playbooks" index={15}>
+          <p className="max-w-[58ch] text-sm leading-relaxed text-monitor-muted">
+            Four additional playbooks covering the situations that derail most people - plateaus, travel, supplements, and what to do after week 8.
+          </p>
+          <div className="flex flex-col gap-4">
+            {guide.bonusModules.map((m, i) => (
+              <DeepDiveBlock key={i} dive={m} />
+            ))}
+          </div>
+        </Section>
+
         {/* ── Recalibration ─────────────────────────────────────────────── */}
-        <Section title="Weekly recalibration" index={14}>
+        <Section title="Weekly recalibration" index={16}>
           <p className="text-sm leading-relaxed text-monitor-fg">{guide.recalibration}</p>
         </Section>
 
