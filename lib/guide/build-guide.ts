@@ -274,7 +274,7 @@ function socialBriefing(social: string): DeepDive {
     actions: [
       "Schedule one real-world social contact a week and treat it like an appointment",
       "Train with one other person, or share your weekly check-in with someone",
-      "Join the community thread that comes with this plan and post your first win",
+      "Tell one person, a friend, a colleague, or a family member, that you started this plan, and ask them to check in on you",
       "Replace some passive screen time with a message or a call to someone who matters",
     ],
   };
