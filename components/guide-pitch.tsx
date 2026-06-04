@@ -25,7 +25,7 @@ const STEPS = [
   {
     n: "2",
     title: "We turn them into a daily plan",
-    body: "An 8-week protocol that targets your highest-impact risks first.",
+    body: "A 90-day program that targets your highest-impact risks first.",
   },
   {
     n: "3",
@@ -79,7 +79,7 @@ export function GuidePitch({
         {/* What they actually get out of it, derived from their answers */}
         <div className="flex flex-col gap-3">
           <h3 className="font-mono text-xs uppercase tracking-[0.18em] text-monitor-muted">
-            What 8 weeks will change for you
+            What 90 days will change for you
           </h3>
           <ul className="flex flex-col divide-y divide-monitor-line rounded-lg border border-monitor-line bg-monitor-panel">
             {outcomes.map((outcome) => (

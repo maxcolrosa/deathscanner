@@ -2,28 +2,38 @@
 // CheckoutButton to Stripe later, without touching the UI.
 export const PRODUCT = {
   name: "The Second Wind Protocol",
-  tagline: "A personalized 8-week protocol built from your scan.",
+  tagline: "A complete, personalized 90-day program built from your scan.",
   /** Live (sale) price the user pays before the countdown ends. */
-  price: 9,
+  price: 13,
   /** Price after the on-page countdown expires. */
-  expiredPrice: 19,
+  expiredPrice: 24,
   /** Anchor: the "normal" price, shown struck through. */
-  listPrice: 79,
+  listPrice: 129,
   /** Anchor: total itemized value of everything included. */
-  stackValue: 383,
+  stackValue: 492,
 } as const;
 
-// Itemized value stack. Sum of `value` equals PRODUCT.stackValue (383).
+// Itemized value stack. Sum of `value` equals PRODUCT.stackValue (492).
 export const INCLUDED = [
   {
-    label: "Your custom 8-week plan, built from your scan",
-    note: "Targets your highest-impact risks first, in order.",
+    label: "Your custom 90-day program, built from your scan",
+    note: "Targets your highest-impact risks first, across a Foundation, Build, and Push phase.",
+    value: 99,
+  },
+  {
+    label: "The metabolic reset and recipe bank: real meals, macros, and a shopping list",
+    note: "Calorie and protein estimates per recipe, aisle-grouped shopping list, plant-protein swaps included.",
     value: 89,
   },
   {
-    label: "The metabolic reset: exactly what to eat",
-    note: "No counting, no guesswork. Just a list and a rhythm.",
+    label: "The exercise library: every movement, with form, cues, and swaps",
+    note: "Setup, execution, common mistakes, an easier and a harder option for every exercise in your plan.",
     value: 69,
+  },
+  {
+    label: "Your numbers dashboard and 90-day progress system",
+    note: "Starting bands, targets, monthly review checkpoints, and decision rules for when to add load or hold.",
+    value: 59,
   },
   {
     label: "Sleep and stress recovery system",
@@ -31,23 +41,18 @@ export const INCLUDED = [
     value: 49,
   },
   {
-    label: "The 10-minute daily routine",
-    note: "Short enough that 'no time' stops being the reason.",
+    label: "The science: why every step of the plan works",
+    note: "Mechanism explanations for each major lever, grounded in well-established research.",
     value: 39,
   },
   {
-    label: "Your numbers dashboard: starting bands, targets, and an 8-week milestone map",
-    note: "One page that shows where you are, where you are going, and the checkpoints between.",
-    value: 49,
-  },
-  {
-    label: "The printable tracker pack: workout log, habit and measurement trackers, shopping list",
-    note: "Print once, use every week. No app required.",
-    value: 39,
-  },
-  {
-    label: "Four bonus playbooks: plateaus, travel, supplements, and your next 8 weeks",
+    label: "Four bonus playbooks: plateaus, travel, supplements, and life after your 90 days",
     note: "Answers to the four situations that end most programs, before you hit them.",
     value: 49,
+  },
+  {
+    label: "The printable kit: workbook, tracker pack, and quick-start",
+    note: "Five downloadable PDFs. Print once, use every week. No app required.",
+    value: 39,
   },
 ] as const;
