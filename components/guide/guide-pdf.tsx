@@ -369,6 +369,14 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
         {/* ── Nutrition ── */}
         <Section index={6} title="Your nutrition plan">
           <Panel dive={n.philosophy} />
+          {/* Plate formula */}
+          <Text style={styles.label}>Build every plate like this</Text>
+          <Text style={[styles.para, { borderLeftWidth: 2, borderLeftColor: C.accentDim, paddingLeft: 8 }]}>{n.plateFormula}</Text>
+          {/* Goal-specific calibration */}
+          <Text style={styles.label}>Calibrated to your goal</Text>
+          {n.calibration.map((c, i) => (
+            <Bullet key={i}>{c}</Bullet>
+          ))}
           <Text style={styles.label}>Your protein target</Text>
           <Text style={styles.para}>{n.proteinTarget}</Text>
           <Text style={styles.label}>Hydration</Text>

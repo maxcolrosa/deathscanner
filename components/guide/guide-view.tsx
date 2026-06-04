@@ -405,6 +405,20 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
         <Section title="Your nutrition plan" index={7}>
           <DeepDiveBlock dive={n.philosophy} />
 
+          {/* Plate formula: visually distinct callout block */}
+          <div className="flex flex-col gap-1.5 rounded-xl border border-monitor-accent/30 bg-monitor-accent/[0.06] p-5">
+            <SubLabel>Build every plate like this</SubLabel>
+            <p className="mt-1 text-sm leading-relaxed text-monitor-fg">{n.plateFormula}</p>
+          </div>
+
+          {/* Goal-specific calibration cues */}
+          <div className="flex flex-col gap-2">
+            <SubLabel>Calibrated to your goal</SubLabel>
+            <div className="mt-1">
+              <Bullets items={n.calibration} />
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5 rounded-xl border border-monitor-line bg-monitor-panel p-5">
               <SubLabel>Your protein target</SubLabel>

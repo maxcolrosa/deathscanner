@@ -62,8 +62,10 @@ const validGuide = {
   weeks: Array.from({ length: 8 }, (_, i) => validWeek(i + 1)),
   nutritionPlan: {
     philosophy: validDeepDive("Your diet is close but leaking"),
-    proteinTarget: "A palm of protein at every meal",
+    plateFormula: "Half your plate vegetables, a palm of protein, a fist of whole-food carbs, a thumb of healthy fat.",
+    proteinTarget: "A palm of protein at every meal. For most adults this lands around 1.6 to 2.0 g per kg of bodyweight.",
     hydration: "Drink water through the day, more on training days.",
+    calibration: ["Pair protein with every meal to steady blood sugar"],
     principles: ["Aim for roughly 1.6 g protein per kg"],
     sampleDays: [
       {

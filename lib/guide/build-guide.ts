@@ -381,12 +381,72 @@ function proteinTarget(bodycomp: string): string {
   return "a palm of protein at every meal";
 }
 
+// Build a plate-formula string. The carb half of the formula shifts by goal:
+// fat -> smaller carb portion note; strength -> extra carbs on training days.
+function plateFormula(goal: string | null): string {
+  const carbCue =
+    goal === "strength"
+      ? "one to two fists of whole-food carbs (go bigger on training days)"
+      : goal === "fat"
+        ? "a modest fist of whole-food carbs (keep it smaller to create a gentle deficit)"
+        : "a fist of whole-food carbs";
+  return `Fill half your plate with vegetables (two loosely-packed fist-fulls), add a palm of protein, ${carbCue}, and finish with a thumb of healthy fat, such as olive oil, avocado, or a small handful of nuts. That single template covers most of your meals without any counting.`;
+}
+
+// Goal-specific calibration cues. At most three, concise and actionable.
+function goalCalibration(goal: string | null): string[] {
+  if (goal === "fat") {
+    return [
+      "Eat protein and vegetables first at each meal so the calorie-dense items come last, when you are already partly full",
+      "Watch liquid calories, smoothies, juice, and alcohol add up quickly without filling you; swap them for water or sparkling water",
+      "Aim to finish each meal feeling 80 percent full, not stuffed. You are creating a small, comfortable deficit, not starving",
+    ];
+  }
+  if (goal === "strength") {
+    return [
+      "On training days, add an extra fist of carbs around the session, before or after, to fuel the work and accelerate recovery",
+      "Eat enough. Under-eating while trying to build muscle is the most common mistake; if you are not gaining strength week to week, add a meal",
+      "Keep protein high every day, not just training days, because muscle repair happens around the clock",
+    ];
+  }
+  if (goal === "energy") {
+    return [
+      "Pair protein or fat with every carb source to slow digestion and keep blood sugar steady rather than spiking and crashing",
+      "Eat within an hour of waking to set your metabolism in motion and avoid the mid-morning energy dip",
+      "Aim for 25 to 30 g of fibre a day from vegetables, legumes, and whole grains; fibre is the main driver of steady energy and satiety",
+    ];
+  }
+  if (goal === "heart") {
+    return [
+      "Prioritise fibre at most meals, two fists of vegetables and a legume or whole grain, because soluble fibre actively lowers cholesterol",
+      "Use olive oil as your main fat and get oily fish, salmon, mackerel, or sardines, twice a week for the omega-3 benefit",
+      "Cut added salt and ultra-processed meat first; they have the largest effect on blood pressure",
+    ];
+  }
+  // Default: sensible for any profile
+  return [
+    "Aim for 25 to 30 g of fibre a day via vegetables, legumes, oats, and whole grains to support digestion, satiety, and cardiovascular health",
+    "Pair protein with every meal to steady your blood sugar and keep hunger manageable across the day",
+    "Limit ultra-processed food to less than 20 percent of your meals; that single shift removes most of the dietary damage without requiring perfection",
+  ];
+}
+
 function buildNutritionPlan(diet: string, goal: string | null, bodycomp: string) {
   const philosophy = dietBriefing(diet);
+  const plate = plateFormula(goal);
+  const calibration = goalCalibration(goal);
+
+  // Protein guidance: hand-portion target plus an honest reference range so
+  // readers who want numbers have them, without implying we computed it precisely.
+  const portionTarget = proteinTarget(bodycomp);
+  const proteinNote =
+    bodycomp === "over" || bodycomp === "obese"
+      ? `${portionTarget}. For most adults this lands around 1.8 to 2.2 g of protein per kg of target bodyweight per day, if you would rather not count portions. The larger-palm guidance here is intentional and matches the higher end of that range.`
+      : `${portionTarget}. For most adults this lands around 1.6 to 2.0 g of protein per kg of bodyweight per day, if you would rather not count. Prioritise real food sources first, lean meat, fish, eggs, Greek yogurt, and legumes, before turning to protein powder.`;
+
   const principles: string[] = [
-    `Eat ${proteinTarget(bodycomp)}`,
-    "Build each plate around protein, vegetables, and a whole-food carb",
-    "Stop eating about three hours before bed",
+    plate,
+    "Stop eating about three hours before bed to protect sleep quality and overnight blood-sugar regulation",
     "Eighty percent consistent beats one hundred percent for a week and then quitting",
   ];
   if (diet === "poor")
@@ -410,27 +470,30 @@ function buildNutritionPlan(diet: string, goal: string | null, bodycomp: string)
     swaps.push({ from: "Under-eating protein on busy days", to: "A protein shake as the backup" });
   }
 
-  const carbNote = goal === "strength" ? "extra rice or potatoes on training days" : "a fist of whole-food carbs";
+  // Sample days: portion cues in every meal description so the reader knows
+  // roughly how much, not just what.
+  const carbNote = goal === "strength" ? "two fists of rice or potatoes (bigger on training days)" : "a fist of rice, potato, or whole-grain bread";
+  const snackNote = goal === "fat" ? "Greek yogurt (one small pot) or sliced vegetables with two tablespoons of hummus" : "Greek yogurt with a handful of berries, or a piece of fruit and 20 to 25 g of nuts";
   const sampleDays: SampleDay[] = [
     {
       label: "A training day",
-      breakfast: "Three eggs or Greek yogurt, oats, and a handful of berries",
-      lunch: `Chicken or tofu, ${carbNote}, and a big salad`,
-      dinner: "Salmon, lean beef, or beans with potatoes and greens",
-      snacks: goal === "fat" ? "Greek yogurt, or vegetables and hummus" : "Greek yogurt, or fruit with a few nuts",
+      breakfast: "Three eggs scrambled or a 150 g serving of Greek yogurt, a palm-sized portion of oats, and a handful of berries",
+      lunch: `A palm of chicken, tofu, or tinned fish, ${carbNote}, and two fists of mixed salad or roasted vegetables, dressed with olive oil`,
+      dinner: "A palm of salmon, lean beef, or beans, a fist of potatoes or greens, and a large side of steamed or roasted vegetables",
+      snacks: snackNote,
     },
     {
       label: "A rest day",
-      breakfast: "Veggie omelette or a high-protein yogurt bowl",
-      lunch: "Big mixed salad with two palms of protein and olive oil",
-      dinner: "Stir-fry with tofu or chicken, plenty of vegetables, a smaller scoop of rice",
-      snacks: "A piece of fruit and a small handful of nuts",
+      breakfast: "A two-egg veggie omelette or a high-protein yogurt bowl with a tablespoon of nuts and some berries",
+      lunch: "A large mixed salad with two palms of protein, a thumb of olive oil, and a small handful of croutons or seeds for crunch",
+      dinner: "A stir-fry with a palm of tofu or chicken, two fists of vegetables, and a smaller fist of rice",
+      snacks: "One piece of fruit and a small handful of nuts, about 20 g",
     },
     {
       label: "An eating-out day",
       breakfast: "Keep it normal at home so the meal out is the only variable",
-      lunch: "Grilled protein, double the vegetables, dressing on the side",
-      dinner: "A sensible main you enjoy, one drink at most, and skip the bread basket",
+      lunch: "Grilled protein, ask for double the vegetables or a side salad, dressing on the side",
+      dinner: "A sensible main you enjoy, one drink at most, skip the bread basket, and no need for dessert unless you really want it",
       snacks: "None needed; you planned the bigger meal in",
     },
   ];
@@ -456,8 +519,10 @@ function buildNutritionPlan(diet: string, goal: string | null, bodycomp: string)
     "Drink water through the day, roughly two to three litres for most adults, more on training days. Thirst often masquerades as hunger and as the mid-afternoon energy crash; a glass of water before you reach for a snack settles which one it really is.";
   return {
     philosophy,
-    proteinTarget: proteinTarget(bodycomp),
+    plateFormula: plate,
+    proteinTarget: proteinNote,
     hydration,
+    calibration,
     principles,
     sampleDays,
     swaps,

@@ -63,8 +63,12 @@ export const SampleDaySchema = z.object({
 
 export const NutritionPlanSchema = z.object({
   philosophy: DeepDiveSchema,
+  // "Build every plate like this" formula using hand-portion guidance.
+  plateFormula: z.string().min(1),
   proteinTarget: z.string().min(1),
   hydration: z.string().min(1),
+  // Goal-specific calibration cues (1-3 concrete nudges keyed to the user's goal).
+  calibration: z.array(z.string().min(1)).min(1),
   principles: z.array(z.string().min(1)).min(1),
   sampleDays: z.array(SampleDaySchema).min(2),
   swaps: z.array(SwapSchema).min(1),
