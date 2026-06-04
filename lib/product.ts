@@ -10,10 +10,10 @@ export const PRODUCT = {
   /** Anchor: the "normal" price, shown struck through. */
   listPrice: 79,
   /** Anchor: total itemized value of everything included. */
-  stackValue: 294,
+  stackValue: 383,
 } as const;
 
-// Itemized value stack. Sum of `value` equals PRODUCT.stackValue.
+// Itemized value stack. Sum of `value` equals PRODUCT.stackValue (383).
 export const INCLUDED = [
   {
     label: "Your custom 8-week plan, built from your scan",
@@ -36,13 +36,18 @@ export const INCLUDED = [
     value: 39,
   },
   {
-    label: "Weekly recalibration as you improve",
-    note: "The plan tightens as your numbers move.",
-    value: 29,
+    label: "Your numbers dashboard: starting bands, targets, and an 8-week milestone map",
+    note: "One page that shows where you are, where you are going, and the checkpoints between.",
+    value: 49,
   },
   {
-    label: "A private community doing the same thing",
-    note: "The accountability that makes it stick.",
-    value: 19,
+    label: "The printable tracker pack: workout log, habit and measurement trackers, shopping list",
+    note: "Print once, use every week. No app required.",
+    value: 39,
+  },
+  {
+    label: "Four bonus playbooks: plateaus, travel, supplements, and your next 8 weeks",
+    note: "Answers to the four situations that end most programs, before you hit them.",
+    value: 49,
   },
 ] as const;
