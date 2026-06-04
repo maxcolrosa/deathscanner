@@ -115,7 +115,7 @@ const validGuide = {
   outcomes: ["Lose around 5 kg of body fat"],
   closing: "You started today. Keep going.",
   yourNumbers: {
-    summary: "Track these six numbers over 8 weeks.",
+    summary: "Track these six numbers over the 90-day program.",
     reclaimedYearsHeadline: "Around 9 recoverable years are on the table. These are the numbers that move them.",
     metrics: [
       { label: "Resting heart rate", startingBand: "Estimated 72 to 82 bpm", target: "Goal: drop 5 to 10 bpm", how: "Zone 2 cardio and sleep" },
@@ -133,7 +133,7 @@ const validGuide = {
     validDeepDive("The Plateau Protocol"),
     validDeepDive("Travel and Holiday Survival Kit"),
     validDeepDive("The Supplement Truth"),
-    validDeepDive("Your Next 8 Weeks"),
+    validDeepDive("Life After Your 90 Days"),
   ],
   trackers: {
     groceryByAisle: [
