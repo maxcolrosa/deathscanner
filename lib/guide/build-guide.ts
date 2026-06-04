@@ -635,7 +635,7 @@ function buildFaqs(level: Level, injury: boolean, goal: string | null, days: num
     },
     {
       q: "How long until I see results?",
-      a: "Everyone responds at their own pace, and the research is clear that chasing a deadline is one of the fastest ways to quit. Focus on the habits: hit your sessions, sleep enough, eat well. The changes follow, and they stick because they came from consistent behaviour rather than a sprint.",
+      a: "Everyone responds at their own pace, and the research is clear that chasing a deadline is one of the fastest ways to quit. Focus on the habits: hit your sessions, sleep enough, eat well. The changes follow, and they stick because they came from consistent behavior rather than a sprint.",
     },
     {
       q: `Why only ${days} training days a week?`,

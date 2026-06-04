@@ -55,7 +55,7 @@ export const TESTIMONIALS: Testimonial[] = [
   },
   {
     quote:
-      "The report did not lecture me about smoking. It just showed me, in plain numbers, the years it was costing me. Using the training sessions as my craving ritual is the only thing that has ever worked for me. I am off cigarettes for good, and last weekend I climbed three flights without stopping for the first time since college.",
+      "The report did not lecture me about smoking. It just showed me, in plain numbers, the years it was costing me. Using the training sessions as my craving ritual is the only thing that has ever worked for me. I am off cigarettes now, and last weekend I climbed three flights without stopping for the first time since college.",
     name: "Marcus T.",
     meta: "Electrician, 39 · Atlanta",
     detail: "Off cigarettes",
