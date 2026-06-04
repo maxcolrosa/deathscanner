@@ -146,6 +146,24 @@ const validGuide = {
       "Hit your step target",
     ],
   },
+  recipeBank: {
+    recipes: Array.from({ length: 8 }, (_, i) => ({
+      id: `r${i + 1}`,
+      name: `Recipe ${i + 1}`,
+      meal: (["breakfast", "lunch", "dinner", "snack"] as const)[i % 4],
+      tags: ["high-protein", "quick"],
+      servings: 1,
+      timeMins: 15,
+      calories: 400,
+      proteinG: 35,
+      ingredients: ["200 g chicken breast", "1 tablespoon olive oil"],
+      steps: ["Cook the chicken in the oil.", "Season and serve."],
+      note: "Estimates: 400 kcal, 35 g protein per serving.",
+    })),
+    shoppingList: [
+      { aisle: "Protein", items: ["Chicken breast", "Eggs"] },
+    ],
+  },
 };
 
 describe("GuideDocSchema", () => {

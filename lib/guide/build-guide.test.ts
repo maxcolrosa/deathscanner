@@ -110,4 +110,60 @@ describe("buildGuide", () => {
       expect(buildGuide(r, a)).toEqual(buildGuide(r, a));
     }
   });
+
+  // ─── Recipe bank (Layer A) ───────────────────────────────────────────────
+
+  it("recipeBank has at least 12 recipes spanning all four meal types", () => {
+    for (const a of [sedentary, active, injured]) {
+      const guide = buildGuide(computeResult(a), a);
+      const { recipes } = guide.recipeBank;
+      expect(recipes.length).toBeGreaterThanOrEqual(12);
+      const mealTypes = new Set(recipes.map((r) => r.meal));
+      expect(mealTypes.has("breakfast")).toBe(true);
+      expect(mealTypes.has("lunch")).toBe(true);
+      expect(mealTypes.has("dinner")).toBe(true);
+      expect(mealTypes.has("snack")).toBe(true);
+    }
+  });
+
+  it("recipeBank: fat goal yields lower average calories than strength goal", () => {
+    const fatAnswers = { ...sedentary, goal: "fat" };
+    const strengthAnswers = { ...sedentary, goal: "strength" };
+    const fatGuide = buildGuide(computeResult(fatAnswers), fatAnswers);
+    const strengthGuide = buildGuide(computeResult(strengthAnswers), strengthAnswers);
+    const avg = (recipes: { calories: number }[]) =>
+      recipes.reduce((sum, r) => sum + r.calories, 0) / recipes.length;
+    expect(avg(fatGuide.recipeBank.recipes)).toBeLessThan(avg(strengthGuide.recipeBank.recipes));
+  });
+
+  it("recipeBank always contains at least one vegetarian or plant-protein recipe", () => {
+    for (const a of [sedentary, active, injured]) {
+      const guide = buildGuide(computeResult(a), a);
+      const hasVeg = guide.recipeBank.recipes.some(
+        (r) => r.tags.includes("vegetarian") || r.tags.includes("plant-protein")
+      );
+      expect(hasVeg).toBe(true);
+    }
+  });
+
+  it("recipeBank shoppingList is non-empty and contains aisle-grouped items", () => {
+    for (const a of [sedentary, active, injured]) {
+      const guide = buildGuide(computeResult(a), a);
+      const { shoppingList } = guide.recipeBank;
+      expect(shoppingList.length).toBeGreaterThan(0);
+      for (const aisleEntry of shoppingList) {
+        expect(aisleEntry.aisle.length).toBeGreaterThan(0);
+        expect(aisleEntry.items.length).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it("recipeBank is deterministic for fixed inputs (deep-equal on two builds)", () => {
+    for (const a of [sedentary, active, injured]) {
+      const r = computeResult(a);
+      const g1 = buildGuide(r, a).recipeBank;
+      const g2 = buildGuide(r, a).recipeBank;
+      expect(g1).toEqual(g2);
+    }
+  });
 });

@@ -11,7 +11,9 @@ import type {
   YourNumbers,
   YourNumbersMetric,
   GroceryAisle,
+  RecipeBank,
 } from "@/lib/guide/schema";
+import { RECIPES } from "@/lib/guide/recipes";
 
 type Level = "beginner" | "intermediate";
 
@@ -944,6 +946,275 @@ function buildTrackers(answers: Answers): { groceryByAisle: GroceryAisle[]; dail
   return { groceryByAisle, dailyChecklist };
 }
 
+/* ─── Recipe bank (Layer A) ─────────────────────────────────────────────────
+   Deterministically selects a tailored subset from the RECIPES library and
+   builds a consolidated, aisle-grouped shopping list. No Math.random. */
+
+// Ingredient-to-aisle mapping extended to cover recipe-bank ingredients.
+// Extends the existing GROCERY_AISLE_MAP pattern used by buildTrackers.
+const RECIPE_AISLE_MAP: Record<string, string> = {
+  // Protein
+  "eggs": "Protein",
+  "egg whites": "Protein",
+  "egg": "Protein",
+  "smoked salmon": "Protein",
+  "salmon": "Protein",
+  "cod": "Protein",
+  "tuna": "Protein",
+  "turkey": "Protein",
+  "chicken": "Protein",
+  "beef": "Protein",
+  "prawns": "Protein",
+  "sardines": "Protein",
+  "tofu": "Protein",
+  "greek yogurt": "Dairy",
+  "yogurt": "Dairy",
+  "cottage cheese": "Dairy",
+  "feta": "Dairy",
+  "feta cheese": "Dairy",
+  "milk": "Dairy",
+  "oat milk": "Dairy",
+  // Produce / fresh
+  "spinach": "Produce",
+  "baby spinach": "Produce",
+  "banana": "Produce",
+  "berries": "Produce",
+  "mixed berries": "Produce",
+  "tomatoes": "Produce",
+  "cherry tomatoes": "Produce",
+  "cucumber": "Produce",
+  "red onion": "Produce",
+  "onion": "Produce",
+  "garlic": "Produce",
+  "lemon": "Produce",
+  "lime": "Produce",
+  "avocado": "Produce",
+  "courgette": "Produce",
+  "broccoli": "Produce",
+  "red pepper": "Produce",
+  "pepper": "Produce",
+  "kale": "Produce",
+  "cabbage": "Produce",
+  "spring onions": "Produce",
+  "celery": "Produce",
+  "sweet potato": "Produce",
+  "rocket": "Produce",
+  "lettuce": "Produce",
+  "apple": "Produce",
+  "pineapple": "Produce",
+  "parsley": "Produce",
+  "coriander": "Produce",
+  "ginger": "Produce",
+  // Pantry
+  "oats": "Pantry",
+  "rolled oats": "Pantry",
+  "chia seeds": "Pantry",
+  "quinoa": "Pantry",
+  "rice": "Pantry",
+  "brown rice": "Pantry",
+  "rye bread": "Pantry",
+  "whole-grain bread": "Pantry",
+  "oatcakes": "Pantry",
+  "rice cakes": "Pantry",
+  "tortillas": "Pantry",
+  "olive oil": "Pantry",
+  "sesame oil": "Pantry",
+  "soy sauce": "Pantry",
+  "tamari": "Pantry",
+  "oyster sauce": "Pantry",
+  "cornflour": "Pantry",
+  "baking powder": "Pantry",
+  "vanilla extract": "Pantry",
+  "honey": "Pantry",
+  "maple syrup": "Pantry",
+  "almond butter": "Pantry",
+  "pumpkin seeds": "Pantry",
+  "nuts": "Pantry",
+  "almonds": "Pantry",
+  "sesame seeds": "Pantry",
+  "protein powder": "Pantry",
+  "creatine": "Pantry",
+  // Tinned / canned
+  "tinned tomatoes": "Tinned",
+  "chopped tomatoes": "Tinned",
+  "white beans": "Tinned",
+  "cannellini beans": "Tinned",
+  "black beans": "Tinned",
+  "chickpeas": "Tinned",
+  "lentils": "Tinned",
+  "green lentils": "Tinned",
+  "tinned fish": "Tinned",
+  "capers": "Tinned",
+  // Frozen
+  "frozen vegetables": "Frozen",
+  "frozen peas": "Frozen",
+  "edamame": "Frozen",
+  "frozen edamame": "Frozen",
+  "frozen berries": "Frozen",
+};
+
+// Canonical aisle order for the shopping list output.
+const SHOPPING_AISLE_ORDER = ["Protein", "Dairy", "Produce", "Tinned", "Pantry", "Frozen"];
+
+// Normalise an ingredient string to a lookup key. Extracts the base ingredient
+// name by lowercasing, stripping leading quantities and measures, and trimming
+// parenthetical notes.
+function normaliseIngredient(raw: string): string {
+  return raw
+    .toLowerCase()
+    // Remove leading quantity patterns like "2 tablespoons", "100 g", "half a"
+    .replace(/^[\d\s\/\.]+/, "")
+    .replace(/^(a |an |half a |half an |one |two |three |four )/, "")
+    .replace(/^[\d\s]*(g|ml|kg|litre|liter|tablespoon|teaspoon|cup|handful|pinch|tin|clove|scoop|slice|stick|piece|head|bunch)[s]?\s+(of\s+)?/, "")
+    // Strip parenthetical notes (e.g. "about 300 g")
+    .replace(/\(.*?\)/g, "")
+    // Strip trailing qualifiers after a comma
+    .replace(/,.*$/, "")
+    .trim();
+}
+
+// Look up an aisle for a normalised ingredient. Falls back to "Other".
+function aisleFor(normalised: string): string {
+  // Exact match first.
+  if (RECIPE_AISLE_MAP[normalised]) return RECIPE_AISLE_MAP[normalised];
+  // Partial match: the map key appears in the normalised string.
+  for (const [key, aisle] of Object.entries(RECIPE_AISLE_MAP)) {
+    if (normalised.includes(key)) return aisle;
+  }
+  return "Other";
+}
+
+function buildRecipeBank(goal: string | null, diet: string, bodycomp: string): RecipeBank {
+  void bodycomp; // Reserved for future use; diet already proxies complexity.
+
+  // --- Tag-score each recipe for this user profile ---
+  // Higher score = better fit. Selection is by descending score then id for
+  // determinism (no randomness, no Date.now).
+  function scoreRecipe(tags: string[]): number {
+    let score = 0;
+
+    // Goal-based tag preference.
+    if (goal === "fat") {
+      if (tags.includes("low-cal")) score += 3;
+      if (tags.includes("high-protein")) score += 2;
+      if (tags.includes("balanced")) score += 1;
+      if (tags.includes("higher-carb")) score -= 1;
+    } else if (goal === "strength") {
+      if (tags.includes("higher-carb")) score += 3;
+      if (tags.includes("high-protein")) score += 2;
+      if (tags.includes("balanced")) score += 1;
+    } else {
+      // energy / heart / null: prefer balanced + high-protein
+      if (tags.includes("balanced")) score += 3;
+      if (tags.includes("high-protein")) score += 2;
+      if (tags.includes("low-cal")) score += 1;
+    }
+
+    // Diet complexity preference: poor diet -> bias toward quick/simple.
+    if (diet === "poor" || diet === "average") {
+      if (tags.includes("quick")) score += 2;
+    }
+
+    // Always give a meaningful bonus to vegetarian/plant-protein options to
+    // ensure they appear regardless of goal.
+    if (tags.includes("vegetarian") || tags.includes("plant-protein")) score += 1;
+
+    return score;
+  }
+
+  // Group recipes by meal type for balanced selection.
+  const byMeal: Record<string, typeof RECIPES> = {
+    breakfast: [],
+    lunch: [],
+    dinner: [],
+    snack: [],
+  };
+  for (const r of RECIPES) {
+    byMeal[r.meal].push(r);
+  }
+
+  // Sort each meal group by score desc, then id asc (deterministic tie-break).
+  function sortedGroup(group: typeof RECIPES) {
+    return [...group].sort((a, b) => {
+      const ds = scoreRecipe(b.tags) - scoreRecipe(a.tags);
+      if (ds !== 0) return ds;
+      return a.id.localeCompare(b.id);
+    });
+  }
+
+  // Pick top N from each meal type to reach ~12 to 16 total. Spread:
+  // 4 breakfast, 4 lunch, 5 dinner, 3 snack = 16 recipes.
+  const picks = [
+    ...sortedGroup(byMeal["breakfast"]).slice(0, 4),
+    ...sortedGroup(byMeal["lunch"]).slice(0, 4),
+    ...sortedGroup(byMeal["dinner"]).slice(0, 5),
+    ...sortedGroup(byMeal["snack"]).slice(0, 3),
+  ];
+
+  // Guarantee at least one vegetarian/plant-protein recipe is included. If
+  // none of the picks qualify, swap in the highest-scoring qualifying recipe
+  // from the full library that is not already in the list.
+  const hasVeg = picks.some(
+    (r) => r.tags.includes("vegetarian") || r.tags.includes("plant-protein")
+  );
+  if (!hasVeg) {
+    const vegCandidates = RECIPES
+      .filter((r) => r.tags.includes("vegetarian") || r.tags.includes("plant-protein"))
+      .sort((a, b) => {
+        const ds = scoreRecipe(b.tags) - scoreRecipe(a.tags);
+        if (ds !== 0) return ds;
+        return a.id.localeCompare(b.id);
+      });
+    const sub = vegCandidates.find((r) => !picks.some((p) => p.id === r.id));
+    if (sub) {
+      // Replace the last pick (lowest priority) with the vegetarian option.
+      picks[picks.length - 1] = sub;
+    }
+  }
+
+  // Sort final list deterministically: by meal order then id, for stable output.
+  const mealOrder = ["breakfast", "lunch", "dinner", "snack"];
+  picks.sort((a, b) => {
+    const mo = mealOrder.indexOf(a.meal) - mealOrder.indexOf(b.meal);
+    if (mo !== 0) return mo;
+    return a.id.localeCompare(b.id);
+  });
+
+  // --- Build the consolidated aisle-grouped shopping list ---
+  // Collect all ingredients from the selected recipes.
+  const allIngredients: string[] = picks.flatMap((r) => r.ingredients);
+
+  // Normalise, dedupe, and bucket into aisles.
+  const seenNormalised = new Set<string>();
+  const aisleItems: Record<string, Set<string>> = {};
+  for (const raw of allIngredients) {
+    const norm = normaliseIngredient(raw);
+    if (!norm || seenNormalised.has(norm)) continue;
+    seenNormalised.add(norm);
+
+    // Use the first-matching raw ingredient text (cleaner than the norm) as the
+    // display item. Trim optional trailing notes after a comma.
+    const display = raw.replace(/\(.*?\)/g, "").replace(/,.*$/, "").trim();
+    const aisle = aisleFor(norm);
+    if (!aisleItems[aisle]) aisleItems[aisle] = new Set();
+    aisleItems[aisle].add(display);
+  }
+
+  const shoppingList = SHOPPING_AISLE_ORDER
+    .filter((a) => aisleItems[a] && aisleItems[a].size > 0)
+    .map((aisle) => ({
+      aisle,
+      items: Array.from(aisleItems[aisle]).sort(),
+    }));
+
+  // If anything ended up in "Other", append that aisle at the end.
+  if (aisleItems["Other"] && aisleItems["Other"].size > 0) {
+    shoppingList.push({ aisle: "Other", items: Array.from(aisleItems["Other"]).sort() });
+  }
+
+  return { recipes: picks, shoppingList };
+}
+
 // Phase-based themes keep weeks coherent as a training progression.
 // Risk personalization lives in riskBriefings/yourSituation/strategy; it
 // must not bleed into the weekly grid where it would read as mismatched
@@ -1026,5 +1297,6 @@ export function buildGuide(result: ScanResult, answers: Answers): GuideDoc {
     yourNumbers: buildYourNumbers(result, answers),
     bonusModules: buildBonusModules(answers, result),
     trackers: buildTrackers(answers),
+    recipeBank: buildRecipeBank(goal, diet, bodycomp),
   };
 }

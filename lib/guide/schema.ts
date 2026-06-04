@@ -154,6 +154,33 @@ export const TrackersSchema = z.object({
   dailyChecklist: z.array(z.string().min(1)).min(3),
 });
 
+// --- Recipe bank (Layer A) ---
+
+// Calories and proteinG are clearly ESTIMATES per serving, as noted in the
+// recipe data and in any rendered copy.
+export const RecipeSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  meal: z.enum(["breakfast", "lunch", "dinner", "snack"]),
+  tags: z.array(z.string().min(1)).min(1),
+  servings: z.number().int().positive(),
+  timeMins: z.number().int().positive(),
+  // Per-serving estimates.
+  calories: z.number().int().positive(),
+  proteinG: z.number().int().positive(),
+  ingredients: z.array(z.string().min(1)).min(1),
+  steps: z.array(z.string().min(1)).min(1),
+  note: z.string().optional(),
+});
+
+export const RecipeBankSchema = z.object({
+  // A personalised subset from the full library. At least 8 recipes to ensure
+  // meaningful coverage across all meal types.
+  recipes: z.array(RecipeSchema).min(8),
+  // Consolidated ingredient list from the selected recipes, aisle-grouped.
+  shoppingList: z.array(GroceryAisleSchema).min(1),
+});
+
 export const GuideDocSchema = z.object({
   title: z.string().min(1),
   intro: z.string().min(1),
@@ -179,6 +206,8 @@ export const GuideDocSchema = z.object({
   // Exactly 4 bonus playbooks reusing the DeepDive shape.
   bonusModules: z.array(DeepDiveSchema).length(4),
   trackers: TrackersSchema,
+  // Layer A: real recipe and meal bank, personalised by goal/diet/bodycomp.
+  recipeBank: RecipeBankSchema,
 });
 
 export type DeepDive = z.infer<typeof DeepDiveSchema>;
@@ -192,6 +221,8 @@ export type YourNumbersMilestone = z.infer<typeof YourNumbersMilestoneSchema>;
 export type YourNumbers = z.infer<typeof YourNumbersSchema>;
 export type GroceryAisle = z.infer<typeof GroceryAisleSchema>;
 export type Trackers = z.infer<typeof TrackersSchema>;
+export type Recipe = z.infer<typeof RecipeSchema>;
+export type RecipeBank = z.infer<typeof RecipeBankSchema>;
 export type GuideDoc = z.infer<typeof GuideDocSchema>;
 
 // Loose validation for the raw scan answers carried into checkout. Keys are
