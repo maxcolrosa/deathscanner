@@ -200,8 +200,8 @@ function YourNumbersSection({ yourNumbers }: { yourNumbers: YourNumbers }) {
           <SubLabel>Estimated bands and targets</SubLabel>
         </div>
         <ul className="flex flex-col divide-y divide-monitor-line">
-          {metrics.map((m, i) => (
-            <li key={i} className="grid grid-cols-1 sm:grid-cols-[1.5fr_1fr_1fr] gap-0">
+          {metrics.map((m) => (
+            <li key={m.label} className="grid grid-cols-1 sm:grid-cols-[1.5fr_1fr_1fr] gap-0">
               <div className="px-5 py-3.5 flex flex-col gap-0.5">
                 <span className="text-sm font-medium text-monitor-fg">{m.label}</span>
                 <span className="text-xs text-monitor-muted">{m.how}</span>
@@ -223,8 +223,8 @@ function YourNumbersSection({ yourNumbers }: { yourNumbers: YourNumbers }) {
       <div className="flex flex-col gap-2">
         <SubLabel>What to expect, week by week</SubLabel>
         <div className="flex flex-col gap-0 divide-y divide-monitor-line rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden mt-1">
-          {milestones.map((ms, i) => (
-            <div key={i} className="flex items-start gap-4 px-5 py-3.5">
+          {milestones.map((ms) => (
+            <div key={ms.week} className="flex items-start gap-4 px-5 py-3.5">
               <Badge>{ms.week}</Badge>
               <p className="text-sm leading-relaxed text-monitor-fg">{ms.marker}</p>
             </div>
@@ -689,8 +689,8 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
             Four additional playbooks covering the situations that derail most people - plateaus, travel, supplements, and what to do after week 8.
           </p>
           <div className="flex flex-col gap-4">
-            {guide.bonusModules.map((m, i) => (
-              <DeepDiveBlock key={i} dive={m} />
+            {guide.bonusModules.map((m) => (
+              <DeepDiveBlock key={m.heading} dive={m} />
             ))}
           </div>
         </Section>
