@@ -332,6 +332,9 @@ export function GroceryChecklist({ aisles }: { aisles: GroceryAisle[] }) {
         Print and bring to the store. Tick as you add to cart.
       </Text>
       {aisles.map((aisle, ai) => (
+        // wrap={false} keeps each aisle group on one page.
+        // Safe because aisles hold a bounded number of items (a few to ~15).
+        // If an aisle ever grows very large, remove wrap={false} here to allow it to split.
         <View key={ai} wrap={false}>
           <Text style={trackerStyles.aisleHeader}>{aisle.aisle}</Text>
           {aisle.items.map((item, ii) => (
@@ -377,6 +380,60 @@ export function TrackerSectionHead({ title }: { title: string }) {
     </View>
   );
 }
+
+/* ─── Cover + section-header styles (shared by recipe-book-pdf and exercise-library-pdf) */
+export const coverStyles = StyleSheet.create({
+  /* Brand mark row at the top of the cover page */
+  coverMark: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 80 },
+  coverDot: { width: 5, height: 5, borderRadius: 3, backgroundColor: C.accent },
+  coverMarkText: { fontFamily: MONO, fontSize: 8.5, letterSpacing: 2.2, color: C.fg },
+  coverKicker: {
+    fontFamily: MONO,
+    fontSize: 8.5,
+    letterSpacing: 2.2,
+    textTransform: "uppercase",
+    color: C.accent,
+    marginBottom: 14,
+  },
+  coverTitle: {
+    fontFamily: SANS,
+    fontWeight: 700,
+    fontSize: 28,
+    lineHeight: 1.12,
+    letterSpacing: -0.4,
+    color: C.fg,
+    marginBottom: 14,
+    maxWidth: 400,
+  },
+  coverIntro: {
+    fontFamily: SANS,
+    fontSize: 11,
+    lineHeight: 1.6,
+    color: C.muted,
+    maxWidth: 400,
+    marginBottom: 28,
+  },
+  coverRule: { borderBottomWidth: 0.75, borderBottomColor: C.line, marginBottom: 16 },
+  coverNote: {
+    fontFamily: MONO,
+    fontSize: 8,
+    color: C.muted,
+  },
+
+  /* Section divider header (label + horizontal rule) */
+  sectionHead: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 14 },
+  sectionTitle: {
+    fontFamily: MONO,
+    fontSize: 9.5,
+    letterSpacing: 1.8,
+    textTransform: "uppercase",
+    color: C.muted,
+  },
+  sectionLine: { flex: 1, height: 0.75, backgroundColor: C.line },
+
+  /* Generic muted caption line */
+  muted: { fontSize: 9.5, color: C.muted, marginBottom: 12 },
+});
 
 /* ─── Shared styles for new content cards ───────────────────────────────────── */
 export const contentStyles = StyleSheet.create({

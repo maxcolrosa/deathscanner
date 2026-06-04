@@ -13,8 +13,8 @@ import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import type { GuideDoc } from "@/lib/guide/schema";
 import {
   SANS,
-  MONO,
   C,
+  coverStyles,
   ExerciseEntryCard,
 } from "@/components/guide/pdf-shared";
 
@@ -33,6 +33,7 @@ const PATTERN_ORDER = [
 ];
 
 /* ─── StyleSheet ─────────────────────────────────────────────────────────────── */
+// Cover and section-header styles live in coverStyles (pdf-shared.tsx).
 const styles = StyleSheet.create({
   page: {
     backgroundColor: C.bg,
@@ -43,56 +44,6 @@ const styles = StyleSheet.create({
     paddingVertical: 52,
     paddingHorizontal: 48,
   },
-
-  /* Cover */
-  coverMark: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 80 },
-  coverDot: { width: 5, height: 5, borderRadius: 3, backgroundColor: C.accent },
-  coverMarkText: { fontFamily: MONO, fontSize: 8.5, letterSpacing: 2.2, color: C.fg },
-  coverKicker: {
-    fontFamily: MONO,
-    fontSize: 8.5,
-    letterSpacing: 2.2,
-    textTransform: "uppercase",
-    color: C.accent,
-    marginBottom: 14,
-  },
-  coverTitle: {
-    fontFamily: SANS,
-    fontWeight: 700,
-    fontSize: 28,
-    lineHeight: 1.12,
-    letterSpacing: -0.4,
-    color: C.fg,
-    marginBottom: 14,
-    maxWidth: 400,
-  },
-  coverIntro: {
-    fontFamily: SANS,
-    fontSize: 11,
-    lineHeight: 1.6,
-    color: C.muted,
-    maxWidth: 400,
-    marginBottom: 28,
-  },
-  coverRule: { borderBottomWidth: 0.75, borderBottomColor: C.line, marginBottom: 16 },
-  coverNote: {
-    fontFamily: MONO,
-    fontSize: 8,
-    color: C.muted,
-  },
-
-  /* Section header */
-  sectionHead: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 14 },
-  sectionTitle: {
-    fontFamily: MONO,
-    fontSize: 9.5,
-    letterSpacing: 1.8,
-    textTransform: "uppercase",
-    color: C.muted,
-  },
-  sectionLine: { flex: 1, height: 0.75, backgroundColor: C.line },
-
-  muted: { fontSize: 9.5, color: C.muted, marginBottom: 12 },
 });
 
 /* ─── Document ───────────────────────────────────────────────────────────────── */
@@ -122,19 +73,19 @@ export function ExerciseLibraryPdfDocument({ guide }: { guide: GuideDoc }) {
     >
       <Page size="A4" style={styles.page}>
         {/* ── Cover ─────────────────────────────────────────────────────────── */}
-        <View style={styles.coverMark}>
-          <View style={styles.coverDot} />
-          <Text style={styles.coverMarkText}>{BRAND}</Text>
+        <View style={coverStyles.coverMark}>
+          <View style={coverStyles.coverDot} />
+          <Text style={coverStyles.coverMarkText}>{BRAND}</Text>
         </View>
-        <Text style={styles.coverKicker}>Exercise library</Text>
-        <Text style={styles.coverTitle}>Second Wind Protocol Exercise Library</Text>
-        <Text style={styles.coverIntro}>
+        <Text style={coverStyles.coverKicker}>Exercise library</Text>
+        <Text style={coverStyles.coverTitle}>Second Wind Protocol Exercise Library</Text>
+        <Text style={coverStyles.coverIntro}>
           Detailed form guides for every movement in your program. Read setup and
           execution cues before your first session. Return to the mistakes section
           whenever something feels off.
         </Text>
-        <View style={styles.coverRule} />
-        <Text style={styles.coverNote}>
+        <View style={coverStyles.coverRule} />
+        <Text style={coverStyles.coverNote}>
           These are general exercise descriptions, not medical or physiotherapy advice.
           If you have pain or an existing injury, consult a qualified professional before
           starting a new exercise.
@@ -145,9 +96,9 @@ export function ExerciseLibraryPdfDocument({ guide }: { guide: GuideDoc }) {
           const entries = grouped.get(pattern)!;
           return (
             <View key={pattern} break={gi > 0}>
-              <View style={styles.sectionHead}>
-                <Text style={styles.sectionTitle}>{pattern} pattern</Text>
-                <View style={styles.sectionLine} />
+              <View style={coverStyles.sectionHead}>
+                <Text style={coverStyles.sectionTitle}>{pattern} pattern</Text>
+                <View style={coverStyles.sectionLine} />
               </View>
               {entries.map((entry, i) => (
                 <ExerciseEntryCard key={i} entry={entry} />
