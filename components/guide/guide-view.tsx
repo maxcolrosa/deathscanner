@@ -1,4 +1,10 @@
-import type { DeepDive, GuideDoc, YourNumbers } from "@/lib/guide/schema";
+import type {
+  DeepDive,
+  ExerciseEntry,
+  GuideDoc,
+  Recipe,
+  YourNumbers,
+} from "@/lib/guide/schema";
 
 /* ─── Design constants ───────────────────────────────────────────────────── */
 // DESIGN_VARIANCE: 8 | MOTION_INTENSITY: 6 (CSS cubic-bezier cascades)
@@ -151,28 +157,53 @@ function DownloadKit({ token }: { token: string }) {
         The full personalized workbook - 8-week plan, training, nutrition, your numbers dashboard, and four bonus playbooks.
       </p>
 
-      {/* Secondary downloads: tracker pack + quick-start */}
-      <div className="flex flex-col sm:flex-row gap-2 pt-1">
+      {/* Secondary downloads: recipe book, exercise library, tracker pack, quick-start */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+        <a
+          href={`/guide/${token}/download/recipes`}
+          download
+          className="inline-flex items-center gap-2 rounded-lg border border-monitor-line bg-monitor-panel px-5 py-2.5 text-xs font-medium text-monitor-fg transition-colors duration-200 hover:border-monitor-accent/40 hover:text-monitor-accent"
+        >
+          <DownloadIcon />
+          <span>
+            <span className="block font-semibold">Recipe book PDF</span>
+            <span className="block text-monitor-muted font-normal mt-0.5">All recipes with macros, steps, and shopping list</span>
+          </span>
+        </a>
+        <a
+          href={`/guide/${token}/download/exercises`}
+          download
+          className="inline-flex items-center gap-2 rounded-lg border border-monitor-line bg-monitor-panel px-5 py-2.5 text-xs font-medium text-monitor-fg transition-colors duration-200 hover:border-monitor-accent/40 hover:text-monitor-accent"
+        >
+          <DownloadIcon />
+          <span>
+            <span className="block font-semibold">Exercise library PDF</span>
+            <span className="block text-monitor-muted font-normal mt-0.5">Setup, cues, regressions, and progressions</span>
+          </span>
+        </a>
         <a
           href={`/guide/${token}/download/trackers`}
           download
-          className="inline-flex items-center justify-center gap-2 rounded-lg border border-monitor-line bg-monitor-panel px-5 py-2.5 text-xs font-medium text-monitor-fg transition-colors duration-200 hover:border-monitor-accent/40 hover:text-monitor-accent"
+          className="inline-flex items-center gap-2 rounded-lg border border-monitor-line bg-monitor-panel px-5 py-2.5 text-xs font-medium text-monitor-fg transition-colors duration-200 hover:border-monitor-accent/40 hover:text-monitor-accent"
         >
           <DownloadIcon />
-          Printable tracker pack
+          <span>
+            <span className="block font-semibold">Printable tracker pack</span>
+            <span className="block text-monitor-muted font-normal mt-0.5">Workout log, habit grid, and shopping list</span>
+          </span>
         </a>
         <a
           href={`/guide/${token}/download/quickstart`}
           download
-          className="inline-flex items-center justify-center gap-2 rounded-lg border border-monitor-line bg-monitor-panel px-5 py-2.5 text-xs font-medium text-monitor-fg transition-colors duration-200 hover:border-monitor-accent/40 hover:text-monitor-accent"
+          className="inline-flex items-center gap-2 rounded-lg border border-monitor-line bg-monitor-panel px-5 py-2.5 text-xs font-medium text-monitor-fg transition-colors duration-200 hover:border-monitor-accent/40 hover:text-monitor-accent"
         >
           <DownloadIcon />
-          One-page quick-start
+          <span>
+            <span className="block font-semibold">One-page quick-start</span>
+            <span className="block text-monitor-muted font-normal mt-0.5">Your first 7 days on one page</span>
+          </span>
         </a>
       </div>
-      <p className="text-xs text-monitor-muted/60">
-        Tracker pack: workout log, habit grid, shopping list. Quick-start: your first 7 days on one page.
-      </p>
     </div>
   );
 }
@@ -309,6 +340,148 @@ function WeekCard({ w, delay }: { w: GuideDoc["weeks"][number]; delay: number })
   );
 }
 
+/* ─── Recipe card ────────────────────────────────────────────────────────── */
+
+function RecipeCard({ recipe }: { recipe: Recipe }) {
+  const mealLabel = recipe.meal.charAt(0).toUpperCase() + recipe.meal.slice(1);
+  return (
+    <div className="overflow-hidden rounded-xl border border-monitor-line bg-monitor-panel">
+      {/* Header */}
+      <div className="flex flex-wrap items-center gap-3 border-b border-monitor-line px-5 py-4">
+        <h3 className="text-sm font-semibold text-monitor-fg flex-1 min-w-0">{recipe.name}</h3>
+        <div className="flex flex-wrap gap-1.5 shrink-0">
+          <Badge>{mealLabel}</Badge>
+          <Badge>{recipe.timeMins} min</Badge>
+          <Badge>~{recipe.calories} kcal est.</Badge>
+          <Badge>~{recipe.proteinG}g protein est.</Badge>
+        </div>
+      </div>
+
+      <div className="flex flex-col divide-y divide-monitor-line">
+        {/* Tags */}
+        {recipe.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 px-5 py-3">
+            {recipe.tags.map((tag) => (
+              <span
+                key={tag}
+                className="font-mono text-[10px] uppercase tracking-[0.14em] text-monitor-muted/60 bg-monitor-line/40 rounded px-1.5 py-0.5"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* Ingredients + Steps side by side on wider screens */}
+        <div className="grid grid-cols-1 sm:grid-cols-[1fr_1.5fr] divide-y sm:divide-y-0 sm:divide-x divide-monitor-line">
+          <div className="px-5 py-4 flex flex-col gap-2">
+            <SubLabel>Ingredients (serves {recipe.servings})</SubLabel>
+            <ul className="mt-1 flex flex-col gap-1.5">
+              {recipe.ingredients.map((ing) => (
+                <li key={ing} className="flex items-start gap-2 text-xs leading-relaxed text-monitor-fg">
+                  <span aria-hidden className="text-monitor-accent/50 mt-px">-</span>
+                  {ing}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="px-5 py-4 flex flex-col gap-2">
+            <SubLabel>Steps</SubLabel>
+            <ol className="mt-1 flex flex-col gap-2">
+              {recipe.steps.map((step, i) => (
+                <li key={step} className="flex items-start gap-2.5 text-xs leading-relaxed text-monitor-fg">
+                  <span className="font-mono text-monitor-accent/60 shrink-0 tabular-nums w-4">{i + 1}.</span>
+                  {step}
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+
+        {/* Optional note */}
+        {recipe.note && (
+          <div className="px-5 py-3 bg-monitor-accent/[0.03]">
+            <p className="text-xs leading-relaxed text-monitor-muted italic">{recipe.note}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Exercise library card ──────────────────────────────────────────────── */
+
+function ExerciseLibraryCard({ entry }: { entry: ExerciseEntry }) {
+  return (
+    <div className="overflow-hidden rounded-xl border border-monitor-line bg-monitor-panel">
+      {/* Header: name + pattern + targets */}
+      <div className="flex flex-wrap items-center gap-3 border-b border-monitor-line px-5 py-4">
+        <h3 className="text-sm font-semibold text-monitor-fg flex-1 min-w-0">{entry.name}</h3>
+        <div className="flex gap-1.5 shrink-0">
+          <Badge>{entry.pattern}</Badge>
+        </div>
+      </div>
+
+      <div className="px-5 py-2.5 border-b border-monitor-line">
+        <span className="text-xs text-monitor-muted">Targets: {entry.targets}</span>
+      </div>
+
+      {/* Setup / Execution / Mistakes in 3-col grid on wide, stacked on mobile */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-monitor-line">
+        <div className="px-4 py-4 flex flex-col gap-2">
+          <SubLabel>Setup</SubLabel>
+          <ul className="mt-1 flex flex-col gap-1.5">
+            {entry.setup.map((s) => (
+              <li key={s} className="flex items-start gap-2 text-xs leading-relaxed text-monitor-fg">
+                <span aria-hidden className="text-monitor-accent/50 mt-px shrink-0">-</span>
+                {s}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="px-4 py-4 flex flex-col gap-2">
+          <SubLabel>Execution</SubLabel>
+          <ol className="mt-1 flex flex-col gap-1.5">
+            {entry.execution.map((e, i) => (
+              <li key={e} className="flex items-start gap-2 text-xs leading-relaxed text-monitor-fg">
+                <span className="font-mono text-monitor-accent/60 shrink-0 tabular-nums w-4">{i + 1}.</span>
+                {e}
+              </li>
+            ))}
+          </ol>
+        </div>
+        <div className="px-4 py-4 flex flex-col gap-2">
+          <SubLabel>Common mistakes</SubLabel>
+          <ul className="mt-1 flex flex-col gap-1.5">
+            {entry.mistakes.map((m) => (
+              <li key={m} className="flex items-start gap-2 text-xs leading-relaxed text-monitor-alert/80">
+                <span aria-hidden className="text-monitor-alert/60 mt-px shrink-0">!</span>
+                {m}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* Easier / Harder / How to learn */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 border-t border-monitor-line divide-y sm:divide-y-0 sm:divide-x divide-monitor-line bg-monitor-accent/[0.03]">
+        <div className="px-4 py-3 flex flex-col gap-1">
+          <SubLabel>Easier option</SubLabel>
+          <p className="text-xs leading-relaxed text-monitor-fg mt-0.5">{entry.easier}</p>
+        </div>
+        <div className="px-4 py-3 flex flex-col gap-1">
+          <SubLabel>Harder progression</SubLabel>
+          <p className="text-xs leading-relaxed text-monitor-fg mt-0.5">{entry.harder}</p>
+        </div>
+        <div className="px-4 py-3 flex flex-col gap-1">
+          <SubLabel>How to learn it</SubLabel>
+          <p className="text-xs leading-relaxed text-monitor-muted mt-0.5">{entry.learn}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Main component ─────────────────────────────────────────────────────── */
 
 export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) {
@@ -390,7 +563,7 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
         </Section>
 
         {/* ── Outcomes ──────────────────────────────────────────────────── */}
-        <Section title="What these 8 weeks deliver" index={3}>
+        <Section title="What these 90 days deliver" index={3}>
           <Bullets items={guide.outcomes} />
         </Section>
 
@@ -401,8 +574,8 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
             costs you, what improves when you fix it, and exactly what to do.
           </p>
           <div className="flex flex-col gap-4">
-            {guide.riskBriefings.map((d, i) => (
-              <DeepDiveBlock key={i} dive={d} />
+            {guide.riskBriefings.map((d) => (
+              <DeepDiveBlock key={d.heading} dive={d} />
             ))}
           </div>
         </Section>
@@ -438,8 +611,8 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
             <div className="flex flex-col gap-2 rounded-xl border border-monitor-line bg-monitor-panel p-5">
               <SubLabel>Warm up first, every session</SubLabel>
               <ul className="mt-1 flex flex-col divide-y divide-monitor-line">
-                {guide.training.warmup.map((m, i) => (
-                  <li key={i} className="flex items-baseline justify-between gap-4 py-2">
+                {guide.training.warmup.map((m) => (
+                  <li key={m.name} className="flex items-baseline justify-between gap-4 py-2">
                     <span className="text-sm text-monitor-fg">{m.name}</span>
                     <span className="font-mono text-[11px] text-monitor-muted shrink-0">{m.detail}</span>
                   </li>
@@ -468,8 +641,8 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
             </p>
           </div>
           <div className="flex flex-col gap-3">
-            {guide.training.workouts.map((wo, wi) => (
-              <div key={wi} className="overflow-hidden rounded-xl border border-monitor-line bg-monitor-panel">
+            {guide.training.workouts.map((wo) => (
+              <div key={wo.day} className="overflow-hidden rounded-xl border border-monitor-line bg-monitor-panel">
                 <div className="flex items-center gap-3 px-5 py-3.5 border-b border-monitor-line">
                   <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-monitor-accent/60 shrink-0 w-8">
                     {wo.day.slice(0, 3)}
@@ -477,9 +650,9 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
                   <span className="text-sm font-semibold text-monitor-fg">{wo.title}</span>
                 </div>
                 <div className="flex flex-col gap-2 px-5 py-4">
-                  {wo.exercises.map((ex, ei) => (
+                  {wo.exercises.map((ex) => (
                     <div
-                      key={ei}
+                      key={ex.name}
                       className="grid gap-x-3 gap-y-0.5"
                       style={{ gridTemplateColumns: "1fr auto auto" }}
                     >
@@ -501,8 +674,21 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
           </div>
         </Section>
 
+        {/* ── Exercise library ──────────────────────────────────────────── */}
+        <Section title="Exercise library" index={7}>
+          <p className="max-w-[58ch] text-sm leading-relaxed text-monitor-muted">
+            Detailed setup and execution cues for every movement in your plan. No guesswork on form.
+            The printable exercise library PDF in your download kit has everything in one place.
+          </p>
+          <div className="flex flex-col gap-4">
+            {guide.exerciseLibrary.map((entry) => (
+              <ExerciseLibraryCard key={entry.name} entry={entry} />
+            ))}
+          </div>
+        </Section>
+
         {/* ── 8-week plan ───────────────────────────────────────────────── */}
-        <Section title="Your 8-week plan" index={7}>
+        <Section title="Your 8-week plan" index={8}>
           <div className="flex flex-col gap-4">
             {guide.weeks.map((w, i) => (
               <WeekCard key={w.week} w={w} delay={i * 50 + 100} />
@@ -510,8 +696,64 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
           </div>
         </Section>
 
+        {/* ── Your 90-day arc ───────────────────────────────────────────── */}
+        <Section title="Your 90-day arc" index={9}>
+          {/* Summary */}
+          <div className="flex flex-col gap-2 rounded-xl border border-monitor-accent/30 bg-monitor-accent/[0.06] p-5">
+            <SubLabel>The journey</SubLabel>
+            <p className="mt-1 text-sm leading-relaxed text-monitor-fg">{guide.programArc.summary}</p>
+          </div>
+
+          {/* Phases timeline */}
+          <div className="flex flex-col gap-2">
+            <SubLabel>Phase breakdown</SubLabel>
+            <div className="flex flex-col divide-y divide-monitor-line rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden mt-1">
+              {guide.programArc.phases.map((phase) => (
+                <div key={phase.name} className="grid grid-cols-1 sm:grid-cols-[auto_1fr_1.5fr] gap-0">
+                  <div className="px-5 py-4 sm:border-r border-b sm:border-b-0 border-monitor-line flex flex-col gap-1 sm:w-36">
+                    <span className="text-sm font-semibold text-monitor-fg">{phase.name}</span>
+                    <Badge>{phase.weeks}</Badge>
+                  </div>
+                  <div className="px-5 py-4 sm:border-r border-b sm:border-b-0 border-monitor-line flex flex-col gap-1">
+                    <SubLabel>Focus</SubLabel>
+                    <p className="text-sm leading-relaxed text-monitor-fg mt-0.5">{phase.focus}</p>
+                  </div>
+                  <div className="px-5 py-4 flex flex-col gap-1">
+                    <SubLabel>What changes</SubLabel>
+                    <p className="text-sm leading-relaxed text-monitor-muted mt-0.5">{phase.whatChanges}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Monthly reviews */}
+          <div className="flex flex-col gap-2">
+            <SubLabel>Monthly progress reviews</SubLabel>
+            <div className="flex flex-col gap-3 mt-1">
+              {guide.programArc.monthlyReviews.map((review) => (
+                <div key={review.month} className="overflow-hidden rounded-xl border border-monitor-line bg-monitor-panel">
+                  <div className="border-b border-monitor-line px-5 py-3.5">
+                    <span className="text-sm font-semibold text-monitor-fg">{review.month}</span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-monitor-line">
+                    <div className="px-5 py-4 flex flex-col gap-2">
+                      <SubLabel>Checkpoints</SubLabel>
+                      <Bullets items={review.checkpoints} />
+                    </div>
+                    <div className="px-5 py-4 flex flex-col gap-2">
+                      <SubLabel>Adjust rules</SubLabel>
+                      <Bullets items={review.adjustRules} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Section>
+
         {/* ── Nutrition plan ────────────────────────────────────────────── */}
-        <Section title="Your nutrition plan" index={8}>
+        <Section title="Your nutrition plan" index={10}>
           <DeepDiveBlock dive={n.philosophy} />
 
           {/* Plate formula: visually distinct callout block */}
@@ -543,8 +785,8 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
 
           {/* Sample days */}
           <div className="flex flex-col gap-4">
-            {n.sampleDays.map((day, di) => (
-              <div key={di} className="rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden">
+            {n.sampleDays.map((day) => (
+              <div key={day.label} className="rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden">
                 <div className="px-5 pt-4 pb-3 border-b border-monitor-line">
                   <SubLabel>{day.label}</SubLabel>
                 </div>
@@ -573,8 +815,8 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
           <div className="flex flex-col gap-2">
             <SubLabel>Swaps</SubLabel>
             <div className="flex flex-col gap-1 mt-1">
-              {n.swaps.map((s, i) => (
-                <div key={i} className="flex items-center gap-3 text-sm">
+              {n.swaps.map((s) => (
+                <div key={s.from} className="flex items-center gap-3 text-sm">
                   <span className="text-monitor-muted line-through">{s.from}</span>
                   <span aria-hidden className="font-mono text-[10px] text-monitor-accent/60">
                     {">"}
@@ -602,12 +844,53 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
           </div>
         </Section>
 
+        {/* ── Recipe bank ───────────────────────────────────────────────── */}
+        <Section title="Recipe bank" index={11}>
+          <p className="max-w-[58ch] text-sm leading-relaxed text-monitor-muted">
+            Real recipes built around your goal and dietary preferences. Calorie and protein figures are
+            per-serving estimates, not measured values. The recipe book PDF in your download kit
+            includes all recipes with the shopping list in one printable document.
+          </p>
+
+          {/* Recipes grouped by meal type */}
+          {(["breakfast", "lunch", "dinner", "snack"] as const).map((meal) => {
+            const recipes = guide.recipeBank.recipes.filter((r) => r.meal === meal);
+            if (recipes.length === 0) return null;
+            const mealLabel = meal.charAt(0).toUpperCase() + meal.slice(1);
+            return (
+              <div key={meal} className="flex flex-col gap-3">
+                <SubLabel>{mealLabel}s</SubLabel>
+                {recipes.map((recipe) => (
+                  <RecipeCard key={recipe.name} recipe={recipe} />
+                ))}
+              </div>
+            );
+          })}
+
+          {/* Shopping list by aisle */}
+          <div className="flex flex-col gap-2">
+            <SubLabel>Shopping list by aisle</SubLabel>
+            <div className="flex flex-col divide-y divide-monitor-line rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden mt-1">
+              {guide.recipeBank.shoppingList.map((aisleGroup) => (
+                <div key={aisleGroup.aisle} className="grid grid-cols-1 sm:grid-cols-[8rem_1fr] gap-0">
+                  <div className="px-5 py-3 sm:border-r border-b sm:border-b-0 border-monitor-line bg-monitor-accent/[0.03] flex items-start">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-monitor-accent/70">{aisleGroup.aisle}</span>
+                  </div>
+                  <div className="px-5 py-3">
+                    <p className="text-xs leading-relaxed text-monitor-fg">{aisleGroup.items.join(", ")}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Section>
+
         {/* ── Daily blueprint ───────────────────────────────────────────── */}
-        <Section title="Your daily blueprint" index={9}>
+        <Section title="Your daily blueprint" index={12}>
           <div className="rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden">
             <ul className="flex flex-col divide-y divide-monitor-line">
-              {guide.dailyBlueprint.map((b, i) => (
-                <li key={i} className="flex items-start gap-4 px-5 py-3">
+              {guide.dailyBlueprint.map((b) => (
+                <li key={b.time} className="flex items-start gap-4 px-5 py-3">
                   <span className="font-mono text-[11px] text-monitor-accent w-16 shrink-0 mt-[2px] tabular-nums">
                     {b.time}
                   </span>
@@ -619,7 +902,7 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
         </Section>
 
         {/* ── Sleep and stress ──────────────────────────────────────────── */}
-        <Section title="Sleep and stress recovery" index={10}>
+        <Section title="Sleep and stress recovery" index={13}>
           <DeepDiveBlock dive={guide.sleepAndStress.briefing} />
           <div className="flex flex-col gap-2">
             <SubLabel>Your protocol</SubLabel>
@@ -630,12 +913,12 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
         </Section>
 
         {/* ── 10-minute fallback ────────────────────────────────────────── */}
-        <Section title="The 10-minute fallback" index={11}>
+        <Section title="The 10-minute fallback" index={14}>
           <p className="text-sm leading-relaxed text-monitor-fg">{guide.tenMinutePlan.summary}</p>
           <div className="rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden">
             <ul className="flex flex-col divide-y divide-monitor-line">
-              {guide.tenMinutePlan.movements.map((m, i) => (
-                <li key={i} className="flex items-baseline gap-4 px-5 py-3">
+              {guide.tenMinutePlan.movements.map((m) => (
+                <li key={m.name} className="flex items-baseline gap-4 px-5 py-3">
                   <span className="text-sm text-monitor-fg flex-1">{m.name}</span>
                   <span className="font-mono text-xs text-monitor-muted shrink-0">{m.detail}</span>
                 </li>
@@ -645,7 +928,7 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
         </Section>
 
         {/* ── Progress markers ──────────────────────────────────────────── */}
-        <Section title="How to know it is working" index={12}>
+        <Section title="How to know it is working" index={15}>
           <p className="max-w-[58ch] text-sm leading-relaxed text-monitor-muted">
             {guide.progressMarkers.summary}
           </p>
@@ -653,11 +936,11 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
         </Section>
 
         {/* ── Troubleshooting ───────────────────────────────────────────── */}
-        <Section title="When it gets hard" index={13}>
+        <Section title="When it gets hard" index={16}>
           <div className="flex flex-col gap-3">
-            {guide.troubleshooting.map((t, i) => (
+            {guide.troubleshooting.map((t) => (
               <div
-                key={i}
+                key={t.problem}
                 className="grid grid-cols-1 sm:grid-cols-[1fr_2fr] gap-0 rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden"
               >
                 <div className="px-5 py-4 border-b sm:border-b-0 sm:border-r border-monitor-line bg-monitor-accent/[0.03]">
@@ -672,10 +955,10 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
         </Section>
 
         {/* ── FAQs ──────────────────────────────────────────────────────── */}
-        <Section title="Common questions" index={14}>
+        <Section title="Common questions" index={17}>
           <div className="flex flex-col divide-y divide-monitor-line rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden">
-            {guide.faqs.map((f, i) => (
-              <div key={i} className="flex flex-col gap-1.5 px-5 py-4">
+            {guide.faqs.map((f) => (
+              <div key={f.q} className="flex flex-col gap-1.5 px-5 py-4">
                 <p className="text-sm font-semibold text-monitor-fg">{f.q}</p>
                 <p className="text-sm leading-relaxed text-monitor-muted">{f.a}</p>
               </div>
@@ -683,8 +966,43 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
           </div>
         </Section>
 
+        {/* ── The science ───────────────────────────────────────────────── */}
+        <Section title="The science behind the plan" index={18}>
+          {/* Summary intro */}
+          <div className="flex flex-col gap-2 rounded-xl border border-monitor-line bg-monitor-panel p-5">
+            <SubLabel>Why these levers were chosen for you</SubLabel>
+            <p className="mt-1 text-sm leading-relaxed text-monitor-fg">{guide.scienceNotes.summary}</p>
+          </div>
+
+          {/* Per-lever entries */}
+          <div className="flex flex-col gap-3">
+            {guide.scienceNotes.entries.map((entry) => (
+              <div key={entry.lever} className="overflow-hidden rounded-xl border border-monitor-line bg-monitor-panel">
+                <div className="border-b border-monitor-line px-5 py-4">
+                  <h3 className="text-sm font-semibold text-monitor-fg">{entry.lever}</h3>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-monitor-line">
+                  <div className="px-5 py-4 flex flex-col gap-1.5">
+                    <SubLabel>Mechanism</SubLabel>
+                    <p className="text-sm leading-relaxed text-monitor-fg mt-0.5">{entry.mechanism}</p>
+                  </div>
+                  <div className="px-5 py-4 flex flex-col gap-1.5">
+                    <SubLabel>What the evidence shows</SubLabel>
+                    <p className="text-sm leading-relaxed text-monitor-muted mt-0.5">{entry.evidence}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Disclaimer in muted footnote style */}
+          <p className="text-xs leading-relaxed text-monitor-muted/50 border-t border-monitor-line pt-3">
+            {guide.scienceNotes.disclaimer}
+          </p>
+        </Section>
+
         {/* ── Bonus playbooks ───────────────────────────────────────────── */}
-        <Section title="Bonus playbooks" index={15}>
+        <Section title="Bonus playbooks" index={19}>
           <p className="max-w-[58ch] text-sm leading-relaxed text-monitor-muted">
             Four additional playbooks covering the situations that derail most people - plateaus, travel, supplements, and what to do after week 8.
           </p>
@@ -696,7 +1014,7 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
         </Section>
 
         {/* ── Recalibration ─────────────────────────────────────────────── */}
-        <Section title="Weekly recalibration" index={16}>
+        <Section title="Weekly recalibration" index={20}>
           <p className="text-sm leading-relaxed text-monitor-fg">{guide.recalibration}</p>
         </Section>
 
