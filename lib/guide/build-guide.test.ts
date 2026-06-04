@@ -50,4 +50,57 @@ describe("buildGuide", () => {
     const good = buildGuide(computeResult(active), active).nutritionPlan.swaps.length;
     expect(poor).toBeGreaterThan(good);
   });
+
+  it("yourNumbers has at least 4 metrics", () => {
+    for (const a of [sedentary, active, injured]) {
+      const guide = buildGuide(computeResult(a), a);
+      expect(guide.yourNumbers.metrics.length).toBeGreaterThanOrEqual(4);
+    }
+  });
+
+  it("yourNumbers.reclaimedYearsHeadline references recoverableYears when > 0", () => {
+    const result = computeResult(sedentary);
+    const guide = buildGuide(result, sedentary);
+    if (result.recoverableYears > 0) {
+      const rounded = String(Math.round((Math.round(result.recoverableYears * 10) / 10)));
+      expect(guide.yourNumbers.reclaimedYearsHeadline).toContain(rounded);
+    } else {
+      expect(guide.yourNumbers.reclaimedYearsHeadline.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("bonusModules has exactly 4 entries with the expected headings", () => {
+    const guide = buildGuide(computeResult(sedentary), sedentary);
+    expect(guide.bonusModules).toHaveLength(4);
+    const headings = guide.bonusModules.map((m) => m.heading);
+    expect(headings).toContain("The Plateau Protocol");
+    expect(headings).toContain("Travel and Holiday Survival Kit");
+    expect(headings).toContain("The Supplement Truth");
+    expect(headings).toContain("Your Next 8 Weeks");
+  });
+
+  it("trackers.groceryByAisle is non-empty", () => {
+    for (const a of [sedentary, active, injured]) {
+      const guide = buildGuide(computeResult(a), a);
+      expect(guide.trackers.groceryByAisle.length).toBeGreaterThan(0);
+      // Every aisle must have at least one item.
+      for (const aisleEntry of guide.trackers.groceryByAisle) {
+        expect(aisleEntry.items.length).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it("trackers.dailyChecklist has at least 3 items", () => {
+    for (const a of [sedentary, active, injured]) {
+      const guide = buildGuide(computeResult(a), a);
+      expect(guide.trackers.dailyChecklist.length).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it("two builds with identical inputs produce deeply equal output", () => {
+    for (const a of [sedentary, active, injured]) {
+      const r = computeResult(a);
+      expect(buildGuide(r, a)).toEqual(buildGuide(r, a));
+    }
+  });
 });

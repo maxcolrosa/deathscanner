@@ -114,6 +114,38 @@ const validGuide = {
   recalibration: "Tighten weekly.",
   outcomes: ["Lose around 5 kg of body fat"],
   closing: "You started today. Keep going.",
+  yourNumbers: {
+    summary: "Track these six numbers over 8 weeks.",
+    reclaimedYearsHeadline: "Around 9 recoverable years are on the table. These are the numbers that move them.",
+    metrics: [
+      { label: "Resting heart rate", startingBand: "Estimated 72 to 82 bpm", target: "Goal: drop 5 to 10 bpm", how: "Zone 2 cardio and sleep" },
+      { label: "Weight trend", startingBand: "Estimated: your starting point", target: "Goal: lose around 5%", how: "Track the weekly trend" },
+      { label: "Daily protein", startingBand: "Estimated: below target", target: "Goal: a palm at every meal", how: "Plan your protein sources when you shop" },
+      { label: "Daily steps", startingBand: "Estimated 4,000 to 7,000 steps", target: "Build to 8,000 steps a day", how: "Short walk after each meal" },
+    ],
+    milestones: [
+      { week: "Week 2", marker: "Sleep better and afternoon energy is steadier." },
+      { week: "Week 4", marker: "Clothes feel different and measurements are moving." },
+      { week: "Week 8", marker: "Numbers are visibly shifting and habits are locked in." },
+    ],
+  },
+  bonusModules: [
+    validDeepDive("The Plateau Protocol"),
+    validDeepDive("Travel and Holiday Survival Kit"),
+    validDeepDive("The Supplement Truth"),
+    validDeepDive("Your Next 8 Weeks"),
+  ],
+  trackers: {
+    groceryByAisle: [
+      { aisle: "Protein", items: ["Eggs", "Chicken or tofu"] },
+      { aisle: "Produce", items: ["Fruit"] },
+    ],
+    dailyChecklist: [
+      "At least 10 minutes of movement",
+      "Protein at every meal",
+      "Hit your step target",
+    ],
+  },
 };
 
 describe("GuideDocSchema", () => {

@@ -8,6 +8,9 @@ import type {
   DeepDive,
   Movement,
   SampleDay,
+  YourNumbers,
+  YourNumbersMetric,
+  GroceryAisle,
 } from "@/lib/guide/schema";
 
 type Level = "beginner" | "intermediate";
@@ -680,6 +683,267 @@ function weekHabit(i: number, barrier: string) {
   return habits[i % habits.length];
 }
 
+/* ─── Your Numbers dashboard ─────────────────────────────────────────────── */
+
+// Round recoverable years the same way guide-pitch.tsx does (one decimal then
+// toFixed(0) effectively rounds to an integer).
+function formatRecoverableYears(years: number): string {
+  return String(Math.round((Math.round(years * 10) / 10)));
+}
+
+function buildYourNumbers(result: ScanResult, answers: Answers): YourNumbers {
+  const activity = str(answers.activity) || "moderate";
+  const bodycomp = str(answers.bodycomp) || "healthy";
+  const sleep = str(answers.sleep) || "optimal";
+  const goal = result.primaryGoal;
+
+  // Resting heart rate starting band: sedentary -> higher, active -> lower.
+  const hrBand: Record<string, string> = {
+    none: "Estimated 78 to 90 bpm",
+    light: "Estimated 72 to 82 bpm",
+    moderate: "Estimated 65 to 75 bpm",
+    high: "Estimated 55 to 68 bpm",
+  };
+  const hrStartingBand = hrBand[activity] ?? "Estimated 65 to 80 bpm";
+
+  // Waist/weight trend target by bodycomp and goal.
+  function weightTrendTarget(): string {
+    if (bodycomp === "obese") return "Goal: lose 5 to 10% of current bodyweight over 8 weeks";
+    if (bodycomp === "over") return "Goal: lose around 3 to 5% of current bodyweight over 8 weeks";
+    if (goal === "strength") return "Goal: hold bodyweight, shift toward lean recomposition";
+    return "Goal: hold current weight while improving body composition";
+  }
+
+  // Daily steps target by activity level.
+  function stepsTarget(): string {
+    if (activity === "none") return "Build to 7,000 steps a day by week 4";
+    if (activity === "light") return "Build to 8,000 steps a day by week 4";
+    return "Build to 9,000 to 10,000 steps a day";
+  }
+
+  // Sleep hours target from current band.
+  function sleepStartingBand(): string {
+    if (sleep === "low") return "Estimated 4 to 5 hours per night";
+    if (sleep === "belowavg") return "Estimated 5 to 6 hours per night";
+    if (sleep === "optimal") return "Estimated 7 to 8 hours per night";
+    return "Estimated 8 to 9 hours per night";
+  }
+  function sleepTarget(): string {
+    if (sleep === "low" || sleep === "belowavg") return "Goal: 7 to 8 hours per night within 4 weeks";
+    return "Goal: protect and maintain 7 to 8 hours per night";
+  }
+
+  const days = daysPerWeek(activity);
+
+  const metrics: YourNumbersMetric[] = [
+    {
+      label: "Resting heart rate",
+      startingBand: hrStartingBand,
+      target: "Goal: drop 5 to 10 bpm over 8 weeks",
+      how: "Zone 2 cardio sessions and consistently better sleep are the two levers that move this number",
+    },
+    {
+      label: "Weight or waist trend",
+      startingBand: "Estimated: your starting point (measure on Day 1)",
+      target: weightTrendTarget(),
+      how: "Track the weekly trend, not a daily number. Clothes fit and waist tape are more reliable than the scale alone",
+    },
+    {
+      label: "Daily protein",
+      startingBand: "Estimated: below your target on most days",
+      target: `Goal: ${proteinTarget(bodycomp)} at every meal, every day`,
+      how: "Pre-plan protein sources when you shop. Eggs, yogurt, lean meat, fish, and legumes are your daily staples",
+    },
+    {
+      label: "Daily steps",
+      startingBand: activity === "none" ? "Estimated 2,000 to 4,000 steps a day" : "Estimated 4,000 to 7,000 steps a day",
+      target: stepsTarget(),
+      how: "Break it into chunks: a short walk after each meal and a longer one on non-training days adds up fast",
+    },
+    {
+      label: "Sleep hours",
+      startingBand: sleepStartingBand(),
+      target: sleepTarget(),
+      how: "One fixed wake time and removing screens 30 minutes before bed are the two changes with the most evidence behind them",
+    },
+    {
+      label: "Weekly training days",
+      startingBand: activity === "none" ? "Estimated 0 days" : `Estimated ${days - 1} to ${days} days`,
+      target: `Goal: ${days} structured sessions per week by week 3`,
+      how: "Follow the plan in this guide. Start at your level, add one small progression each week",
+    },
+  ];
+
+  const reclaimedYearsHeadline =
+    result.recoverableYears > 0
+      ? `Based on your scan, you have around ${formatRecoverableYears(result.recoverableYears)} recoverable years on the table. These are the numbers that move them.`
+      : "These are the numbers that show the plan is working. Track the trend, not the day.";
+
+  const summary =
+    "This dashboard shows the six metrics your 8-week plan is designed to move. Starting bands are estimates based on your answers. Track the trend over weeks, not day-to-day noise, and use these numbers to know that what you are doing is working.";
+
+  const milestones = [
+    {
+      week: "Week 2",
+      marker: "Sleep is noticeably better and energy in the afternoon is steadier. The habits feel less effortful than Day 1.",
+    },
+    {
+      week: "Week 4",
+      marker: "Clothes feel different and measurements are moving. Resting heart rate is starting to trend down. You are halfway.",
+    },
+    {
+      week: "Week 8",
+      marker: "The numbers above are visibly shifting and the habits are locked in. You have a baseline to build the next 8 weeks from.",
+    },
+  ];
+
+  return { summary, reclaimedYearsHeadline, metrics, milestones };
+}
+
+/* ─── Bonus modules ──────────────────────────────────────────────────────── */
+
+function buildBonusModules(answers: Answers, result: ScanResult): DeepDive[] {
+  const goal = result.primaryGoal;
+  const diet = str(answers.diet) || "average";
+  const barriers = toValues(answers.activity_barrier);
+  const injury = barriers.includes("injury");
+  const days = daysPerWeek(str(answers.activity) || "moderate");
+
+  const plateauProtocol: DeepDive = {
+    heading: "The Plateau Protocol",
+    problem:
+      "Progress stalls for almost everyone around week 4 to 6. You are doing the same sessions, eating the same way, and the numbers stop moving. This feels like failure; it is not. It is the point where most people quit, and where the real gains are waiting.",
+    why: "The body adapts to a fixed stimulus. When you always lift the same load, walk the same route, and eat the same way, your physiology has no reason to change further. Plateaus are a signal that the plan needs a nudge, not an exit.",
+    whenFixed:
+      "A small, deliberate change to one variable restarts adaptation. You do not overhaul the plan; you rotate one element and progress resumes. Most plateaus break within two weeks of a targeted change.",
+    actions: [
+      `Change one thing at a time: add one more training day, increase load by the smallest increment available, or add 10 minutes to your conditioning session. Do not change everything at once`,
+      injury
+        ? "For pain-free movements, apply the deload week rule (about two-thirds of normal load and effort for one week), then rebuild from there"
+        : `Take the deload week (about two-thirds of normal load and effort), then return and push slightly past where you stalled. The deload is where adaptation consolidates`,
+      "If fat loss stalls, check protein first. Underreporting protein intake is the most common hidden cause of a plateau",
+      goal === "strength"
+        ? "For strength specifically: if a lift has not moved in three sessions, drop the load by 10 percent and rebuild with better technique. Technique is often the real ceiling"
+        : "If cardio feels too easy, add intervals: one or two hard 30-second efforts in the session is enough to restart the stimulus",
+      `After ${days} consistent weeks, vary the rep range on your main lifts for one block: if you have been doing 8 to 10 reps, spend two weeks at 4 to 6. The new range shocks the system without a new program`,
+    ],
+  };
+
+  const travelKit: DeepDive = {
+    heading: "Travel and Holiday Survival Kit",
+    problem:
+      "Travel wrecks consistency for almost everyone. A week away means no gym, irregular meals, alcohol at events, and broken sleep. Most people come back having lost the thread entirely and spend two weeks rebuilding.",
+    why: "The habits are fragile early on. A disrupted environment removes the cues that make the habits automatic: your usual training time is gone, the fridge is not stocked your way, and the social pull toward eating and drinking more is stronger than usual. Without a plan, the default wins.",
+    whenFixed:
+      "With a minimal protocol set before you leave, travel becomes a maintenance week rather than a setback. You keep the habit loop intact, you come back maybe slightly behind on training load, and you pick up exactly where you left off.",
+    actions: [
+      "Before you go: decide on your floor. The minimum is the 10-minute bodyweight circuit every other day and protein at every meal. That is all you are committing to",
+      "At the hotel: bodyweight squats, push-ups, and the plank circuits from your plan require no equipment and can be done in 10 minutes in the room",
+      diet === "poor" || diet === "average"
+        ? "At meals out: anchor every plate to a protein source and ask for extra vegetables or a side salad. Skip the bread basket and cap it at one drink"
+        : "At meals out: you already eat well at home, so keep the same anchoring rules: protein first, vegetables doubled, one drink maximum",
+      "Walk everywhere you can. Sightseeing, exploring, and commuting on foot keeps steps high without a session",
+      "When you return: do not try to make up missed sessions. Pick up week as planned and simply continue. One maintenance week does not undo eight weeks of work",
+    ],
+  };
+
+  const supplementTruth: DeepDive = {
+    heading: "The Supplement Truth",
+    problem:
+      "The supplement industry is worth billions, and most of it is noise. Most people either spend money on things that do not work or avoid the two or three supplements that genuinely have evidence behind them.",
+    why: "No supplement replaces the fundamentals: protein, sleep, and training are responsible for ninety percent of the results. Supplements can fill gaps; they cannot create the foundation. The marketing obscures this by selling the ten percent as if it were the ninety.",
+    whenFixed:
+      "A clear, evidence-based hierarchy means you spend nothing on things with no effect, use the two or three that are genuinely supported, and stop second-guessing the rest.",
+    actions: [
+      "Protein powder: the one supplement worth considering if your diet is short on protein. Whey or plant-based protein powder is just food in powder form. Use it as a backup for busy days, not a replacement for real food",
+      "Creatine monohydrate: the most studied supplement in existence. Around 3 to 5 g a day supports strength, muscle, and recovery. No loading phase needed. Take it daily and consistently",
+      "Vitamin D: most people indoors in northern latitudes are deficient. Around 1,000 to 2,000 IU a day is a reasonable baseline, particularly in winter. It affects mood, immune function, and muscle performance",
+      "Everything else: the evidence for most others, including BCAAs, fat burners, testosterone boosters, and most pre-workouts, is thin, mixed, or entirely absent. Save your money",
+      "If you have a diagnosed deficiency, follow your doctor's guidance. The above is general guidance for a generally healthy adult, not a substitute for medical advice",
+    ],
+  };
+
+  const next8Weeks: DeepDive = {
+    heading: "Your Next 8 Weeks",
+    problem:
+      "Most fitness plans end and leave you with nothing. You finish week 8, feel good, and have no idea what comes next. Within two weeks the habits start slipping, and within a month you are back where you started.",
+    why: "The first 8 weeks build the foundation. The next 8 consolidate and build on it. Without a clear continuation, the gains from the first block get absorbed back into the baseline as the body adapts to the new level and the habits need a new stimulus to stay sticky.",
+    whenFixed:
+      "A simple continuation plan keeps the momentum going. You do not start over; you recalibrate from a stronger baseline. The habits are now largely automatic, so the second block is mostly about adding one more variable to keep making progress.",
+    actions: [
+      "Keep the same training structure for weeks 9 and 10. Add one small progression to each session: one more rep, slightly more load, or one extra interval. The goal is to not plateau into the new baseline",
+      "In week 10, reassess the six numbers from your dashboard. Compare them to your Day 1 estimates. That gap is what the first 8 weeks built",
+      "From week 11, add one new challenge: a fourth training day if you have been on three, a new compound lift, or a longer conditioning session. One new stimulus is enough",
+      "Keep the weekly habit grid going. The habits from this block are your new floor. Build the next 8 weeks on top of them, do not replace them",
+      goal === "fat"
+        ? "If fat loss has slowed, a two-week diet break at maintenance calories resets metabolic adaptation before you return to a mild deficit. This is normal and expected at this stage"
+        : goal === "strength"
+          ? "For the next strength block, consider a periodisation shift: move from 3 to 4 sets of 8 to 10 to heavier sets of 4 to 6 reps on your main lifts. Strength responds well to variety in rep ranges over longer cycles"
+          : "Use the check-in from week 10 to identify your next one or two focus areas. The scan gave you a starting point; your 8-week data gives you a more accurate one",
+    ],
+  };
+
+  return [plateauProtocol, travelKit, supplementTruth, next8Weeks];
+}
+
+/* ─── Trackers ───────────────────────────────────────────────────────────── */
+
+// Regroup the flat groceryStaples list into labelled aisles for a checkable
+// shopping list. Mapping is deterministic and matches the staples list in
+// buildNutritionPlan.
+const GROCERY_AISLE_MAP: Record<string, string> = {
+  "Eggs": "Protein",
+  "Chicken or tofu": "Protein",
+  "Greek yogurt": "Protein",
+  "Tinned fish or beans": "Protein",
+  "Oats": "Pantry",
+  "Rice or potatoes": "Pantry",
+  "Olive oil": "Pantry",
+  "Nuts": "Pantry",
+  "Fruit": "Produce",
+  "Frozen vegetables": "Frozen",
+};
+
+function buildTrackers(answers: Answers): { groceryByAisle: GroceryAisle[]; dailyChecklist: string[] } {
+  const activity = str(answers.activity) || "moderate";
+  const bodycomp = str(answers.bodycomp) || "healthy";
+  const sleep = str(answers.sleep) || "optimal";
+
+  // Regroup the standard grocery staples into aisles.
+  const aisleMap: Record<string, string[]> = {};
+  for (const [item, aisle] of Object.entries(GROCERY_AISLE_MAP)) {
+    if (!aisleMap[aisle]) aisleMap[aisle] = [];
+    aisleMap[aisle].push(item);
+  }
+  // Deterministic aisle order.
+  const aisleOrder = ["Protein", "Produce", "Pantry", "Frozen"];
+  const groceryByAisle: GroceryAisle[] = aisleOrder
+    .filter((a) => aisleMap[a] && aisleMap[a].length > 0)
+    .map((aisle) => ({ aisle, items: aisleMap[aisle] }));
+
+  // Steps target label for the checklist.
+  const stepsGoal =
+    activity === "none" ? "7,000" : activity === "light" ? "8,000" : "9,000";
+
+  // Sleep wind-down reminder varies by current sleep quality.
+  const windDown =
+    sleep === "low" || sleep === "belowavg"
+      ? "Screens off 30 minutes before bed and follow your wind-down routine"
+      : "Protect your wind-down window - screens off and lights dimmed before bed";
+
+  const dailyChecklist: string[] = [
+    "At least 10 minutes of movement (minimum floor on any day)",
+    `${proteinTarget(bodycomp)} at every meal`,
+    `Hit your step target (${stepsGoal} steps or more)`,
+    "Stop eating about 3 hours before bed",
+    windDown,
+    "One fixed wake time - same time tomorrow as today",
+    "Today's habit from your weekly plan",
+  ];
+
+  return { groceryByAisle, dailyChecklist };
+}
+
 // Phase-based themes keep weeks coherent as a training progression.
 // Risk personalization lives in riskBriefings/yourSituation/strategy; it
 // must not bleed into the weekly grid where it would read as mismatched
@@ -759,5 +1023,8 @@ export function buildGuide(result: ScanResult, answers: Answers): GuideDoc {
     recalibration: "Each week the plan tightens as your numbers move. Add a little load or a little distance, repeat what worked, and replace what did not. Every fourth or fifth week, take the lighter deload week so your body can catch up and consolidate the gains.",
     outcomes: result.outcomes.map((o) => o.label),
     closing: "The date you saw assumes you change nothing. You already changed something by starting. Pick Day 1, do the first small thing, and let the plan carry the rest. Keep going.",
+    yourNumbers: buildYourNumbers(result, answers),
+    bonusModules: buildBonusModules(answers, result),
+    trackers: buildTrackers(answers),
   };
 }

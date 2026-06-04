@@ -119,6 +119,41 @@ export const ProgressMarkersSchema = z.object({
   markers: z.array(z.string().min(1)).min(3),
 });
 
+// --- Your Numbers dashboard ---
+
+export const YourNumbersMetricSchema = z.object({
+  label: z.string().min(1),
+  // Framed as an estimate band, never as a measured personal data point.
+  startingBand: z.string().min(1),
+  target: z.string().min(1),
+  how: z.string().min(1),
+});
+
+export const YourNumbersMilestoneSchema = z.object({
+  week: z.string().min(1),
+  marker: z.string().min(1),
+});
+
+export const YourNumbersSchema = z.object({
+  summary: z.string().min(1),
+  reclaimedYearsHeadline: z.string().min(1),
+  metrics: z.array(YourNumbersMetricSchema).min(4),
+  // Exactly 3 milestones: week 2, week 4, week 8.
+  milestones: z.array(YourNumbersMilestoneSchema).length(3),
+});
+
+// --- Trackers (derived data for printable tracker templates) ---
+
+export const GroceryAisleSchema = z.object({
+  aisle: z.string().min(1),
+  items: z.array(z.string().min(1)).min(1),
+});
+
+export const TrackersSchema = z.object({
+  groceryByAisle: z.array(GroceryAisleSchema).min(1),
+  dailyChecklist: z.array(z.string().min(1)).min(3),
+});
+
 export const GuideDocSchema = z.object({
   title: z.string().min(1),
   intro: z.string().min(1),
@@ -139,6 +174,11 @@ export const GuideDocSchema = z.object({
   recalibration: z.string().min(1),
   outcomes: z.array(z.string().min(1)).min(1),
   closing: z.string().min(1),
+  // Workbook additions (Layer 1).
+  yourNumbers: YourNumbersSchema,
+  // Exactly 4 bonus playbooks reusing the DeepDive shape.
+  bonusModules: z.array(DeepDiveSchema).length(4),
+  trackers: TrackersSchema,
 });
 
 export type DeepDive = z.infer<typeof DeepDiveSchema>;
@@ -147,6 +187,10 @@ export type Workout = z.infer<typeof WorkoutSchema>;
 export type Movement = z.infer<typeof MovementSchema>;
 export type SampleDay = z.infer<typeof SampleDaySchema>;
 export type GuideWeek = z.infer<typeof GuideWeekSchema>;
+export type YourNumbersMetric = z.infer<typeof YourNumbersMetricSchema>;
+export type YourNumbers = z.infer<typeof YourNumbersSchema>;
+export type GroceryAisle = z.infer<typeof GroceryAisleSchema>;
+export type Trackers = z.infer<typeof TrackersSchema>;
 export type GuideDoc = z.infer<typeof GuideDocSchema>;
 
 // Loose validation for the raw scan answers carried into checkout. Keys are
