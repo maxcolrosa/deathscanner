@@ -16,6 +16,28 @@ const GENERIC_OUTCOMES: Outcome[] = [
   { id: "longevity", label: "Move your projected date in the right direction" },
 ];
 
+// Objection-handling FAQ shown at the bottom of the pitch. Keeps the parody
+// disclosure out (that lives in legal pages) and makes no guarantee or medical
+// claim; it answers the questions that stall a purchase.
+const PITCH_FAQS = [
+  {
+    q: "Is this a subscription?",
+    a: "No. It is a one-time payment. You get instant access and the whole kit is yours to keep.",
+  },
+  {
+    q: "How fast do I get it?",
+    a: "Immediately. The moment you check out, your protocol and the full download kit are ready.",
+  },
+  {
+    q: "Do I need a gym or equipment?",
+    a: "No. The plan runs at home with minimal kit, and every movement has an easier and a harder version.",
+  },
+  {
+    q: "How is this different from a free plan online?",
+    a: "It is built from your actual scan answers and ordered by the risks costing you the most, not a generic template.",
+  },
+];
+
 function formatYears(years: number): string {
   return (Math.round(years * 10) / 10).toFixed(0);
 }
@@ -204,12 +226,31 @@ export function GuidePitch({
           </ul>
         </div>
 
-        {/* ── Proof, concentrated right before the ask ─────────────── */}
+        {/* ── The offer ────────────────────────────────────────────── */}
+        <OfferModule recoverableYears={recoverableYears} answers={answers} />
+
+        {/* ── Proof ────────────────────────────────────────────────── */}
         <TransformationsGallery />
         <Reviews />
 
-        {/* ── The offer ────────────────────────────────────────────── */}
-        <OfferModule recoverableYears={recoverableYears} answers={answers} />
+        {/* ── FAQ (objection handling) ─────────────────────────────── */}
+        <div className="flex flex-col gap-4">
+          <h3 className="font-mono text-xs uppercase tracking-[0.18em] text-monitor-muted">
+            Common questions
+          </h3>
+          <div className="divide-y divide-monitor-line border-y border-monitor-line">
+            {PITCH_FAQS.map((faq) => (
+              <div key={faq.q} className="flex flex-col gap-1.5 py-4">
+                <span className="text-sm font-semibold text-monitor-fg">
+                  {faq.q}
+                </span>
+                <span className="text-sm leading-relaxed text-monitor-muted">
+                  {faq.a}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* ── Close ────────────────────────────────────────────────── */}
         <div className="flex flex-col items-center gap-5 text-center">
