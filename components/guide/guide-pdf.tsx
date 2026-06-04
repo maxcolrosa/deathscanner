@@ -304,6 +304,32 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
           ))}
           <Text style={styles.label}>The deload week</Text>
           <Text style={styles.para}>{guide.training.deload}</Text>
+          {/* Sessions shown once for all 8 weeks - no reprinting per week */}
+          <Text style={styles.label}>Your sessions for all 8 weeks</Text>
+          <Text style={styles.muted}>
+            These are your sessions for all 8 weeks. Run them every week and add a little load or one more rep as you go. The movements stay the same; the numbers climb.
+          </Text>
+          {guide.training.workouts.map((wo, wi) => (
+            <View key={wi} wrap={false}>
+              <Text style={styles.workoutTitle}>
+                {wo.day}: {wo.title}
+              </Text>
+              {wo.exercises.map((ex, ei) => (
+                <View key={ei}>
+                  <Text style={styles.exName}>
+                    {ex.name}
+                    <Text style={styles.exMeta}>
+                      {"  "}
+                      {ex.sets} x {ex.reps}, rest {ex.rest}
+                    </Text>
+                  </Text>
+                  <Text style={styles.exMeta}>
+                    {ex.cues}. Progress: {ex.progression}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          ))}
         </Section>
 
         {/* ── First 7 days ── */}
@@ -320,32 +346,15 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
         </Section>
 
         {/* ── 8-week plan ── */}
+        {/* Workouts are defined once in the training section above; no reprinting exercises per week. */}
         <Section index={5} title="Your 8-week plan">
           {guide.weeks.map((w) => (
             <View key={w.week} wrap={false}>
               <Text style={styles.weekTitle}>{w.focus}</Text>
               <Text style={styles.muted}>{w.theme}</Text>
-              {w.workouts.map((wo, wi) => (
-                <View key={wi} wrap={false}>
-                  <Text style={styles.workoutTitle}>
-                    {wo.day}: {wo.title}
-                  </Text>
-                  {wo.exercises.map((ex, ei) => (
-                    <View key={ei}>
-                      <Text style={styles.exName}>
-                        {ex.name}
-                        <Text style={styles.exMeta}>
-                          {"  "}
-                          {ex.sets} x {ex.reps}, rest {ex.rest}
-                        </Text>
-                      </Text>
-                      <Text style={styles.exMeta}>
-                        {ex.cues}. Progress: {ex.progression}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-              ))}
+              <Text style={styles.itemMeta}>
+                Run your training sessions this week, adding a little where last week felt easy.
+              </Text>
               <Text style={styles.label}>Nutrition focus</Text>
               <Text style={styles.item}>{w.nutritionFocus}</Text>
               <Text style={styles.label}>Habit</Text>

@@ -38,7 +38,6 @@ export const GuideWeekSchema = z.object({
   week: z.number().int().min(1).max(8),
   theme: z.string().min(1),
   focus: z.string().min(1),
-  workouts: z.array(WorkoutSchema).min(1),
   nutritionFocus: z.string().min(1),
   habit: HabitSchema,
   checkpoint: z.string().min(1),
@@ -75,6 +74,7 @@ export const NutritionPlanSchema = z.object({
 
 export const TrainingPlanSchema = z.object({
   approach: DeepDiveSchema,
+  workouts: z.array(WorkoutSchema).min(1),
   warmup: z.array(MovementSchema).min(2),
   progressionRules: z.array(z.string().min(1)).min(2),
   deload: z.string().min(1),

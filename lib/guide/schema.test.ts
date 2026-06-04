@@ -27,9 +27,6 @@ function validWeek(week: number) {
     week,
     theme: `Week ${week} theme`,
     focus: `Week ${week} focus`,
-    workouts: [
-      { day: "Monday", title: "Full body A", exercises: [validExercise()] },
-    ],
     nutritionFocus: "Protein at every meal",
     habit: {
       name: "Post-lunch walk",
@@ -52,6 +49,9 @@ const validGuide = {
   ],
   training: {
     approach: validDeepDive("How the plan builds you"),
+    workouts: [
+      { day: "Monday", title: "Full body A", exercises: [validExercise()] },
+    ],
     warmup: [
       { name: "Easy cardio", detail: "3 minutes" },
       { name: "Glute bridges", detail: "10 reps" },
@@ -133,7 +133,7 @@ describe("GuideDocSchema", () => {
 
   it("rejects a malformed exercise (missing sets)", () => {
     const bad = structuredClone(validGuide);
-    delete (bad.weeks[0].workouts[0].exercises[0] as Record<string, unknown>).sets;
+    delete (bad.training.workouts[0].exercises[0] as Record<string, unknown>).sets;
     expect(() => GuideDocSchema.parse(bad)).toThrow();
   });
 

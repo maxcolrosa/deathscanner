@@ -338,7 +338,7 @@ function buildRiskBriefings(answers: Answers, result: ScanResult): DeepDive[] {
 
 /* ─── Training plan ──────────────────────────────────────────────────────── */
 
-function buildTrainingPlan(level: Level, injury: boolean, days: number) {
+function buildTrainingPlan(level: Level, injury: boolean, days: number, workouts: Workout[]) {
   const approach: DeepDive = {
     heading: "How this plan actually builds you",
     problem:
@@ -370,7 +370,7 @@ function buildTrainingPlan(level: Level, injury: boolean, days: number) {
   ];
   const deload =
     "Every fourth or fifth week, take a lighter week: same sessions, roughly two-thirds of the load and effort. It feels like a step back and is actually where the adaptation catches up. Then resume where you left off.";
-  return { approach, warmup, progressionRules, deload };
+  return { approach, workouts, warmup, progressionRules, deload };
 }
 
 /* ─── Nutrition plan ─────────────────────────────────────────────────────── */
@@ -644,14 +644,21 @@ export function buildGuide(result: ScanResult, answers: Answers): GuideDoc {
   };
   const goalText = goal && goalLine[goal] ? goalLine[goal] : "add years and feel better";
 
+  // Phase-based themes keep weeks coherent as a training progression.
+  // Risk personalization lives in riskBriefings/yourSituation/strategy; it
+  // must not bleed into the weekly grid where it would read as mismatched
+  // (e.g. "Week 3: Tobacco use" paired with a strength session).
+  const phaseTheme: Record<string, string> = {
+    Foundation: "Groove the movement patterns, lock in protein, and protect your sleep.",
+    Build: "Add load and volume each session, tighten nutrition, and build the streak.",
+    Push: "Drive intensity, consolidate the habits, and finish strong.",
+  };
   const weeks: GuideWeek[] = Array.from({ length: 8 }, (_, i) => {
-    const target = risks[i % risks.length];
     const block = i < 2 ? "Foundation" : i < 5 ? "Build" : "Push";
     return {
       week: i + 1,
-      theme: `${block}: ${target.toLowerCase()}`,
-      focus: `Week ${i + 1}: ${target}`,
-      workouts,
+      theme: phaseTheme[block],
+      focus: `Week ${i + 1}: ${block}`,
       nutritionFocus:
         i < 2
           ? "Lock in protein at every meal and your first swap"
@@ -669,7 +676,7 @@ export function buildGuide(result: ScanResult, answers: Answers): GuideDoc {
     yourSituation: `At ${result.currentAge}, your largest modifiable risks are ${risks.slice(0, 2).join(" and ").toLowerCase()}. ${injury ? "Because you flagged a past injury, every movement here has a low-impact version. " : ""}That is where your recoverable years come from, and it is where this plan spends its energy first.`,
     strategy: `We attack ${risks[0].toLowerCase()} first because it is costing you the most, then work down your list in order of impact. Training is ${days} days a week, eating is built around protein and whole foods, and the plan tightens as your numbers move. You do not do everything at once; you stack one win on the last.`,
     riskBriefings: buildRiskBriefings(answers, result),
-    training: buildTrainingPlan(level, injury, days),
+    training: buildTrainingPlan(level, injury, days, workouts),
     weeks,
     nutritionPlan: buildNutritionPlan(diet, goal, bodycomp),
     dailyBlueprint: [

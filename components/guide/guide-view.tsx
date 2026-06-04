@@ -146,39 +146,15 @@ function WeekCard({ w, delay }: { w: GuideDoc["weeks"][number]; delay: number })
         <div className="w-[3px] shrink-0 bg-monitor-accent/20 transition-colors duration-300 group-hover:bg-monitor-accent/50" />
         <div className="flex flex-1 flex-col gap-0 divide-y divide-monitor-line px-0">
 
-          {/* Workouts */}
-          {w.workouts.map((wo, wi) => (
-            <div key={wi} className="flex flex-col gap-3 px-5 py-4">
-              <div className="flex items-center gap-3">
-                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-monitor-accent/60 shrink-0 w-8">
-                  {wo.day.slice(0, 3)}
-                </span>
-                <span className="text-sm font-semibold text-monitor-fg">{wo.title}</span>
-              </div>
-
-              {/* Exercise rows */}
-              <div className="flex flex-col gap-2 pl-11">
-                {wo.exercises.map((ex, ei) => (
-                  <div
-                    key={ei}
-                    className="grid gap-x-3 gap-y-0.5"
-                    style={{ gridTemplateColumns: "1fr auto auto" }}
-                  >
-                    <span className="text-sm text-monitor-fg col-span-1">{ex.name}</span>
-                    <div className="flex items-center gap-1.5 row-start-1 col-start-2">
-                      <Badge>{ex.sets} x {ex.reps}</Badge>
-                      <span className="font-mono text-[10px] text-monitor-muted whitespace-nowrap">
-                        {ex.rest}
-                      </span>
-                    </div>
-                    <span className="text-xs leading-relaxed text-monitor-muted/70 col-span-2 col-start-1">
-                      {ex.cues}. Progress: {ex.progression}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+          {/* Training note - sessions are defined once above; no reprinting exercises here */}
+          <div className="flex items-start gap-3 px-5 py-3.5">
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-monitor-accent/60 mt-px shrink-0 w-8">
+              Trn
+            </span>
+            <p className="text-xs leading-relaxed text-monitor-muted">
+              Run your training sessions this week, adding a little where last week felt easy.
+            </p>
+          </div>
 
           {/* Nutrition + Habit footer */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-0 divide-y sm:divide-y-0 sm:divide-x divide-monitor-line">
@@ -371,6 +347,48 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
           <div className="flex flex-col gap-1.5 rounded-xl border border-monitor-line bg-monitor-accent/[0.04] p-5">
             <SubLabel>The deload week</SubLabel>
             <p className="text-sm leading-relaxed text-monitor-fg">{guide.training.deload}</p>
+          </div>
+
+          {/* Sessions - shown once for all 8 weeks. Run them every week and add
+              a little load or one more rep as you go. The movements stay the
+              same; the numbers climb. */}
+          <div className="flex flex-col gap-2">
+            <SubLabel>Your sessions for all 8 weeks</SubLabel>
+            <p className="text-sm leading-relaxed text-monitor-muted">
+              These are your sessions for all 8 weeks. Run them every week and add a little load or one more rep as you go. The movements stay the same; the numbers climb.
+            </p>
+          </div>
+          <div className="flex flex-col gap-3">
+            {guide.training.workouts.map((wo, wi) => (
+              <div key={wi} className="overflow-hidden rounded-xl border border-monitor-line bg-monitor-panel">
+                <div className="flex items-center gap-3 px-5 py-3.5 border-b border-monitor-line">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-monitor-accent/60 shrink-0 w-8">
+                    {wo.day.slice(0, 3)}
+                  </span>
+                  <span className="text-sm font-semibold text-monitor-fg">{wo.title}</span>
+                </div>
+                <div className="flex flex-col gap-2 px-5 py-4">
+                  {wo.exercises.map((ex, ei) => (
+                    <div
+                      key={ei}
+                      className="grid gap-x-3 gap-y-0.5"
+                      style={{ gridTemplateColumns: "1fr auto auto" }}
+                    >
+                      <span className="text-sm text-monitor-fg col-span-1">{ex.name}</span>
+                      <div className="flex items-center gap-1.5 row-start-1 col-start-2">
+                        <Badge>{ex.sets} x {ex.reps}</Badge>
+                        <span className="font-mono text-[10px] text-monitor-muted whitespace-nowrap">
+                          {ex.rest}
+                        </span>
+                      </div>
+                      <span className="text-xs leading-relaxed text-monitor-muted/70 col-span-2 col-start-1">
+                        {ex.cues}. Progress: {ex.progression}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </Section>
 

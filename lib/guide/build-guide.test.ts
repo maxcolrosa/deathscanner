@@ -20,22 +20,27 @@ describe("buildGuide", () => {
     );
   });
 
-  it("leads week 1 with the top risk category", () => {
+  it("top risk category appears in the guide narrative, not the week grid", () => {
     const r = computeResult(sedentary);
-    expect(buildGuide(r, sedentary).weeks[0].focus.toLowerCase()).toContain(
-      r.topRisks[0].category.toLowerCase()
-    );
+    const guide = buildGuide(r, sedentary);
+    const topRisk = r.topRisks[0].category.toLowerCase();
+    // Risk personalization lives in yourSituation and strategy, not the weekly focus.
+    expect(
+      guide.yourSituation.toLowerCase() + guide.strategy.toLowerCase()
+    ).toContain(topRisk);
+    // Week 1 focus reflects the Foundation phase, not a risk category.
+    expect(guide.weeks[0].focus.toLowerCase()).toContain("foundation");
   });
 
   it("scales training volume to activity (sedentary fewer days than very active)", () => {
-    const s = buildGuide(computeResult(sedentary), sedentary).weeks[0].workouts.length;
-    const a = buildGuide(computeResult(active), active).weeks[0].workouts.length;
+    const s = buildGuide(computeResult(sedentary), sedentary).training.workouts.length;
+    const a = buildGuide(computeResult(active), active).training.workouts.length;
     expect(a).toBeGreaterThan(s);
   });
 
   it("uses low-impact variants and names the injury when injury is the barrier", () => {
     const g = buildGuide(computeResult(injured), injured);
-    const names = g.weeks[0].workouts.flatMap((w) => w.exercises.map((e) => e.name.toLowerCase())).join(" ");
+    const names = g.training.workouts.flatMap((w) => w.exercises.map((e) => e.name.toLowerCase())).join(" ");
     expect(names).toMatch(/box squat|glute bridge|incline|band/);
     expect(g.yourSituation.toLowerCase()).toContain("injury");
   });
