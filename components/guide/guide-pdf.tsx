@@ -165,6 +165,9 @@ const styles = StyleSheet.create({
   exMeta: { fontFamily: MONO, fontSize: 8.5, color: C.muted, marginBottom: 4 },
 
   h3: { fontFamily: SANS, fontWeight: 600, fontSize: 11, color: C.fg, marginTop: 10, marginBottom: 3 },
+
+  /* Plate-formula callout: left accent border to set it apart */
+  callout: { borderLeftWidth: 2, borderLeftColor: C.accentDim, paddingLeft: 8 },
 });
 
 /* ─── Primitives ─────────────────────────────────────────────────────────────── */
@@ -371,7 +374,7 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
           <Panel dive={n.philosophy} />
           {/* Plate formula */}
           <Text style={styles.label}>Build every plate like this</Text>
-          <Text style={[styles.para, { borderLeftWidth: 2, borderLeftColor: C.accentDim, paddingLeft: 8 }]}>{n.plateFormula}</Text>
+          <Text style={[styles.para, styles.callout]}>{n.plateFormula}</Text>
           {/* Goal-specific calibration */}
           <Text style={styles.label}>Calibrated to your goal</Text>
           {n.calibration.map((c, i) => (

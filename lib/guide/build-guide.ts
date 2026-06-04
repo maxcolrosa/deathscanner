@@ -390,7 +390,7 @@ function plateFormula(goal: string | null): string {
       : goal === "fat"
         ? "a modest fist of whole-food carbs (keep it smaller to create a gentle deficit)"
         : "a fist of whole-food carbs";
-  return `Fill half your plate with vegetables (two loosely-packed fist-fulls), add a palm of protein, ${carbCue}, and finish with a thumb of healthy fat, such as olive oil, avocado, or a small handful of nuts. That single template covers most of your meals without any counting.`;
+  return `Fill half your plate with vegetables (two loosely-packed fistfuls), add a palm of protein, ${carbCue}, and finish with a thumb of healthy fat, such as olive oil, avocado, or a small handful of nuts. That single template covers most of your meals without any counting.`;
 }
 
 // Goal-specific calibration cues. At most three, concise and actionable.
@@ -445,7 +445,6 @@ function buildNutritionPlan(diet: string, goal: string | null, bodycomp: string)
       : `${portionTarget}. For most adults this lands around 1.6 to 2.0 g of protein per kg of bodyweight per day, if you would rather not count. Prioritise real food sources first, lean meat, fish, eggs, Greek yogurt, and legumes, before turning to protein powder.`;
 
   const principles: string[] = [
-    plate,
     "Stop eating about three hours before bed to protect sleep quality and overnight blood-sugar regulation",
     "Eighty percent consistent beats one hundred percent for a week and then quitting",
   ];
