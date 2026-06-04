@@ -352,7 +352,7 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
             <View key={w.week} wrap={false}>
               <Text style={styles.weekTitle}>{w.focus}</Text>
               <Text style={styles.muted}>{w.theme}</Text>
-              <Text style={styles.itemMeta}>
+              <Text style={styles.muted}>
                 Run your training sessions this week, adding a little where last week felt easy.
               </Text>
               <Text style={styles.label}>Nutrition focus</Text>

@@ -616,6 +616,16 @@ function weekHabit(i: number, barrier: string) {
   return habits[i % habits.length];
 }
 
+// Phase-based themes keep weeks coherent as a training progression.
+// Risk personalization lives in riskBriefings/yourSituation/strategy; it
+// must not bleed into the weekly grid where it would read as mismatched
+// (e.g. "Week 3: Tobacco use" paired with a strength session).
+const PHASE_THEME: Record<string, string> = {
+  Foundation: "Groove the movement patterns, lock in protein, and protect your sleep.",
+  Build: "Add load and volume each session, tighten nutrition, and build the streak.",
+  Push: "Drive intensity, consolidate the habits, and finish strong.",
+};
+
 // Deterministic, offline guide generation. Branches on the user's answers so it
 // reads as personalized, with no network or AI call.
 export function buildGuide(result: ScanResult, answers: Answers): GuideDoc {
@@ -643,21 +653,11 @@ export function buildGuide(result: ScanResult, answers: Answers): GuideDoc {
     heart: "protect your heart and add years",
   };
   const goalText = goal && goalLine[goal] ? goalLine[goal] : "add years and feel better";
-
-  // Phase-based themes keep weeks coherent as a training progression.
-  // Risk personalization lives in riskBriefings/yourSituation/strategy; it
-  // must not bleed into the weekly grid where it would read as mismatched
-  // (e.g. "Week 3: Tobacco use" paired with a strength session).
-  const phaseTheme: Record<string, string> = {
-    Foundation: "Groove the movement patterns, lock in protein, and protect your sleep.",
-    Build: "Add load and volume each session, tighten nutrition, and build the streak.",
-    Push: "Drive intensity, consolidate the habits, and finish strong.",
-  };
   const weeks: GuideWeek[] = Array.from({ length: 8 }, (_, i) => {
     const block = i < 2 ? "Foundation" : i < 5 ? "Build" : "Push";
     return {
       week: i + 1,
-      theme: phaseTheme[block],
+      theme: PHASE_THEME[block],
       focus: `Week ${i + 1}: ${block}`,
       nutritionFocus:
         i < 2
