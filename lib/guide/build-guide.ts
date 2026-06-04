@@ -717,8 +717,8 @@ function buildYourNumbers(result: ScanResult, answers: Answers): YourNumbers {
 
   // Waist/weight trend target by bodycomp and goal.
   function weightTrendTarget(): string {
-    if (bodycomp === "obese") return "Goal: lose 5 to 10% of current bodyweight over 8 weeks";
-    if (bodycomp === "over") return "Goal: lose around 3 to 5% of current bodyweight over 8 weeks";
+    if (bodycomp === "obese") return "Goal: lose 5 to 10% of current bodyweight across the 90-day program";
+    if (bodycomp === "over") return "Goal: lose around 3 to 5% of current bodyweight across the 90-day program";
     if (goal === "strength") return "Goal: hold bodyweight, shift toward lean recomposition";
     return "Goal: hold current weight while improving body composition";
   }
@@ -748,7 +748,7 @@ function buildYourNumbers(result: ScanResult, answers: Answers): YourNumbers {
     {
       label: "Resting heart rate",
       startingBand: hrStartingBand,
-      target: "Goal: drop 5 to 10 bpm over 8 weeks",
+      target: "Goal: drop 5 to 10 bpm over the 90-day program",
       how: "Zone 2 cardio sessions and consistently better sleep are the two levers that move this number",
     },
     {
@@ -789,7 +789,7 @@ function buildYourNumbers(result: ScanResult, answers: Answers): YourNumbers {
       : "These are the numbers that show the plan is working. Track the trend, not the day.";
 
   const summary =
-    "This dashboard shows the six metrics your 8-week plan is designed to move. Starting bands are estimates based on your answers. Track the trend over weeks, not day-to-day noise, and use these numbers to know that what you are doing is working.";
+    "This dashboard shows the six metrics your 90-day program is designed to move. Starting bands are estimates based on your answers. Track the trend over weeks, not day-to-day noise, and use these numbers to know that what you are doing is working.";
 
   const milestones = [
     {
@@ -802,7 +802,7 @@ function buildYourNumbers(result: ScanResult, answers: Answers): YourNumbers {
     },
     {
       week: "Week 8",
-      marker: "The numbers above are visibly shifting and the habits are locked in. You have a baseline to build the next 8 weeks from.",
+      marker: "The numbers above are visibly shifting and the habits are locked in. You have a strong foundation for the Push phase ahead.",
     },
   ];
 
@@ -852,7 +852,7 @@ function buildBonusModules(answers: Answers, result: ScanResult): DeepDive[] {
         ? "At meals out: anchor every plate to a protein source and ask for extra vegetables or a side salad. Skip the bread basket and cap it at one drink"
         : "At meals out: you already eat well at home, so keep the same anchoring rules: protein first, vegetables doubled, one drink maximum",
       "Walk everywhere you can. Sightseeing, exploring, and commuting on foot keeps steps high without a session",
-      "When you return: do not try to make up missed sessions. Pick up week as planned and simply continue. One maintenance week does not undo eight weeks of work",
+      "When you return: do not try to make up missed sessions. Pick up where you left off and simply continue. One maintenance week does not undo the progress you have built",
     ],
   };
 
@@ -872,27 +872,27 @@ function buildBonusModules(answers: Answers, result: ScanResult): DeepDive[] {
     ],
   };
 
-  const next8Weeks: DeepDive = {
-    heading: "Your Next 8 Weeks",
+  const lifeAfter: DeepDive = {
+    heading: "Life After Your 90 Days",
     problem:
-      "Most fitness plans end and leave you with nothing. You finish week 8, feel good, and have no idea what comes next. Within two weeks the habits start slipping, and within a month you are back where you started.",
-    why: "The first 8 weeks build the foundation. The next 8 consolidate and build on it. Without a clear continuation, the gains from the first block get absorbed back into the baseline as the body adapts to the new level and the habits need a new stimulus to stay sticky.",
+      "Most fitness programs end and leave you with nothing. You cross the finish line, feel good, and have no clear answer for what comes next. Without a maintenance plan, the habits start to loosen and within a month you are rebuilding from scratch.",
+    why: "The 90 days build the foundation and prove what works for your body. But habits need ongoing stimulus to stay automatic. The transition from a structured program to self-directed maintenance is the highest-risk moment, and most people underplan for it.",
     whenFixed:
-      "A simple continuation plan keeps the momentum going. You do not start over; you recalibrate from a stronger baseline. The habits are now largely automatic, so the second block is mostly about adding one more variable to keep making progress.",
+      "A simple post-program protocol keeps the momentum going indefinitely. The habits are largely automatic by now, so maintenance is about removing friction and keeping one or two forward-facing goals to stay engaged, not starting over.",
     actions: [
-      "Keep the same training structure for weeks 9 and 10. Add one small progression to each session: one more rep, slightly more load, or one extra interval. The goal is to not plateau into the new baseline",
-      "In week 10, reassess the six numbers from your dashboard. Compare them to your Day 1 estimates. That gap is what the first 8 weeks built",
-      "From week 11, add one new challenge: a fourth training day if you have been on three, a new compound lift, or a longer conditioning session. One new stimulus is enough",
-      "Keep the weekly habit grid going. The habits from this block are your new floor. Build the next 8 weeks on top of them, do not replace them",
+      "Keep your training frequency. Dropping from your program days to one or two sessions a week is the fastest way to lose what you built. Aim to hold your final-week session count as your new baseline",
+      "At the end of week 12, reassess the six numbers from your dashboard. Compare them to your Day 1 estimates and to the 90-day targets. That gap is your real result",
+      "Add one new challenge every 4 to 6 weeks: a new compound lift, a longer conditioning session, or a fourth training day if you have been on three. One new stimulus is enough to keep adapting",
+      "Keep the weekly habit grid going. The habits from this program are your new floor. Do not replace them; build on top of them",
       goal === "fat"
-        ? "If fat loss has slowed, a two-week diet break at maintenance calories resets metabolic adaptation before you return to a mild deficit. This is normal and expected at this stage"
+        ? "If fat loss was your goal and you want to continue, a two-week break at maintenance calories before a new deficit phase resets metabolic adaptation. This is normal and recommended at this stage"
         : goal === "strength"
-          ? "For the next strength block, consider a periodisation shift: move from 3 to 4 sets of 8 to 10 to heavier sets of 4 to 6 reps on your main lifts. Strength responds well to variety in rep ranges over longer cycles"
-          : "Use the check-in from week 10 to identify your next one or two focus areas. The scan gave you a starting point; your 8-week data gives you a more accurate one",
+          ? "For your next strength block, consider a periodisation shift: move from your current rep range to heavier sets of 4 to 6 reps on your main lifts. Strength responds well to variety in rep ranges over longer cycles"
+          : "Use the week 12 check-in to identify your next one or two focus areas. Your 90-day data is a far more accurate picture of what your body responds to than the scan estimate that started this",
     ],
   };
 
-  return [plateauProtocol, travelKit, supplementTruth, next8Weeks];
+  return [plateauProtocol, travelKit, supplementTruth, lifeAfter];
 }
 
 /* ─── Trackers ───────────────────────────────────────────────────────────── */

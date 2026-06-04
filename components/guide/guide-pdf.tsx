@@ -307,7 +307,7 @@ const TOC_ENTRIES = [
   "Your biggest risks, in depth",
   "How your training works",
   "Start here: your first 7 days",
-  "Your 8-week plan",
+  "Your week-by-week plan",
   "Your nutrition plan",
   "Your daily blueprint",
   "Sleep and stress recovery",
@@ -336,7 +336,7 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
     <Document
       title={guide.title}
       author={BRAND}
-      subject="Your personalized 8-week protocol"
+      subject="Your personalized 90-day program"
     >
       <Page size="A4" style={styles.page}>
         {/* ── Cover ────────────────────────────────────────────────────────────
@@ -357,7 +357,7 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
           <View style={styles.metaDivider} />
           <View style={styles.metaItem}>
             <Text style={styles.metaKey}>DURATION </Text>
-            <Text style={styles.metaVal}>8 WEEKS</Text>
+            <Text style={styles.metaVal}>90 DAYS</Text>
           </View>
           <View style={styles.metaDivider} />
           <View style={styles.metaItem}>
@@ -385,7 +385,7 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
           <Text style={styles.lead}>{guide.yourSituation}</Text>
           <Text style={trackerStyles.label}>The strategy</Text>
           <Text style={styles.para}>{guide.strategy}</Text>
-          <Text style={trackerStyles.label}>What these 8 weeks deliver</Text>
+          <Text style={trackerStyles.label}>What these 90 days deliver</Text>
           {guide.outcomes.map((o, i) => (
             <Bullet key={i}>{o}</Bullet>
           ))}
@@ -405,7 +405,7 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
           <View style={styles.metricsHeaderRow}>
             <Text style={[styles.metricsHeaderCell, { flex: 2 }]}>Metric</Text>
             <Text style={[styles.metricsHeaderCell, { flex: 2 }]}>Starting band</Text>
-            <Text style={[styles.metricsHeaderCell, { flex: 2 }]}>8-week target</Text>
+            <Text style={[styles.metricsHeaderCell, { flex: 2 }]}>90-day target</Text>
             <Text style={[styles.metricsHeaderCell, { flex: 3 }]}>How to get there</Text>
           </View>
           {yn.metrics.map((m, i) => (
@@ -452,10 +452,10 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
           ))}
           <Text style={trackerStyles.label}>The deload week</Text>
           <Text style={styles.para}>{guide.training.deload}</Text>
-          {/* Sessions shown once for all 8 weeks - no reprinting per week */}
-          <Text style={trackerStyles.label}>Your sessions for all 8 weeks</Text>
+          {/* Sessions shown once for the weekly plan - no reprinting per week */}
+          <Text style={trackerStyles.label}>Your weekly training sessions</Text>
           <Text style={styles.muted}>
-            These are your sessions for all 8 weeks. Run them every week and add a little load or one more rep as you go. The movements stay the same; the numbers climb.
+            These are your sessions to run each week across the 90-day program. Add a little load or one more rep as you go. The movements stay the same; the numbers climb.
           </Text>
           {guide.training.workouts.map((wo, wi) => (
             <View key={wi} wrap={false}>
@@ -493,8 +493,8 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
           ))}
         </Section>
 
-        {/* ── 06. 8-week plan ──────────────────────────────────────────────── */}
-        <Section index={6} title="Your 8-week plan">
+        {/* ── 06. Week-by-week plan ────────────────────────────────────────── */}
+        <Section index={6} title="Your week-by-week plan">
           {guide.weeks.map((w) => (
             <View key={w.week} wrap={false}>
               <Text style={styles.weekTitle}>{w.focus}</Text>

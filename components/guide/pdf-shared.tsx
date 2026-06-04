@@ -245,7 +245,7 @@ export function WorkoutLogGrid({ guide }: { guide: GuideDoc }) {
  */
 export function WeeklyHabitGrid({ guide }: { guide: GuideDoc }) {
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-  // Deduplicate habit names across the 8 weeks for a compact list.
+  // Deduplicate habit names across the weeks for a compact list.
   const seen = new Set<string>();
   const habits: string[] = [];
   for (const w of guide.weeks) {

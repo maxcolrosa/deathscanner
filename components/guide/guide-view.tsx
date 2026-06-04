@@ -154,7 +154,7 @@ function DownloadKit({ token }: { token: string }) {
         Download your workbook PDF
       </a>
       <p className="text-xs text-monitor-muted max-w-[46ch]">
-        The full personalized workbook - 8-week plan, training, nutrition, your numbers dashboard, and four bonus playbooks.
+        The full personalized workbook - your 90-day program, training, nutrition, your numbers dashboard, and four bonus playbooks.
       </p>
 
       {/* Secondary downloads: recipe book, exercise library, tracker pack, quick-start */}
@@ -242,7 +242,7 @@ function YourNumbersSection({ yourNumbers }: { yourNumbers: YourNumbers }) {
                 <span className="text-sm text-monitor-fg mt-0.5">{m.startingBand}</span>
               </div>
               <div className="px-5 py-3.5 sm:border-l border-t sm:border-t-0 border-monitor-line flex flex-col gap-0.5">
-                <SubLabel>8-week target</SubLabel>
+                <SubLabel>90-day target</SubLabel>
                 <span className="text-sm text-monitor-accent mt-0.5">{m.target}</span>
               </div>
             </li>
@@ -631,13 +631,13 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
             <p className="text-sm leading-relaxed text-monitor-fg">{guide.training.deload}</p>
           </div>
 
-          {/* Sessions - shown once for all 8 weeks. Run them every week and add
-              a little load or one more rep as you go. The movements stay the
-              same; the numbers climb. */}
+          {/* Sessions - shown once for the weekly plan. Run them every week across
+              the 90-day program, adding a little load or one more rep as you go.
+              The movements stay the same; the numbers climb. */}
           <div className="flex flex-col gap-2">
-            <SubLabel>Your sessions for all 8 weeks</SubLabel>
+            <SubLabel>Your weekly training sessions</SubLabel>
             <p className="text-sm leading-relaxed text-monitor-muted">
-              These are your sessions for all 8 weeks. Run them every week and add a little load or one more rep as you go. The movements stay the same; the numbers climb.
+              These are your sessions to run each week across the 90-day program. Add a little load or one more rep as you go. The movements stay the same; the numbers climb.
             </p>
           </div>
           <div className="flex flex-col gap-3">
@@ -687,8 +687,8 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
           </div>
         </Section>
 
-        {/* ── 8-week plan ───────────────────────────────────────────────── */}
-        <Section title="Your 8-week plan" index={8}>
+        {/* ── Week-by-week plan ─────────────────────────────────────────── */}
+        <Section title="Your week-by-week plan" index={8}>
           <div className="flex flex-col gap-4">
             {guide.weeks.map((w, i) => (
               <WeekCard key={w.week} w={w} delay={i * 50 + 100} />
@@ -1004,7 +1004,7 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
         {/* ── Bonus playbooks ───────────────────────────────────────────── */}
         <Section title="Bonus playbooks" index={19}>
           <p className="max-w-[58ch] text-sm leading-relaxed text-monitor-muted">
-            Four additional playbooks covering the situations that derail most people - plateaus, travel, supplements, and what to do after week 8.
+            Four additional playbooks covering the situations that derail most people - plateaus, travel, supplements, and keeping the results for good.
           </p>
           <div className="flex flex-col gap-4">
             {guide.bonusModules.map((m) => (

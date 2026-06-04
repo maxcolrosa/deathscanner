@@ -2,7 +2,7 @@
  * tracker-pack-pdf.tsx
  *
  * Standalone printable tracker pack: workout log, weekly habit grid,
- * 8-week measurement grid, grocery checklist, and daily checklist card.
+ * 12-week measurement grid, grocery checklist, and daily checklist card.
  *
  * HARD CONSTRAINT: do NOT add `fixed` to any element.
  * @react-pdf 4.x throws "unsupported number" across many auto-broken pages
@@ -101,9 +101,9 @@ export function TrackerPackPdfDocument({ guide }: { guide: GuideDoc }) {
           <WeeklyHabitGrid guide={guide} />
         </View>
 
-        {/* ── 3. 8-week measurement tracker ────────────────────────────────── */}
+        {/* ── 3. 12-week measurement tracker ───────────────────────────────── */}
         <View break style={styles.sectionBreak}>
-          <TrackerSectionHead title="8-week measurement tracker" />
+          <TrackerSectionHead title="12-week measurement tracker" />
           <MeasurementTrackerGrid />
         </View>
 

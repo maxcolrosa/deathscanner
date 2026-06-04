@@ -83,7 +83,7 @@ describe("buildGuide", () => {
     expect(headings).toContain("The Plateau Protocol");
     expect(headings).toContain("Travel and Holiday Survival Kit");
     expect(headings).toContain("The Supplement Truth");
-    expect(headings).toContain("Your Next 8 Weeks");
+    expect(headings).toContain("Life After Your 90 Days");
   });
 
   it("trackers.groceryByAisle is non-empty", () => {

@@ -67,13 +67,13 @@ test("buying builds and shows the generated guide", async ({ page }) => {
     page.getByRole("heading", { name: /being written/i })
   ).toBeVisible({ timeout: 15000 });
 
-  // Then the finished guide renders. "Your 8-week plan" is a <span> in
+  // Then the finished guide renders. "Your week-by-week plan" is a <span> in
   // SectionLabel, not a heading, so target it via text.
   await expect(
     page.getByRole("heading", { name: /second wind protocol/i })
   ).toBeVisible({ timeout: 20000 });
   await expect(
-    page.getByText("Your 8-week plan", { exact: true })
+    page.getByText("Your week-by-week plan", { exact: true })
   ).toBeVisible({ timeout: 20000 });
   // New depth sections are present.
   await expect(page.getByText(/your biggest risks, in depth/i)).toBeVisible();
