@@ -1280,6 +1280,11 @@ function buildScienceNotes(result: ScanResult): ScienceNotes {
     "Body composition": "body fat and visceral fat",
     "Sleep": "sleep quality and recovery",
     "Stress": "chronic stress and cortisol",
+    "Tobacco use": "smoking, lung and vascular damage",
+    "Alcohol intake": "alcohol, recovery and liver health",
+    "Social connection": "social connection, stress and longevity",
+    "Medical history": "blood pressure, blood sugar and metabolic risk",
+    "Genetics": "biological baseline and modifiable factors",
   };
 
   // Build a personalised intro from the top one or two risk categories.

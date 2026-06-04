@@ -232,8 +232,17 @@ describe("buildGuide", () => {
   it("scienceNotes summary mentions top risk levers for a sedentary profile", () => {
     const result = computeResult(sedentary);
     const guide = buildGuide(result, sedentary);
-    // For a sedentary smoker with poor diet the top risk should involve activity/fitness.
-    expect(guide.scienceNotes.summary.length).toBeGreaterThan(20);
+    const summaryLower = guide.scienceNotes.summary.toLowerCase();
+    // The sedentary fixture has Tobacco use as its #1 risk (heavy smoker).
+    // After RISK_TO_LEVER mapping this becomes "smoking, lung and vascular damage".
+    // Assert the summary references the actual top risk category or its mapped lever phrase.
+    const topCategory = result.topRisks[0].category.toLowerCase(); // e.g. "tobacco use"
+    // At least one word from the top category or its common lever terms must appear.
+    const categoryWords = topCategory.split(/\W+/).filter((w) => w.length > 3);
+    const hasCategory = categoryWords.some((w) => summaryLower.includes(w));
+    // Also accept the mapped lever keywords that RISK_TO_LEVER injects.
+    const hasLeverKeyword = summaryLower.includes("smoking") || summaryLower.includes("lung") || summaryLower.includes("vascular");
+    expect(hasCategory || hasLeverKeyword).toBe(true);
   });
 
   it("scienceNotes is deterministic for fixed inputs", () => {
