@@ -13,6 +13,9 @@ export function SiteFooter() {
         <span className="font-mono text-sm tracking-tight text-monitor-fg">
           LONGEVITY SCAN
         </span>
+        <span className="font-mono text-xs text-monitor-muted">
+          Longevity Scan is a brand of ColrosaStudios LTD.
+        </span>
         <nav className="flex flex-wrap gap-x-6 gap-y-2">
           {LINKS.map((link) => (
             <Link
@@ -25,7 +28,13 @@ export function SiteFooter() {
           ))}
         </nav>
         <span className="font-mono text-xs text-monitor-muted">
-          &copy; {new Date().getFullYear()} Longevity Scan
+          For entertainment. Results vary.{" "}
+          <Link href="/terms" className="text-monitor-accent hover:underline">
+            See our Terms.
+          </Link>
+        </span>
+        <span className="font-mono text-xs text-monitor-muted">
+          &copy; {new Date().getFullYear()} ColrosaStudios LTD. All rights reserved.
         </span>
       </div>
     </footer>

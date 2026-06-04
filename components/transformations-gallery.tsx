@@ -82,6 +82,15 @@ export function TransformationsGallery({
           to   { opacity: 1; transform: translateY(0); }
         }
       `}</style>
+
+      {/* Results disclaimer */}
+      <p className="font-mono text-[10px] leading-relaxed text-monitor-muted">
+        * Illustrative, including AI-generated images and reviews. Not real
+        customers. Results vary and are not typical.{" "}
+        <a href="/terms" className="text-monitor-accent hover:underline">
+          See our Terms.
+        </a>
+      </p>
     </section>
   );
 }
