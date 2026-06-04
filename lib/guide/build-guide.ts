@@ -1337,7 +1337,11 @@ function buildProgramArc(goal: string | null): ProgramArc {
           ? "Load stays light and volume builds from two to three sets per movement. Nutrition tightens around protein and vegetable targets rather than calorie restriction. Swaps replace one processed meal per day."
           : goal === "strength"
             ? "Load is deliberately conservative. Sets build from two to three across the four-week block. Protein intake rises to support early muscle-protein synthesis. The movement patterns must be clean before load increases."
-            : "Load is light and sessions are short. The habit of showing up and protecting sleep is the primary output of this phase. Nutrition anchors on protein at every meal and one daily vegetable target.",
+            : goal === "heart"
+              ? "Conditioning sessions prioritise zone-2 effort, a pace you can hold a short conversation through, and run for 20 to 25 minutes. Strength work uses lighter loads and controlled tempos to keep blood pressure steady. The habit of daily movement is the primary output."
+              : goal === "energy"
+                ? "Sessions are short and consistent rather than intense. Showing up on schedule matters more than effort level. Sleep windows are set and protected from day one, and protein at every meal is the single nutrition non-negotiable for this phase."
+                : "Load is light and sessions are short. The habit of showing up and protecting sleep is the primary output of this phase. Nutrition anchors on protein at every meal and one daily vegetable target.",
     },
     {
       name: "Build",
@@ -1349,7 +1353,11 @@ function buildProgramArc(goal: string | null): ProgramArc {
           ? "Training volume increases to three to four working sets per movement. Nutrition portions tighten slightly: smaller carb windows on rest days, protein stays high every day. The measurement trend should be clearly moving by week 6."
           : goal === "strength"
             ? "Working sets move to four per main lift. Load increases every session where top-of-range reps are cleared. Calorie intake rises on training days to fuel the heavier work and support recovery."
-            : "Sessions add an extra working set and conditioning work extends by five minutes. Energy and sleep quality are the lead indicators to track in this phase, alongside the training log.",
+            : goal === "heart"
+              ? "Zone-2 conditioning sessions extend to 30 minutes and increase in frequency. Strength sets grow to three to four per movement, keeping loads moderate and rest periods long enough to prevent blood pressure spikes. Resting heart rate begins to trend down."
+              : goal === "energy"
+                ? "An extra working set is added to each strength session and conditioning work extends by five minutes. The focus stays on steady, manageable progression rather than intensity. Afternoon energy and sleep quality are the two lead indicators to track."
+                : "Sessions add an extra working set and conditioning work extends by five minutes. Energy and sleep quality are the lead indicators to track in this phase, alongside the training log.",
     },
     {
       name: "Push",
@@ -1361,7 +1369,11 @@ function buildProgramArc(goal: string | null): ProgramArc {
           ? "Conditioning frequency increases to two or three sessions per week. Strength sessions keep three to four sets at a higher load than Foundation. A two-week maintenance break at the end of this phase resets metabolic adaptation before the next cycle."
           : goal === "strength"
             ? "Rep ranges shift: main lifts drop to four to six reps at a heavier load for two to three weeks, then return to eight to ten for one consolidation week before the maintenance hand-off. This variation drives strength adaptation beyond the initial linear gains."
-            : "All session parameters are at their highest for this programme. Daily steps, training sessions, and sleep windows are protected as non-negotiables. A lighter deload in week 12 allows the body to consolidate before maintenance.",
+            : goal === "heart"
+              ? "Zone-2 sessions reach their peak duration and frequency for this programme. Strength work maintains three to four sets with blood-pressure-friendly rest periods. A lighter deload in week 12 lets the body consolidate the cardiovascular gains before the maintenance hand-off."
+              : goal === "energy"
+                ? "All session parameters are at their highest for this programme, but intensity remains secondary to consistency. Daily steps, sleep windows, and training sessions are protected as non-negotiables. A lighter deload in week 12 consolidates the habit before maintenance."
+                : "All session parameters are at their highest for this programme. Daily steps, training sessions, and sleep windows are protected as non-negotiables. A lighter deload in week 12 allows the body to consolidate before maintenance.",
     },
     {
       name: "Maintenance",

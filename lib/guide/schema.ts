@@ -222,7 +222,7 @@ export const ProgramArcSchema = z.object({
   // 1-2 sentences framing the 90-day journey as a coherent transformation arc.
   summary: z.string().min(1),
   // At least 4 phases: Foundation, Build, Push, Maintenance.
-  phases: z.array(ProgramPhaseSchema).min(3),
+  phases: z.array(ProgramPhaseSchema).min(4),
   // One review block per month; at least 3 to cover the full 90-day arc.
   monthlyReviews: z.array(MonthlyReviewSchema).min(3),
 });
