@@ -16,26 +16,112 @@ const GENERIC_OUTCOMES: Outcome[] = [
   { id: "longevity", label: "Move your projected date in the right direction" },
 ];
 
-const STEPS = [
-  {
-    n: "1",
-    title: "Your scan found the risks",
-    body: "We already know the exact factors pulling your projection down.",
-  },
-  {
-    n: "2",
-    title: "We turn them into a daily plan",
-    body: "A 90-day program that targets your highest-impact risks first.",
-  },
-  {
-    n: "3",
-    title: "You reverse them, your date moves",
-    body: "Change the inputs and the model that judged you changes its answer.",
-  },
-];
-
 function formatYears(years: number): string {
   return (Math.round(years * 10) / 10).toFixed(0);
+}
+
+/* The single, dominant offer. Price anchor, live countdown, loss framing, CTA.
+   Everything urgent on the page funnels here. */
+function OfferModule({
+  recoverableYears,
+  answers,
+}: {
+  recoverableYears: number;
+  answers?: Answers;
+}) {
+  const { price, expiredPrice, listPrice, expired, remaining } = useSale();
+  const hasTimer = remaining !== null;
+  const hasYears = recoverableYears > 0;
+  const savings = Math.round((1 - price / PRODUCT.stackValue) * 100);
+
+  return (
+    <div className="overflow-hidden rounded-xl border border-monitor-accent/40 bg-monitor-panel shadow-[inset_0_1px_0_rgba(46,230,201,0.08)]">
+      {/* Urgency bar */}
+      <div className="flex items-center gap-2.5 border-b border-monitor-accent/20 bg-monitor-accent/[0.04] px-6 py-3">
+        <span className="relative flex h-2 w-2">
+          {!expired && (
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-monitor-accent opacity-60" />
+          )}
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-monitor-accent" />
+        </span>
+        <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-monitor-accent">
+          {expired ? "Launch price ended" : "Launch price active"}
+        </span>
+        <span className="ml-auto font-mono text-[11px] text-monitor-muted">
+          {expired ? (
+            <>now ${price}</>
+          ) : hasTimer ? (
+            <>
+              ends in{" "}
+              <SaleCountdown className="text-base font-semibold text-monitor-accent" />
+            </>
+          ) : (
+            <>limited launch offer</>
+          )}
+        </span>
+      </div>
+
+      <div className="flex flex-col gap-7 p-7 sm:p-9">
+        {/* Price anchor */}
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-sm text-monitor-muted">
+            <span>
+              Total value{" "}
+              <span className="line-through">${PRODUCT.stackValue}</span>
+            </span>
+            <span className="text-monitor-line">/</span>
+            <span>
+              Normally <span className="line-through">${listPrice}</span>
+            </span>
+          </div>
+          <div className="flex items-end gap-4">
+            <span className="font-mono text-7xl font-semibold leading-none tracking-tighter text-monitor-fg">
+              ${price}
+            </span>
+            <div className="mb-1 flex flex-col">
+              <span className="font-mono text-xs uppercase tracking-[0.16em] text-monitor-accent">
+                Today only
+              </span>
+              <span className="font-mono text-xs text-monitor-muted">
+                one time, yours to keep
+              </span>
+            </div>
+          </div>
+          <span className="font-mono text-xs text-monitor-muted">
+            That is {savings}% off, about the price of one takeaway, for a
+            90-day program built around your scan.
+          </span>
+        </div>
+
+        {/* Loss frame */}
+        <p className="border-l-2 border-monitor-alert/50 pl-4 text-base leading-relaxed text-monitor-fg">
+          {hasYears ? (
+            <>
+              <span className="font-mono text-monitor-alert">
+                {formatYears(recoverableYears)} years
+              </span>{" "}
+              are still on the table. The date you saw assumes you do nothing.
+              Doing nothing is the expensive choice.
+            </>
+          ) : (
+            <>
+              Your risks are already low. This locks in the years you have and
+              pushes you toward the top of your range.
+            </>
+          )}
+        </p>
+
+        <CheckoutButton answers={answers} />
+
+        {/* Price-jump warning */}
+        {hasTimer && !expired && (
+          <p className="text-center font-mono text-xs text-monitor-muted">
+            When the timer hits zero the price returns to ${expiredPrice}.
+          </p>
+        )}
+      </div>
+    </div>
+  );
 }
 
 export function GuidePitch({
@@ -45,7 +131,6 @@ export function GuidePitch({
   result?: ScanResult;
   answers?: Answers;
 }) {
-  const { price, listPrice, expired } = useSale();
   const recoverableYears = result?.recoverableYears ?? 0;
   const outcomes = result?.outcomes?.length ? result.outcomes : GENERIC_OUTCOMES;
   const topRisk = result?.topRisks?.[0];
@@ -57,99 +142,61 @@ export function GuidePitch({
   const subline = !personalized
     ? `${PRODUCT.tagline} A day-by-day plan you will actually follow.`
     : hasYears
-      ? `You just saw your date. As much as ${formatYears(recoverableYears)} of those years are still on the table, plus a noticeably better quality of life, and they come from the exact habits this protocol is built to change. The date only sticks if you do nothing.`
-      : "You just saw your date. This is the plan to push it later and hold it there.";
+      ? `As much as ${formatYears(recoverableYears)} of those years are still reachable, and they come from the exact habits this protocol is built to change.`
+      : "This is the plan to push your date later and hold it there.";
 
   return (
     <section className="border-t border-monitor-line px-6 py-20">
-      <div className="mx-auto flex max-w-3xl flex-col gap-12">
-        {/* Loss-aversion hook + results headline */}
-        <div className="flex flex-col gap-3">
+      <div className="mx-auto flex max-w-2xl flex-col gap-16">
+        {/* ── Promise ──────────────────────────────────────────────── */}
+        <div className="flex flex-col gap-4">
           <span className="font-mono text-xs uppercase tracking-[0.18em] text-monitor-accent">
             Your personalized protocol
           </span>
           <h2 className="text-4xl font-semibold tracking-tight text-monitor-fg md:text-5xl">
             {headline}
           </h2>
-          <p className="max-w-[58ch] text-lg leading-relaxed text-monitor-muted">
+          <p className="max-w-[54ch] text-lg leading-relaxed text-monitor-muted">
             {subline}
+            {personalized && topRisk ? (
+              <>
+                {" "}
+                It leads with {topRisk.category.toLowerCase()}, the single
+                biggest drag on your projection, then works down your list in
+                order of impact.
+              </>
+            ) : null}
           </p>
         </div>
 
-        {/* What they actually get out of it, derived from their answers */}
-        <div className="flex flex-col gap-3">
-          <h3 className="font-mono text-xs uppercase tracking-[0.18em] text-monitor-muted">
-            What 90 days will change for you
-          </h3>
-          <ul className="flex flex-col divide-y divide-monitor-line rounded-lg border border-monitor-line bg-monitor-panel">
-            {outcomes.map((outcome) => (
-              <li key={outcome.id} className="flex items-center gap-3 px-5 py-4">
-                <span aria-hidden className="font-mono text-monitor-accent">
-                  +
-                </span>
-                <span className="text-sm text-monitor-fg">{outcome.label}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Personalization: this plan is about them, not a generic course */}
-        <div className="rounded-lg border border-monitor-line bg-monitor-panel p-6">
-          <h3 className="font-mono text-xs uppercase tracking-[0.18em] text-monitor-muted">
-            Built from your scan
-          </h3>
-          <p className="mt-3 text-base leading-relaxed text-monitor-fg">
-            {personalized && topRisk
-              ? `Your plan leads with ${topRisk.category.toLowerCase()}, the single biggest drag on your projection, then works down your list in order of impact. Nothing generic. Nothing you do not need.`
-              : "Every plan is ordered by impact: the factors costing you the most years get fixed first. Nothing generic, nothing you do not need."}
-          </p>
-        </div>
-
-        {/* Belief: why this actually moves the number */}
-        <div className="flex flex-col gap-3">
-          <h3 className="font-mono text-xs uppercase tracking-[0.18em] text-monitor-muted">
-            How it works
-          </h3>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {STEPS.map((step) => (
-              <div
-                key={step.n}
-                className="flex flex-col gap-2 rounded-lg border border-monitor-line bg-monitor-panel p-5"
-              >
-                <span className="font-mono text-2xl tracking-tighter text-monitor-accent">
-                  {step.n}
-                </span>
-                <span className="text-sm font-semibold text-monitor-fg">
-                  {step.title}
-                </span>
-                <span className="text-sm leading-relaxed text-monitor-muted">
-                  {step.body}
-                </span>
-              </div>
-            ))}
+        {/* ── Value stack ──────────────────────────────────────────── */}
+        <div className="flex flex-col gap-4">
+          <div className="flex items-baseline justify-between gap-4">
+            <h3 className="font-mono text-xs uppercase tracking-[0.18em] text-monitor-muted">
+              Everything in your protocol
+            </h3>
+            <span className="font-mono text-xs text-monitor-muted">
+              value <span className="text-monitor-fg">${PRODUCT.stackValue}</span>
+            </span>
           </div>
-        </div>
-
-        {/* Value stack */}
-        <div className="flex flex-col gap-3">
-          <h3 className="font-mono text-xs uppercase tracking-[0.18em] text-monitor-muted">
-            Everything you get
-          </h3>
-          <ul className="flex flex-col divide-y divide-monitor-line rounded-lg border border-monitor-line bg-monitor-panel">
+          <ul className="divide-y divide-monitor-line border-y border-monitor-line">
             {INCLUDED.map((item) => (
               <li
                 key={item.label}
-                className="flex items-start justify-between gap-4 px-5 py-4"
+                className="flex items-start justify-between gap-4 py-3.5"
               >
-                <div className="flex flex-col gap-1">
-                  <span className="text-sm font-semibold text-monitor-fg">
+                <div className="flex items-start gap-3">
+                  <span
+                    aria-hidden
+                    className="mt-0.5 font-mono text-xs font-bold text-monitor-accent"
+                  >
+                    +
+                  </span>
+                  <span className="text-sm leading-snug text-monitor-fg">
                     {item.label}
                   </span>
-                  <span className="text-sm leading-relaxed text-monitor-muted">
-                    {item.note}
-                  </span>
                 </div>
-                <span className="shrink-0 font-mono text-sm text-monitor-muted">
+                <span className="shrink-0 font-mono text-xs text-monitor-muted line-through">
                   ${item.value}
                 </span>
               </li>
@@ -157,52 +204,21 @@ export function GuidePitch({
           </ul>
         </div>
 
-        {/* Social proof: real transformations and reviews, right before the offer */}
+        {/* ── Proof, concentrated right before the ask ─────────────── */}
         <TransformationsGallery />
         <Reviews />
 
-        {/* Price anchor + primary CTA */}
-        <div className="flex flex-col items-center gap-5 rounded-lg border border-monitor-accent/40 bg-monitor-panel p-8 text-center">
-          <div className="flex flex-col items-center gap-1">
-            <span className="font-mono text-sm text-monitor-muted">
-              Total value <span className="line-through">${PRODUCT.stackValue}</span>
-            </span>
-            <span className="font-mono text-sm text-monitor-muted">
-              Normally <span className="line-through">${listPrice}</span>
-            </span>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="font-mono text-xs uppercase tracking-[0.18em] text-monitor-accent">
-                Today
-              </span>
-              <span className="font-mono text-6xl tracking-tighter text-monitor-fg">
-                ${price}
-              </span>
-            </div>
-            <span className="mt-1 font-mono text-xs text-monitor-muted">
-              {expired ? (
-                "The launch price has ended."
-              ) : (
-                <>
-                  This price is held for{" "}
-                  <SaleCountdown className="text-monitor-accent" />
-                </>
-              )}
-            </span>
-          </div>
-          <CheckoutButton answers={answers} />
-        </div>
+        {/* ── The offer ────────────────────────────────────────────── */}
+        <OfferModule recoverableYears={recoverableYears} answers={answers} />
 
-        {/* Motivating close + final CTA */}
+        {/* ── Close ────────────────────────────────────────────────── */}
         <div className="flex flex-col items-center gap-5 text-center">
-          <p className="max-w-[48ch] text-lg leading-relaxed text-monitor-fg">
+          <p className="max-w-[44ch] text-lg leading-relaxed text-monitor-fg">
             {hasYears
-              ? `The date you saw assumes you change nothing. For less than the cost of a week of takeout, change something.`
-              : `The hardest part is starting. For less than the cost of a week of takeout, start today.`}
+              ? "You already did the hard part by looking. Now take the next step and change the answer."
+              : "You already did the hard part by looking. Now build the plan that keeps it that way."}
           </p>
-          <CheckoutButton
-            label={`Start reclaiming your years for $${price}`}
-            answers={answers}
-          />
+          <CheckoutButton label="Start reclaiming your years" answers={answers} />
         </div>
       </div>
     </section>
