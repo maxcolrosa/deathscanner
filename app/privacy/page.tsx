@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { LegalPage } from "@/components/legal-page";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — The Longevity Scan",
+  title: "Privacy Policy | The Longevity Scan",
 };
 
 export default function PrivacyPage() {
@@ -88,27 +88,27 @@ export default function PrivacyPage() {
         Where we hold personal data about you, you have the following rights:
       </p>
       <p>
-        <strong>Access</strong> - you may request a copy of the personal data
+        <strong>Access:</strong> you may request a copy of the personal data
         we hold about you.
       </p>
       <p>
-        <strong>Rectification</strong> - you may ask us to correct inaccurate
+        <strong>Rectification:</strong> you may ask us to correct inaccurate
         personal data.
       </p>
       <p>
-        <strong>Erasure</strong> - you may ask us to delete your personal data
+        <strong>Erasure:</strong> you may ask us to delete your personal data
         in certain circumstances.
       </p>
       <p>
-        <strong>Restriction</strong> - you may ask us to restrict the processing
+        <strong>Restriction:</strong> you may ask us to restrict the processing
         of your personal data in certain circumstances.
       </p>
       <p>
-        <strong>Objection</strong> - you may object to processing based on our
+        <strong>Objection:</strong> you may object to processing based on our
         legitimate interests.
       </p>
       <p>
-        <strong>Portability</strong> - you may request a copy of personal data
+        <strong>Portability:</strong> you may request a copy of personal data
         you have provided to us in a structured, commonly used, machine-readable
         format.
       </p>

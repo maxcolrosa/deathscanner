@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { LegalPage } from "@/components/legal-page";
 
 export const metadata: Metadata = {
-  title: "Terms and Conditions — The Longevity Scan",
+  title: "Terms and Conditions | The Longevity Scan",
 };
 
 export default function TermsPage() {

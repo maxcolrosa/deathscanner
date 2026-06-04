@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { LegalPage } from "@/components/legal-page";
 
 export const metadata: Metadata = {
-  title: "Cookies Policy — The Longevity Scan",
+  title: "Cookies Policy | The Longevity Scan",
 };
 
 export default function CookiesPage() {

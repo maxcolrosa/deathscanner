@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { TESTIMONIALS, type Testimonial } from "@/lib/guide/testimonials";
 
 /* Total readers shown in the aggregate. Static social-proof figure. */
@@ -145,9 +146,9 @@ export function Reviews({ heading = "What people say" }: { heading?: string }) {
       <p className="font-mono text-[10px] leading-relaxed text-monitor-muted">
         * Illustrative, including AI-generated images and reviews. Not real
         customers. Results vary and are not typical.{" "}
-        <a href="/terms" className="text-monitor-accent hover:underline">
+        <Link href="/terms" className="text-monitor-accent hover:underline">
           See our Terms.
-        </a>
+        </Link>
       </p>
     </section>
   );

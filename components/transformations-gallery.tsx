@@ -1,4 +1,5 @@
 import Image, { type StaticImageData } from "next/image";
+import Link from "next/link";
 import { TRANSFORMATIONS } from "@/lib/guide/testimonials";
 
 function Frame({ src, label }: { src: StaticImageData; label: string }) {
@@ -85,11 +86,11 @@ export function TransformationsGallery({
 
       {/* Results disclaimer */}
       <p className="font-mono text-[10px] leading-relaxed text-monitor-muted">
-        * Illustrative, including AI-generated images and reviews. Not real
-        customers. Results vary and are not typical.{" "}
-        <a href="/terms" className="text-monitor-accent hover:underline">
+        * Illustrative, including AI-generated images. Not real customers.
+        Results vary and are not typical.{" "}
+        <Link href="/terms" className="text-monitor-accent hover:underline">
           See our Terms.
-        </a>
+        </Link>
       </p>
     </section>
   );
