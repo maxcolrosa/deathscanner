@@ -188,6 +188,7 @@ export type Movement = z.infer<typeof MovementSchema>;
 export type SampleDay = z.infer<typeof SampleDaySchema>;
 export type GuideWeek = z.infer<typeof GuideWeekSchema>;
 export type YourNumbersMetric = z.infer<typeof YourNumbersMetricSchema>;
+export type YourNumbersMilestone = z.infer<typeof YourNumbersMilestoneSchema>;
 export type YourNumbers = z.infer<typeof YourNumbersSchema>;
 export type GroceryAisle = z.infer<typeof GroceryAisleSchema>;
 export type Trackers = z.infer<typeof TrackersSchema>;

@@ -59,14 +59,21 @@ describe("buildGuide", () => {
   });
 
   it("yourNumbers.reclaimedYearsHeadline references recoverableYears when > 0", () => {
+    // sedentary fixture: recoverableYears = 14.1, rounds to 14
     const result = computeResult(sedentary);
     const guide = buildGuide(result, sedentary);
-    if (result.recoverableYears > 0) {
-      const rounded = String(Math.round((Math.round(result.recoverableYears * 10) / 10)));
-      expect(guide.yourNumbers.reclaimedYearsHeadline).toContain(rounded);
-    } else {
-      expect(guide.yourNumbers.reclaimedYearsHeadline.length).toBeGreaterThan(0);
-    }
+    // Hardcoded expected value - if the engine changes and this breaks, the test
+    // will catch it (unlike a formula that mirrors the implementation).
+    expect(result.recoverableYears).toBeGreaterThan(0);
+    expect(guide.yourNumbers.reclaimedYearsHeadline).toContain("14");
+  });
+
+  it("yourNumbers.reclaimedYearsHeadline has a sensible fallback when no recoverable years", () => {
+    // The fallback branch produces a specific coaching string; assert its content.
+    // We synthesize a result with recoverableYears === 0 by patching the object.
+    const result = { ...computeResult(sedentary), recoverableYears: 0 };
+    const guide = buildGuide(result, sedentary);
+    expect(guide.yourNumbers.reclaimedYearsHeadline).toContain("numbers that show the plan is working");
   });
 
   it("bonusModules has exactly 4 entries with the expected headings", () => {
