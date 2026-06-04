@@ -27,7 +27,9 @@ const BUILD_PHASES = [
   "Mapping your recoverable years",
   "Building your custom workout plan",
   "Writing your nutrition plan",
-  "Personalizing your daily routine",
+  "Writing your recipe book",
+  "Compiling your exercise library",
+  "Personalizing your 90-day arc",
   "Assembling your tracker pack",
   "Compiling your workbook and quick-start",
 ];

@@ -5,12 +5,14 @@ import { getOrderByToken } from "@/lib/guide/orders";
 import { GuidePdfDocument } from "@/components/guide/guide-pdf";
 import { TrackerPackPdfDocument } from "@/components/guide/tracker-pack-pdf";
 import { QuickstartPdfDocument } from "@/components/guide/quickstart-pdf";
+import { RecipeBookPdfDocument } from "@/components/guide/recipe-book-pdf";
+import { ExerciseLibraryPdfDocument } from "@/components/guide/exercise-library-pdf";
 import type { GuideDoc } from "@/lib/guide/schema";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-type Asset = "workbook" | "trackers" | "quickstart";
+type Asset = "workbook" | "trackers" | "quickstart" | "recipes" | "exercises";
 
 const ASSET_MAP: Record<
   Asset,
@@ -32,10 +34,24 @@ const ASSET_MAP: Record<
     component: QuickstartPdfDocument,
     filename: "second-wind-quick-start.pdf",
   },
+  recipes: {
+    component: RecipeBookPdfDocument,
+    filename: "second-wind-recipe-book.pdf",
+  },
+  exercises: {
+    component: ExerciseLibraryPdfDocument,
+    filename: "second-wind-exercise-library.pdf",
+  },
 };
 
 function isAsset(v: string): v is Asset {
-  return v === "workbook" || v === "trackers" || v === "quickstart";
+  return (
+    v === "workbook" ||
+    v === "trackers" ||
+    v === "quickstart" ||
+    v === "recipes" ||
+    v === "exercises"
+  );
 }
 
 export async function GET(

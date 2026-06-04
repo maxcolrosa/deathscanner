@@ -17,6 +17,8 @@ import { buildGuide } from "@/lib/guide/build-guide";
 import { GuidePdfDocument } from "@/components/guide/guide-pdf";
 import { TrackerPackPdfDocument } from "@/components/guide/tracker-pack-pdf";
 import { QuickstartPdfDocument } from "@/components/guide/quickstart-pdf";
+import { RecipeBookPdfDocument } from "@/components/guide/recipe-book-pdf";
+import { ExerciseLibraryPdfDocument } from "@/components/guide/exercise-library-pdf";
 
 /* ─── Fixtures (mirrored from build-guide.test.ts) ───────────────────────────── */
 const sedentary = {
@@ -59,6 +61,18 @@ describe("PDF render smoke tests (no-fixed guard)", () => {
 
     it(`QuickstartPdfDocument renders for ${label} profile`, async () => {
       const buf = await renderDoc(QuickstartPdfDocument, guide);
+      expect(buf).toBeInstanceOf(Buffer);
+      expect(buf.length).toBeGreaterThan(0);
+    });
+
+    it(`RecipeBookPdfDocument renders for ${label} profile`, async () => {
+      const buf = await renderDoc(RecipeBookPdfDocument, guide);
+      expect(buf).toBeInstanceOf(Buffer);
+      expect(buf.length).toBeGreaterThan(0);
+    });
+
+    it(`ExerciseLibraryPdfDocument renders for ${label} profile`, async () => {
+      const buf = await renderDoc(ExerciseLibraryPdfDocument, guide);
       expect(buf).toBeInstanceOf(Buffer);
       expect(buf.length).toBeGreaterThan(0);
     });

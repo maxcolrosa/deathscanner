@@ -20,6 +20,11 @@ import {
   MeasurementTrackerGrid,
   GroceryChecklist,
   DailyChecklistCard,
+  RecipeCard,
+  ExerciseEntryCard,
+  ScienceEntryRow,
+  PhaseRow,
+  MonthlyReviewRow,
 } from "@/components/guide/pdf-shared";
 
 /* ─── Brand ──────────────────────────────────────────────────────────────────── */
@@ -312,6 +317,10 @@ const TOC_ENTRIES = [
   "Common questions",
   "Weekly recalibration",
   "Bonus playbooks",
+  "90-day program arc",
+  "The science behind the protocol",
+  "Recipe bank",
+  "Exercise library",
   "Printable trackers: workout log",
   "Printable trackers: habit and measurement grids",
   "Printable trackers: grocery checklist and daily card",
@@ -620,20 +629,82 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
           ))}
         </Section>
 
-        {/* ── 16. Workout log tracker ──────────────────────────────────────── */}
-        <Section index={16} title="Printable tracker: workout log">
+        {/* ── 16. 90-day program arc ───────────────────────────────────────── */}
+        <Section index={16} title="90-day program arc">
+          <Text style={styles.lead}>{guide.programArc.summary}</Text>
+          <Text style={trackerStyles.label}>Program phases</Text>
+          {guide.programArc.phases.map((phase, i) => (
+            <PhaseRow key={i} phase={phase} />
+          ))}
+          <Text style={trackerStyles.label}>Monthly progress reviews</Text>
+          <Text style={styles.muted}>
+            At the end of each month, run through the checkpoints below. Use the adjust rules to decide what to change before the next phase begins.
+          </Text>
+          {guide.programArc.monthlyReviews.map((review, i) => (
+            <MonthlyReviewRow key={i} review={review} />
+          ))}
+        </Section>
+
+        {/* ── 17. Science notes ────────────────────────────────────────────── */}
+        <Section index={17} title="The science behind the protocol">
+          <Text style={styles.lead}>{guide.scienceNotes.summary}</Text>
+          <Text style={[styles.muted, { marginBottom: 12 }]}>
+            {guide.scienceNotes.disclaimer}
+          </Text>
+          {guide.scienceNotes.entries.map((entry, i) => (
+            <ScienceEntryRow key={i} entry={entry} />
+          ))}
+        </Section>
+
+        {/* ── 18. Recipe bank ──────────────────────────────────────────────── */}
+        <Section index={18} title="Recipe bank">
+          <Text style={styles.muted}>
+            All calorie and protein figures are per-serving estimates. Actual values vary with ingredients and portion sizes.
+          </Text>
+          {guide.recipeBank.recipes.map((recipe, i) => (
+            <RecipeCard key={i} recipe={recipe} />
+          ))}
+          <Text style={trackerStyles.label}>Shopping list</Text>
+          <Text style={styles.muted}>
+            All ingredients across the recipes above, grouped by supermarket aisle.
+          </Text>
+          {guide.recipeBank.shoppingList.map((aisle, ai) => (
+            <View key={ai} wrap={false}>
+              <Text style={trackerStyles.aisleHeader}>{aisle.aisle}</Text>
+              {aisle.items.map((item, ii) => (
+                <View key={ii} style={trackerStyles.checkRow}>
+                  <Text style={trackerStyles.checkBox}>[  ]</Text>
+                  <Text style={trackerStyles.checkLabel}>{item}</Text>
+                </View>
+              ))}
+            </View>
+          ))}
+        </Section>
+
+        {/* ── 19. Exercise library ─────────────────────────────────────────── */}
+        <Section index={19} title="Exercise library">
+          <Text style={styles.muted}>
+            Detailed form guides for every movement in your program. Read the setup and execution cues before your first session, then return to the mistakes section whenever something feels off.
+          </Text>
+          {guide.exerciseLibrary.map((entry, i) => (
+            <ExerciseEntryCard key={i} entry={entry} />
+          ))}
+        </Section>
+
+        {/* ── 20. Workout log tracker ──────────────────────────────────────── */}
+        <Section index={20} title="Printable tracker: workout log">
           <WorkoutLogGrid guide={guide} />
         </Section>
 
-        {/* ── 17. Habit and measurement grids ──────────────────────────────── */}
-        <Section index={17} title="Printable trackers: habit and measurement">
+        {/* ── 21. Habit and measurement grids ──────────────────────────────── */}
+        <Section index={21} title="Printable trackers: habit and measurement">
           <WeeklyHabitGrid guide={guide} />
           <View style={styles.trackerBreak} />
           <MeasurementTrackerGrid />
         </Section>
 
-        {/* ── 18. Grocery checklist and daily card ─────────────────────────── */}
-        <Section index={18} title="Printable trackers: grocery and daily card">
+        {/* ── 22. Grocery checklist and daily card ─────────────────────────── */}
+        <Section index={22} title="Printable trackers: grocery and daily card">
           <GroceryChecklist aisles={guide.trackers.groceryByAisle} />
           <View style={styles.trackerBreak} />
           <DailyChecklistCard items={guide.trackers.dailyChecklist} />
