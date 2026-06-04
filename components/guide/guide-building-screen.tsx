@@ -28,7 +28,8 @@ const BUILD_PHASES = [
   "Building your custom workout plan",
   "Writing your nutrition plan",
   "Personalizing your daily routine",
-  "Compiling your protocol and PDF",
+  "Assembling your tracker pack",
+  "Compiling your workbook and quick-start",
 ];
 
 function RotatingStatus({ ms }: { ms: number }) {

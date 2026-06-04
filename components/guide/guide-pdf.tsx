@@ -1,62 +1,30 @@
-import fs from "node:fs";
-import path from "node:path";
-import { Document, Page, Text, View, StyleSheet, Font } from "@react-pdf/renderer";
+/**
+ * guide-pdf.tsx
+ *
+ * The full workbook PDF for the Second Wind Protocol.
+ *
+ * HARD CONSTRAINT: do NOT add `fixed` to any element.
+ * @react-pdf 4.x throws "unsupported number" across many auto-broken pages
+ * whenever a `fixed` element exists, which 500s the PDF routes. Page identity
+ * lives on the cover instead.
+ */
+import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import type { DeepDive, GuideDoc } from "@/lib/guide/schema";
+import {
+  SANS,
+  MONO,
+  C,
+  WorkoutLogGrid,
+  WeeklyHabitGrid,
+  MeasurementTrackerGrid,
+  GroceryChecklist,
+  DailyChecklistCard,
+} from "@/components/guide/pdf-shared";
 
-/* ─── Brand ──────────────────────────────────────────────────────────────────
-   The diagnostic system that generated this protocol. Update here when the
-   brand name changes; this is the only place the PDF names it. */
+/* ─── Brand ──────────────────────────────────────────────────────────────────── */
 const BRAND = "LONGEVITY SCAN";
 
-/* ─── Fonts ───────────────────────────────────────────────────────────────────
-   Register the real Geist family so the PDF matches the product. We only
-   register if the static TTFs are present on disk; otherwise fall back to the
-   built-in PDF fonts so rendering never hard-fails. */
-const FONT_DIR = path.join(process.cwd(), "node_modules/geist/dist/fonts");
-const FONTS_OK = (() => {
-  try {
-    return fs.existsSync(path.join(FONT_DIR, "geist-sans/Geist-Regular.ttf"));
-  } catch {
-    return false;
-  }
-})();
-
-if (FONTS_OK) {
-  Font.register({
-    family: "Geist",
-    fonts: [
-      { src: path.join(FONT_DIR, "geist-sans/Geist-Regular.ttf"), fontWeight: 400 },
-      { src: path.join(FONT_DIR, "geist-sans/Geist-Medium.ttf"), fontWeight: 500 },
-      { src: path.join(FONT_DIR, "geist-sans/Geist-SemiBold.ttf"), fontWeight: 600 },
-      { src: path.join(FONT_DIR, "geist-sans/Geist-Bold.ttf"), fontWeight: 700 },
-    ],
-  });
-  Font.register({
-    family: "GeistMono",
-    fonts: [
-      { src: path.join(FONT_DIR, "geist-mono/GeistMono-Regular.ttf"), fontWeight: 400 },
-      { src: path.join(FONT_DIR, "geist-mono/GeistMono-Medium.ttf"), fontWeight: 500 },
-    ],
-  });
-}
-// Keep words intact: react-pdf hyphenates mid-word by default, which looks broken.
-Font.registerHyphenationCallback((word) => [word]);
-
-const SANS = FONTS_OK ? "Geist" : "Helvetica";
-const MONO = FONTS_OK ? "GeistMono" : "Courier";
-
-/* ─── Monitor palette (mirrors app/globals.css) ─────────────────────────────── */
-const C = {
-  bg: "#070b0d",
-  panel: "#0c1418",
-  line: "#16242b",
-  fg: "#d7e3e6",
-  muted: "#6b8088",
-  accent: "#2ee6c9",
-  accentDim: "#1c8377",
-  alert: "#ff453a",
-} as const;
-
+/* ─── StyleSheet ─────────────────────────────────────────────────────────────── */
 const styles = StyleSheet.create({
   page: {
     backgroundColor: C.bg,
@@ -97,6 +65,42 @@ const styles = StyleSheet.create({
   metaKey: { fontFamily: MONO, fontSize: 7.5, letterSpacing: 1.2, color: C.muted },
   metaVal: { fontFamily: MONO, fontSize: 7.5, letterSpacing: 1.2, color: C.fg },
   metaDivider: { width: 0.75, height: 9, backgroundColor: C.line, marginRight: 16 },
+
+  /* Table of Contents */
+  tocTitle: {
+    fontFamily: SANS,
+    fontWeight: 700,
+    fontSize: 22,
+    color: C.fg,
+    marginBottom: 20,
+  },
+  tocEntry: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 8,
+    paddingBottom: 8,
+    borderBottomWidth: 0.5,
+    borderBottomColor: C.line,
+  },
+  tocIndex: {
+    fontFamily: MONO,
+    fontSize: 8.5,
+    color: C.accentDim,
+    width: 24,
+    marginTop: 1,
+  },
+  tocLabel: {
+    fontFamily: SANS,
+    fontSize: 10.5,
+    color: C.fg,
+    flex: 1,
+  },
+  tocNote: {
+    fontFamily: MONO,
+    fontSize: 8,
+    color: C.muted,
+    marginTop: 18,
+  },
 
   /* Section header */
   sectionHead: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 12 },
@@ -168,6 +172,78 @@ const styles = StyleSheet.create({
 
   /* Plate-formula callout: left accent border to set it apart */
   callout: { borderLeftWidth: 2, borderLeftColor: C.accentDim, paddingLeft: 8 },
+
+  /* Your Numbers */
+  yourNumbersHeadline: {
+    fontFamily: SANS,
+    fontWeight: 700,
+    fontSize: 16,
+    color: C.accent,
+    marginBottom: 6,
+    lineHeight: 1.25,
+  },
+  metricsHeaderRow: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderBottomColor: C.accentDim,
+    marginBottom: 2,
+    marginTop: 8,
+  },
+  metricsHeaderCell: {
+    fontFamily: MONO,
+    fontSize: 7.5,
+    letterSpacing: 1.2,
+    textTransform: "uppercase",
+    color: C.accentDim,
+    paddingVertical: 4,
+    paddingHorizontal: 4,
+  },
+  metricsRow: {
+    flexDirection: "row",
+    borderBottomWidth: 0.5,
+    borderBottomColor: C.line,
+  },
+  metricsCell: {
+    fontFamily: SANS,
+    fontSize: 9.5,
+    color: C.fg,
+    paddingVertical: 5,
+    paddingHorizontal: 4,
+    lineHeight: 1.4,
+  },
+  metricsCellMuted: {
+    fontFamily: SANS,
+    fontSize: 9.5,
+    color: C.muted,
+    paddingVertical: 5,
+    paddingHorizontal: 4,
+    lineHeight: 1.4,
+  },
+  milestoneRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 6,
+    paddingBottom: 6,
+    borderBottomWidth: 0.5,
+    borderBottomColor: C.line,
+  },
+  milestoneWeek: {
+    fontFamily: MONO,
+    fontSize: 8.5,
+    color: C.accentDim,
+    width: 52,
+    marginTop: 1,
+  },
+  milestoneMarker: {
+    fontFamily: SANS,
+    fontSize: 10,
+    color: C.fg,
+    flex: 1,
+    lineHeight: 1.45,
+  },
+
+  /* Tracker sections inside the workbook */
+  trackerBreak: { marginTop: 20 },
 });
 
 /* ─── Primitives ─────────────────────────────────────────────────────────────── */
@@ -209,7 +285,7 @@ function Panel({ dive }: { dive: DeepDive }) {
   );
 }
 
-/* A section that always starts on a fresh page. */
+/** A section that always starts on a fresh page. */
 function Section({
   index,
   title,
@@ -229,10 +305,34 @@ function Section({
   );
 }
 
+/* ─── Table of contents entries ──────────────────────────────────────────────── */
+const TOC_ENTRIES = [
+  "Where you stand",
+  "Your numbers: targets, milestones, and what you can recover",
+  "Your biggest risks, in depth",
+  "How your training works",
+  "Start here: your first 7 days",
+  "Your 8-week plan",
+  "Your nutrition plan",
+  "Your daily blueprint",
+  "Sleep and stress recovery",
+  "The 10-minute fallback",
+  "How to know it is working",
+  "When it gets hard",
+  "Common questions",
+  "Weekly recalibration",
+  "Bonus playbooks",
+  "Printable trackers: workout log",
+  "Printable trackers: habit and measurement grids",
+  "Printable trackers: grocery checklist and daily card",
+];
+
 /* ─── Document ───────────────────────────────────────────────────────────────── */
 
 export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
   const n = guide.nutritionPlan;
+  const yn = guide.yourNumbers;
+
   return (
     <Document
       title={guide.title}
@@ -240,16 +340,13 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
       subject="Your personalized 8-week protocol"
     >
       <Page size="A4" style={styles.page}>
-        {/* ── Cover ──
-            Note: this guide deliberately uses no `fixed` running header/footer.
-            @react-pdf 4.x miscomputes layout for `fixed` elements across this
-            many auto-broken pages and throws "unsupported number", which would
-            500 the PDF download route. Page identity lives on the cover instead. */}
+        {/* ── Cover ────────────────────────────────────────────────────────────
+            No `fixed` running header/footer. See constraint comment at top. */}
         <View style={styles.coverMark}>
           <View style={styles.coverDot} />
           <Text style={styles.coverMarkText}>{BRAND}</Text>
         </View>
-        <Text style={styles.coverKicker}>Personalized protocol</Text>
+        <Text style={styles.coverKicker}>Personalized workbook</Text>
         <Text style={styles.coverTitle}>{guide.title}</Text>
         <Text style={styles.coverIntro}>{guide.intro}</Text>
         <View style={styles.coverRule} />
@@ -265,12 +362,26 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
           </View>
           <View style={styles.metaDivider} />
           <View style={styles.metaItem}>
-            <Text style={styles.metaKey}>STATUS </Text>
-            <Text style={styles.metaVal}>CONFIDENTIAL</Text>
+            <Text style={styles.metaKey}>INCLUDES </Text>
+            <Text style={styles.metaVal}>WORKBOOK + TRACKERS</Text>
           </View>
         </View>
 
-        {/* ── Overview ── */}
+        {/* ── Table of Contents ─────────────────────────────────────────────── */}
+        <View break>
+          <Text style={styles.tocTitle}>Contents</Text>
+          {TOC_ENTRIES.map((entry, i) => (
+            <View key={i} style={styles.tocEntry}>
+              <Text style={styles.tocIndex}>{String(i + 1).padStart(2, "0")}</Text>
+              <Text style={styles.tocLabel}>{entry}</Text>
+            </View>
+          ))}
+          <Text style={styles.tocNote}>
+            Page numbers omitted. This workbook is best read front to back.
+          </Text>
+        </View>
+
+        {/* ── 01. Where you stand ──────────────────────────────────────────── */}
         <Section index={1} title="Where you stand">
           <Text style={styles.lead}>{guide.yourSituation}</Text>
           <Text style={styles.label}>The strategy</Text>
@@ -281,8 +392,43 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
           ))}
         </Section>
 
-        {/* ── Risk briefings ── */}
-        <Section index={2} title="Your biggest risks, in depth">
+        {/* ── 02. Your numbers ─────────────────────────────────────────────── */}
+        <Section index={2} title="Your numbers">
+          <Text style={styles.yourNumbersHeadline}>{yn.reclaimedYearsHeadline}</Text>
+          <Text style={styles.para}>{yn.summary}</Text>
+
+          <Text style={styles.label}>Your starting estimates and targets</Text>
+          <Text style={[styles.muted, { fontSize: 9, marginBottom: 6 }]}>
+            Starting bands are estimated from your scan answers, not measured. Targets are goals, not guarantees.
+          </Text>
+
+          {/* Metrics table */}
+          <View style={styles.metricsHeaderRow}>
+            <Text style={[styles.metricsHeaderCell, { flex: 2 }]}>Metric</Text>
+            <Text style={[styles.metricsHeaderCell, { flex: 2 }]}>Starting band</Text>
+            <Text style={[styles.metricsHeaderCell, { flex: 2 }]}>8-week target</Text>
+            <Text style={[styles.metricsHeaderCell, { flex: 3 }]}>How to get there</Text>
+          </View>
+          {yn.metrics.map((m, i) => (
+            <View key={i} style={styles.metricsRow} wrap={false}>
+              <Text style={[styles.metricsCell, { flex: 2 }]}>{m.label}</Text>
+              <Text style={[styles.metricsCellMuted, { flex: 2 }]}>{m.startingBand}</Text>
+              <Text style={[styles.metricsCell, { flex: 2, color: C.accent }]}>{m.target}</Text>
+              <Text style={[styles.metricsCellMuted, { flex: 3 }]}>{m.how}</Text>
+            </View>
+          ))}
+
+          <Text style={styles.label}>Milestones</Text>
+          {yn.milestones.map((ms, i) => (
+            <View key={i} style={styles.milestoneRow} wrap={false}>
+              <Text style={styles.milestoneWeek}>{ms.week}</Text>
+              <Text style={styles.milestoneMarker}>{ms.marker}</Text>
+            </View>
+          ))}
+        </Section>
+
+        {/* ── 03. Risk briefings ───────────────────────────────────────────── */}
+        <Section index={3} title="Your biggest risks, in depth">
           <Text style={styles.muted}>
             For each of your largest modifiable risks: what is happening, why it
             costs you years, what improves when you fix it, and exactly what to do.
@@ -292,8 +438,8 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
           ))}
         </Section>
 
-        {/* ── Training ── */}
-        <Section index={3} title="How your training works">
+        {/* ── 04. Training ─────────────────────────────────────────────────── */}
+        <Section index={4} title="How your training works">
           <Panel dive={guide.training.approach} />
           <Text style={styles.label}>Warm up first, every session</Text>
           {guide.training.warmup.map((m, i) => (
@@ -335,8 +481,8 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
           ))}
         </Section>
 
-        {/* ── First 7 days ── */}
-        <Section index={4} title="Start here: your first 7 days">
+        {/* ── 05. First 7 days ─────────────────────────────────────────────── */}
+        <Section index={5} title="Start here: your first 7 days">
           {guide.next7Days.map((d, i) => (
             <View key={i} style={styles.bulletRow}>
               <Text style={styles.bulletMark}>{String(i + 1)}</Text>
@@ -348,9 +494,8 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
           ))}
         </Section>
 
-        {/* ── 8-week plan ── */}
-        {/* Workouts are defined once in the training section above; no reprinting exercises per week. */}
-        <Section index={5} title="Your 8-week plan">
+        {/* ── 06. 8-week plan ──────────────────────────────────────────────── */}
+        <Section index={6} title="Your 8-week plan">
           {guide.weeks.map((w) => (
             <View key={w.week} wrap={false}>
               <Text style={styles.weekTitle}>{w.focus}</Text>
@@ -369,13 +514,11 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
           ))}
         </Section>
 
-        {/* ── Nutrition ── */}
-        <Section index={6} title="Your nutrition plan">
+        {/* ── 07. Nutrition ────────────────────────────────────────────────── */}
+        <Section index={7} title="Your nutrition plan">
           <Panel dive={n.philosophy} />
-          {/* Plate formula */}
           <Text style={styles.label}>Build every plate like this</Text>
           <Text style={[styles.para, styles.callout]}>{n.plateFormula}</Text>
-          {/* Goal-specific calibration */}
           <Text style={styles.label}>Calibrated to your goal</Text>
           {n.calibration.map((c, i) => (
             <Bullet key={i}>{c}</Bullet>
@@ -411,8 +554,8 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
           <Text style={styles.item}>{n.groceryStaples.join(", ")}</Text>
         </Section>
 
-        {/* ── Daily blueprint ── */}
-        <Section index={7} title="Your daily blueprint">
+        {/* ── 08. Daily blueprint ──────────────────────────────────────────── */}
+        <Section index={8} title="Your daily blueprint">
           {guide.dailyBlueprint.map((b, i) => (
             <View key={i} style={styles.bulletRow}>
               <Text style={[styles.bulletMark, { fontFamily: MONO, color: C.accent, width: 56 }]}>
@@ -423,8 +566,8 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
           ))}
         </Section>
 
-        {/* ── Sleep and stress ── */}
-        <Section index={8} title="Sleep and stress recovery">
+        {/* ── 09. Sleep and stress ─────────────────────────────────────────── */}
+        <Section index={9} title="Sleep and stress recovery">
           <Panel dive={guide.sleepAndStress.briefing} />
           <Text style={styles.label}>Your protocol</Text>
           {guide.sleepAndStress.protocol.map((p, i) => (
@@ -432,8 +575,8 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
           ))}
         </Section>
 
-        {/* ── Fallback ── */}
-        <Section index={9} title="The 10-minute fallback">
+        {/* ── 10. 10-minute fallback ───────────────────────────────────────── */}
+        <Section index={10} title="The 10-minute fallback">
           <Text style={styles.para}>{guide.tenMinutePlan.summary}</Text>
           {guide.tenMinutePlan.movements.map((m, i) => (
             <Bullet key={i}>
@@ -442,16 +585,16 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
           ))}
         </Section>
 
-        {/* ── Progress ── */}
-        <Section index={10} title="How to know it is working">
+        {/* ── 11. Progress ─────────────────────────────────────────────────── */}
+        <Section index={11} title="How to know it is working">
           <Text style={styles.muted}>{guide.progressMarkers.summary}</Text>
           {guide.progressMarkers.markers.map((m, i) => (
             <Bullet key={i}>{m}</Bullet>
           ))}
         </Section>
 
-        {/* ── Troubleshooting ── */}
-        <Section index={11} title="When it gets hard">
+        {/* ── 12. Troubleshooting ──────────────────────────────────────────── */}
+        <Section index={12} title="When it gets hard">
           {guide.troubleshooting.map((t, i) => (
             <View key={i} wrap={false} style={{ marginBottom: 8 }}>
               <Text style={styles.h3}>{t.problem}</Text>
@@ -460,8 +603,8 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
           ))}
         </Section>
 
-        {/* ── FAQ ── */}
-        <Section index={12} title="Common questions">
+        {/* ── 13. FAQ ──────────────────────────────────────────────────────── */}
+        <Section index={13} title="Common questions">
           {guide.faqs.map((f, i) => (
             <View key={i} wrap={false} style={{ marginBottom: 8 }}>
               <Text style={styles.h3}>{f.q}</Text>
@@ -470,11 +613,40 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
           ))}
         </Section>
 
-        {/* ── Close ── */}
-        <Section index={13} title="Weekly recalibration">
+        {/* ── 14. Weekly recalibration ─────────────────────────────────────── */}
+        <Section index={14} title="Weekly recalibration">
           <Text style={styles.para}>{guide.recalibration}</Text>
           <View style={styles.coverRule} />
           <Text style={styles.lead}>{guide.closing}</Text>
+        </Section>
+
+        {/* ── 15. Bonus playbooks ──────────────────────────────────────────── */}
+        <Section index={15} title="Bonus playbooks">
+          <Text style={styles.muted}>
+            Four additional playbooks for the situations this plan does not cover day-to-day.
+          </Text>
+          {guide.bonusModules.map((mod, i) => (
+            <Panel key={i} dive={mod} />
+          ))}
+        </Section>
+
+        {/* ── 16. Workout log tracker ──────────────────────────────────────── */}
+        <Section index={16} title="Printable tracker: workout log">
+          <WorkoutLogGrid guide={guide} />
+        </Section>
+
+        {/* ── 17. Habit and measurement grids ──────────────────────────────── */}
+        <Section index={17} title="Printable trackers: habit and measurement">
+          <WeeklyHabitGrid guide={guide} />
+          <View style={styles.trackerBreak} />
+          <MeasurementTrackerGrid />
+        </Section>
+
+        {/* ── 18. Grocery checklist and daily card ─────────────────────────── */}
+        <Section index={18} title="Printable trackers: grocery and daily card">
+          <GroceryChecklist aisles={guide.trackers.groceryByAisle} />
+          <View style={styles.trackerBreak} />
+          <DailyChecklistCard items={guide.trackers.dailyChecklist} />
         </Section>
       </Page>
     </Document>
