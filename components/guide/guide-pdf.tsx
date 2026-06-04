@@ -14,6 +14,7 @@ import {
   SANS,
   MONO,
   C,
+  trackerStyles,
   WorkoutLogGrid,
   WeeklyHabitGrid,
   MeasurementTrackerGrid,
@@ -118,17 +119,6 @@ const styles = StyleSheet.create({
   para: { marginBottom: 8, color: C.fg },
   muted: { marginBottom: 8, color: C.muted },
   lead: { fontSize: 11, lineHeight: 1.6, color: C.fg, marginBottom: 14 },
-
-  /* Labels */
-  label: {
-    fontFamily: MONO,
-    fontSize: 8,
-    letterSpacing: 1.4,
-    textTransform: "uppercase",
-    color: C.accent,
-    marginTop: 14,
-    marginBottom: 5,
-  },
 
   /* Bullets */
   bulletRow: { flexDirection: "row", marginBottom: 5 },
@@ -308,7 +298,7 @@ function Section({
 /* ─── Table of contents entries ──────────────────────────────────────────────── */
 const TOC_ENTRIES = [
   "Where you stand",
-  "Your numbers: targets, milestones, and what you can recover",
+  "Your numbers",
   "Your biggest risks, in depth",
   "How your training works",
   "Start here: your first 7 days",
@@ -384,9 +374,9 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
         {/* ── 01. Where you stand ──────────────────────────────────────────── */}
         <Section index={1} title="Where you stand">
           <Text style={styles.lead}>{guide.yourSituation}</Text>
-          <Text style={styles.label}>The strategy</Text>
+          <Text style={trackerStyles.label}>The strategy</Text>
           <Text style={styles.para}>{guide.strategy}</Text>
-          <Text style={styles.label}>What these 8 weeks deliver</Text>
+          <Text style={trackerStyles.label}>What these 8 weeks deliver</Text>
           {guide.outcomes.map((o, i) => (
             <Bullet key={i}>{o}</Bullet>
           ))}
@@ -397,7 +387,7 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
           <Text style={styles.yourNumbersHeadline}>{yn.reclaimedYearsHeadline}</Text>
           <Text style={styles.para}>{yn.summary}</Text>
 
-          <Text style={styles.label}>Your starting estimates and targets</Text>
+          <Text style={trackerStyles.label}>Your starting estimates and targets</Text>
           <Text style={[styles.muted, { fontSize: 9, marginBottom: 6 }]}>
             Starting bands are estimated from your scan answers, not measured. Targets are goals, not guarantees.
           </Text>
@@ -418,7 +408,7 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
             </View>
           ))}
 
-          <Text style={styles.label}>Milestones</Text>
+          <Text style={trackerStyles.label}>Milestones</Text>
           {yn.milestones.map((ms, i) => (
             <View key={i} style={styles.milestoneRow} wrap={false}>
               <Text style={styles.milestoneWeek}>{ms.week}</Text>
@@ -441,20 +431,20 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
         {/* ── 04. Training ─────────────────────────────────────────────────── */}
         <Section index={4} title="How your training works">
           <Panel dive={guide.training.approach} />
-          <Text style={styles.label}>Warm up first, every session</Text>
+          <Text style={trackerStyles.label}>Warm up first, every session</Text>
           {guide.training.warmup.map((m, i) => (
             <Bullet key={i}>
               {m.name}: {m.detail}
             </Bullet>
           ))}
-          <Text style={styles.label}>How to progress</Text>
+          <Text style={trackerStyles.label}>How to progress</Text>
           {guide.training.progressionRules.map((r, i) => (
             <Bullet key={i}>{r}</Bullet>
           ))}
-          <Text style={styles.label}>The deload week</Text>
+          <Text style={trackerStyles.label}>The deload week</Text>
           <Text style={styles.para}>{guide.training.deload}</Text>
           {/* Sessions shown once for all 8 weeks - no reprinting per week */}
-          <Text style={styles.label}>Your sessions for all 8 weeks</Text>
+          <Text style={trackerStyles.label}>Your sessions for all 8 weeks</Text>
           <Text style={styles.muted}>
             These are your sessions for all 8 weeks. Run them every week and add a little load or one more rep as you go. The movements stay the same; the numbers climb.
           </Text>
@@ -503,9 +493,9 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
               <Text style={styles.muted}>
                 Run your training sessions this week, adding a little where last week felt easy.
               </Text>
-              <Text style={styles.label}>Nutrition focus</Text>
+              <Text style={trackerStyles.label}>Nutrition focus</Text>
               <Text style={styles.item}>{w.nutritionFocus}</Text>
-              <Text style={styles.label}>Habit</Text>
+              <Text style={trackerStyles.label}>Habit</Text>
               <Text style={styles.item}>
                 {w.habit.name} ({w.habit.trigger}). {w.habit.why}
               </Text>
@@ -517,40 +507,40 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
         {/* ── 07. Nutrition ────────────────────────────────────────────────── */}
         <Section index={7} title="Your nutrition plan">
           <Panel dive={n.philosophy} />
-          <Text style={styles.label}>Build every plate like this</Text>
+          <Text style={trackerStyles.label}>Build every plate like this</Text>
           <Text style={[styles.para, styles.callout]}>{n.plateFormula}</Text>
-          <Text style={styles.label}>Calibrated to your goal</Text>
+          <Text style={trackerStyles.label}>Calibrated to your goal</Text>
           {n.calibration.map((c, i) => (
             <Bullet key={i}>{c}</Bullet>
           ))}
-          <Text style={styles.label}>Your protein target</Text>
+          <Text style={trackerStyles.label}>Your protein target</Text>
           <Text style={styles.para}>{n.proteinTarget}</Text>
-          <Text style={styles.label}>Hydration</Text>
+          <Text style={trackerStyles.label}>Hydration</Text>
           <Text style={styles.para}>{n.hydration}</Text>
-          <Text style={styles.label}>Principles</Text>
+          <Text style={trackerStyles.label}>Principles</Text>
           {n.principles.map((p, i) => (
             <Bullet key={i}>{p}</Bullet>
           ))}
           {n.sampleDays.map((day, di) => (
             <View key={di} wrap={false}>
-              <Text style={styles.label}>{day.label}</Text>
+              <Text style={trackerStyles.label}>{day.label}</Text>
               <Text style={styles.item}>Breakfast: {day.breakfast}</Text>
               <Text style={styles.item}>Lunch: {day.lunch}</Text>
               <Text style={styles.item}>Dinner: {day.dinner}</Text>
               <Text style={styles.item}>Snacks: {day.snacks}</Text>
             </View>
           ))}
-          <Text style={styles.label}>Swaps</Text>
+          <Text style={trackerStyles.label}>Swaps</Text>
           {n.swaps.map((s, i) => (
             <Text key={i} style={styles.item}>
               {s.from} {"->"} {s.to}
             </Text>
           ))}
-          <Text style={styles.label}>Eating out without losing the week</Text>
+          <Text style={trackerStyles.label}>Eating out without losing the week</Text>
           {n.eatingOut.map((e, i) => (
             <Bullet key={i}>{e}</Bullet>
           ))}
-          <Text style={styles.label}>Grocery staples</Text>
+          <Text style={trackerStyles.label}>Grocery staples</Text>
           <Text style={styles.item}>{n.groceryStaples.join(", ")}</Text>
         </Section>
 
@@ -569,7 +559,7 @@ export function GuidePdfDocument({ guide }: { guide: GuideDoc }) {
         {/* ── 09. Sleep and stress ─────────────────────────────────────────── */}
         <Section index={9} title="Sleep and stress recovery">
           <Panel dive={guide.sleepAndStress.briefing} />
-          <Text style={styles.label}>Your protocol</Text>
+          <Text style={trackerStyles.label}>Your protocol</Text>
           {guide.sleepAndStress.protocol.map((p, i) => (
             <Bullet key={i}>{p}</Bullet>
           ))}

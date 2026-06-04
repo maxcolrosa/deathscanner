@@ -167,6 +167,22 @@ export const trackerStyles = StyleSheet.create({
     marginTop: 14,
     marginBottom: 5,
   },
+
+  /* WorkoutLogGrid: workout title block */
+  workoutTitleBlock: {
+    backgroundColor: C.panel,
+    paddingVertical: 5,
+    paddingHorizontal: 6,
+    borderLeftWidth: 2,
+    borderLeftColor: C.accent,
+    marginBottom: 2,
+  },
+  workoutTitleText: {
+    fontFamily: SANS,
+    fontWeight: 600,
+    fontSize: 9.5,
+    color: C.fg,
+  },
 });
 
 /* ─── Tracker render helpers (shared between workbook and tracker-pack) ────── */
@@ -188,24 +204,8 @@ export function WorkoutLogGrid({ guide }: { guide: GuideDoc }) {
       {guide.training.workouts.map((wo, wi) => (
         <View key={wi} wrap={false} style={{ marginBottom: 14 }}>
           {/* Workout title row */}
-          <View
-            style={{
-              backgroundColor: C.panel,
-              paddingVertical: 5,
-              paddingHorizontal: 6,
-              borderLeftWidth: 2,
-              borderLeftColor: C.accent,
-              marginBottom: 2,
-            }}
-          >
-            <Text
-              style={{
-                fontFamily: SANS,
-                fontWeight: 600,
-                fontSize: 9.5,
-                color: C.fg,
-              }}
-            >
+          <View style={trackerStyles.workoutTitleBlock}>
+            <Text style={trackerStyles.workoutTitleText}>
               {wo.day}: {wo.title}
             </Text>
           </View>

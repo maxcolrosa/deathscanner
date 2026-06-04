@@ -10,7 +10,7 @@
  */
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import type { GuideDoc } from "@/lib/guide/schema";
-import { SANS, MONO, C } from "@/components/guide/pdf-shared";
+import { SANS, MONO, C, trackerStyles } from "@/components/guide/pdf-shared";
 
 /* ─── Brand ──────────────────────────────────────────────────────────────────── */
 const BRAND = "LONGEVITY SCAN";
@@ -70,11 +70,6 @@ const styles = StyleSheet.create({
   movementText: { fontFamily: SANS, fontSize: 9, color: C.fg, flex: 1 },
   movementDetail: { fontFamily: SANS, fontSize: 8.5, color: C.muted, flex: 1 },
 
-  /* Checklist */
-  checkRow: { flexDirection: "row", marginBottom: 4 },
-  checkBox: { fontFamily: MONO, fontSize: 8, color: C.accentDim, width: 22 },
-  checkLabel: { fontFamily: SANS, fontSize: 9, color: C.fg, flex: 1 },
-
   /* Metrics mini-table */
   metricRow: {
     flexDirection: "row",
@@ -85,6 +80,19 @@ const styles = StyleSheet.create({
   metricLabel: { fontFamily: SANS, fontWeight: 600, fontSize: 8.5, color: C.fg, flex: 2 },
   metricBand: { fontFamily: MONO, fontSize: 8, color: C.muted, flex: 2 },
   metricTarget: { fontFamily: MONO, fontSize: 8, color: C.accent, flex: 2 },
+
+  /* 10-minute plan summary */
+  planSummary: { fontFamily: SANS, fontSize: 8.5, color: C.muted, marginBottom: 6 },
+
+  /* Metrics note and header row */
+  metricsNote: { fontFamily: MONO, fontSize: 7.5, color: C.muted, marginBottom: 6 },
+  metricsHeaderRow: {
+    flexDirection: "row",
+    borderBottomWidth: 0.75,
+    borderBottomColor: C.accentDim,
+    paddingBottom: 3,
+    marginBottom: 2,
+  },
 
   /* Footer note */
   footerNote: {
@@ -135,7 +143,7 @@ export function QuickstartPdfDocument({ guide }: { guide: GuideDoc }) {
             ))}
 
             <Text style={styles.sectionLabel}>The 10-minute fallback</Text>
-            <Text style={{ fontFamily: SANS, fontSize: 8.5, color: C.muted, marginBottom: 6 }}>
+            <Text style={styles.planSummary}>
               {guide.tenMinutePlan.summary}
             </Text>
             {guide.tenMinutePlan.movements.map((m, i) => (
@@ -153,33 +161,18 @@ export function QuickstartPdfDocument({ guide }: { guide: GuideDoc }) {
           <View style={styles.colRight}>
             <Text style={styles.sectionLabel}>Daily checklist</Text>
             {guide.trackers.dailyChecklist.map((item, i) => (
-              <View key={i} style={styles.checkRow} wrap={false}>
-                <Text style={styles.checkBox}>[  ]</Text>
-                <Text style={styles.checkLabel}>{item}</Text>
+              <View key={i} style={trackerStyles.checkRow} wrap={false}>
+                <Text style={trackerStyles.checkBox}>[  ]</Text>
+                <Text style={trackerStyles.checkLabel}>{item}</Text>
               </View>
             ))}
 
             <Text style={styles.sectionLabel}>Your top 3 numbers</Text>
-            <Text
-              style={{
-                fontFamily: MONO,
-                fontSize: 7.5,
-                color: C.muted,
-                marginBottom: 6,
-              }}
-            >
+            <Text style={styles.metricsNote}>
               Estimated from your scan, not measured. Targets are goals.
             </Text>
             {/* Mini header */}
-            <View
-              style={{
-                flexDirection: "row",
-                borderBottomWidth: 0.75,
-                borderBottomColor: C.accentDim,
-                paddingBottom: 3,
-                marginBottom: 2,
-              }}
-            >
+            <View style={styles.metricsHeaderRow}>
               <Text style={[styles.metricLabel, { color: C.accentDim }]}>Metric</Text>
               <Text style={[styles.metricBand, { color: C.accentDim }]}>Now (est.)</Text>
               <Text style={[styles.metricTarget, { color: C.accentDim }]}>Target</Text>

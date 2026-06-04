@@ -1,6 +1,6 @@
 import { createElement } from "react";
 import { renderToBuffer } from "@react-pdf/renderer";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getOrderByToken } from "@/lib/guide/orders";
 import { GuidePdfDocument } from "@/components/guide/guide-pdf";
 import { TrackerPackPdfDocument } from "@/components/guide/tracker-pack-pdf";
@@ -48,7 +48,7 @@ export async function GET(
 
   const order = await getOrderByToken(token);
   if (!order) return notFound();
-  if (order.status !== "ready" || !order.guide) return notFound();
+  if (order.status !== "ready" || !order.guide) redirect(`/guide/${token}`);
 
   const { component, filename } = ASSET_MAP[asset];
 
