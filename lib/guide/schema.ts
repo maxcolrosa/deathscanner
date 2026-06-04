@@ -199,6 +199,34 @@ export const RecipeBankSchema = z.object({
   shoppingList: z.array(GroceryAisleSchema).min(1),
 });
 
+// --- 90-day program arc (Layer D) ---
+
+// One entry per phase of the 90-day program arc.
+export const ProgramPhaseSchema = z.object({
+  name: z.string().min(1),
+  weeks: z.string().min(1),
+  focus: z.string().min(1),
+  whatChanges: z.string().min(1),
+});
+
+// One monthly review block. checkpoints describe what to measure/assess;
+// adjustRules give concrete decision rules so the reader knows exactly what
+// to do with the data.
+export const MonthlyReviewSchema = z.object({
+  month: z.string().min(1),
+  checkpoints: z.array(z.string().min(1)).min(2),
+  adjustRules: z.array(z.string().min(1)).min(2),
+});
+
+export const ProgramArcSchema = z.object({
+  // 1-2 sentences framing the 90-day journey as a coherent transformation arc.
+  summary: z.string().min(1),
+  // At least 4 phases: Foundation, Build, Push, Maintenance.
+  phases: z.array(ProgramPhaseSchema).min(3),
+  // One review block per month; at least 3 to cover the full 90-day arc.
+  monthlyReviews: z.array(MonthlyReviewSchema).min(3),
+});
+
 // --- Science & authority layer (Layer C) ---
 
 // One entry per major modifiable lever. mechanism explains WHY the lever works
@@ -249,6 +277,8 @@ export const GuideDocSchema = z.object({
   exerciseLibrary: z.array(ExerciseEntrySchema).min(1),
   // Layer C: science and authority layer with per-lever mechanism explanations.
   scienceNotes: ScienceNotesSchema,
+  // Layer D: 90-day program arc with phase breakdown and monthly progress reviews.
+  programArc: ProgramArcSchema,
 });
 
 export type DeepDive = z.infer<typeof DeepDiveSchema>;
@@ -267,6 +297,9 @@ export type Recipe = z.infer<typeof RecipeSchema>;
 export type RecipeBank = z.infer<typeof RecipeBankSchema>;
 export type ScienceEntry = z.infer<typeof ScienceEntrySchema>;
 export type ScienceNotes = z.infer<typeof ScienceNotesSchema>;
+export type ProgramPhase = z.infer<typeof ProgramPhaseSchema>;
+export type MonthlyReview = z.infer<typeof MonthlyReviewSchema>;
+export type ProgramArc = z.infer<typeof ProgramArcSchema>;
 export type GuideDoc = z.infer<typeof GuideDocSchema>;
 
 // Loose validation for the raw scan answers carried into checkout. Keys are

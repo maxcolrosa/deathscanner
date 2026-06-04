@@ -260,4 +260,83 @@ describe("buildGuide", () => {
       expect(entry.evidence.length).toBeGreaterThan(50);
     }
   });
+
+  // ─── Program arc (Layer D) ───────────────────────────────────────────────
+
+  it("programArc has at least 4 phases including Foundation, Build, Push, and Maintenance", () => {
+    for (const a of [sedentary, active, injured]) {
+      const guide = buildGuide(computeResult(a), a);
+      const { phases } = guide.programArc;
+      expect(phases.length).toBeGreaterThanOrEqual(4);
+      const names = phases.map((p) => p.name);
+      expect(names).toContain("Foundation");
+      expect(names).toContain("Build");
+      expect(names).toContain("Push");
+      expect(names).toContain("Maintenance");
+    }
+  });
+
+  it("programArc has at least 3 monthly reviews", () => {
+    for (const a of [sedentary, active, injured]) {
+      const guide = buildGuide(computeResult(a), a);
+      expect(guide.programArc.monthlyReviews.length).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it("programArc monthly reviews each have non-empty checkpoints and adjustRules", () => {
+    for (const a of [sedentary, active, injured]) {
+      const guide = buildGuide(computeResult(a), a);
+      for (const review of guide.programArc.monthlyReviews) {
+        expect(review.checkpoints.length).toBeGreaterThan(0);
+        expect(review.adjustRules.length).toBeGreaterThan(0);
+        for (const cp of review.checkpoints) {
+          expect(cp.length).toBeGreaterThan(10);
+        }
+        for (const ar of review.adjustRules) {
+          expect(ar.length).toBeGreaterThan(10);
+        }
+      }
+    }
+  });
+
+  it("programArc phases each have non-empty focus and whatChanges", () => {
+    for (const a of [sedentary, active, injured]) {
+      const guide = buildGuide(computeResult(a), a);
+      for (const phase of guide.programArc.phases) {
+        expect(phase.name.length).toBeGreaterThan(0);
+        expect(phase.weeks.length).toBeGreaterThan(0);
+        expect(phase.focus.length).toBeGreaterThan(20);
+        expect(phase.whatChanges.length).toBeGreaterThan(20);
+      }
+    }
+  });
+
+  it("programArc is deterministic for fixed inputs", () => {
+    for (const a of [sedentary, active, injured]) {
+      const r = computeResult(a);
+      expect(buildGuide(r, a).programArc).toEqual(buildGuide(r, a).programArc);
+    }
+  });
+
+  it("programArc summary is non-empty and does not contain em-dashes", () => {
+    for (const a of [sedentary, active, injured]) {
+      const guide = buildGuide(computeResult(a), a);
+      expect(guide.programArc.summary.length).toBeGreaterThan(20);
+      expect(guide.programArc.summary).not.toMatch(/[—–]/);
+    }
+  });
+
+  it("programArc phases and reviews do not contain em-dashes", () => {
+    for (const a of [sedentary, active, injured]) {
+      const guide = buildGuide(computeResult(a), a);
+      for (const phase of guide.programArc.phases) {
+        expect(phase.focus).not.toMatch(/[—–]/);
+        expect(phase.whatChanges).not.toMatch(/[—–]/);
+      }
+      for (const review of guide.programArc.monthlyReviews) {
+        for (const cp of review.checkpoints) expect(cp).not.toMatch(/[—–]/);
+        for (const ar of review.adjustRules) expect(ar).not.toMatch(/[—–]/);
+      }
+    }
+  });
 });

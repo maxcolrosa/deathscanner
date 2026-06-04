@@ -14,6 +14,9 @@ import type {
   RecipeBank,
   ExerciseEntry,
   ScienceNotes,
+  ProgramArc,
+  ProgramPhase,
+  MonthlyReview,
 } from "@/lib/guide/schema";
 import { RECIPES } from "@/lib/guide/recipes";
 import { EXERCISE_ENTRIES } from "@/lib/guide/exercises";
@@ -1313,6 +1316,166 @@ function buildScienceNotes(result: ScanResult): ScienceNotes {
   };
 }
 
+/* ─── 90-day program arc (Layer D) ──────────────────────────────────────────
+   Deterministic, goal-personalised arc. No Math.random / Date.now.
+   The four phases extend the existing Foundation/Build/Push framing cleanly
+   to 12 weeks and then hand off to a sustainable maintenance pattern.
+   Monthly reviews give the reader concrete checkpoints and decision rules so
+   they know exactly what to do with their data rather than guessing. */
+
+function buildProgramArc(goal: string | null): ProgramArc {
+  // Phase descriptions are personalised to the goal where the change is
+  // meaningful; otherwise they use the default wording.
+  const phases: ProgramPhase[] = [
+    {
+      name: "Foundation",
+      weeks: "Weeks 1 to 4",
+      focus:
+        "Establish the movement patterns, sleep schedule, and protein habits. Every session runs at a controlled effort where form comes first. The first wins are behavioural, not physical.",
+      whatChanges:
+        goal === "fat"
+          ? "Load stays light and volume builds from two to three sets per movement. Nutrition tightens around protein and vegetable targets rather than calorie restriction. Swaps replace one processed meal per day."
+          : goal === "strength"
+            ? "Load is deliberately conservative. Sets build from two to three across the four-week block. Protein intake rises to support early muscle-protein synthesis. The movement patterns must be clean before load increases."
+            : "Load is light and sessions are short. The habit of showing up and protecting sleep is the primary output of this phase. Nutrition anchors on protein at every meal and one daily vegetable target.",
+    },
+    {
+      name: "Build",
+      weeks: "Weeks 5 to 8",
+      focus:
+        "Progressive overload takes over. Each session adds a small increment of load, reps, or duration. Nutrition tightens and the daily habits are now largely automatic.",
+      whatChanges:
+        goal === "fat"
+          ? "Training volume increases to three to four working sets per movement. Nutrition portions tighten slightly: smaller carb windows on rest days, protein stays high every day. The measurement trend should be clearly moving by week 6."
+          : goal === "strength"
+            ? "Working sets move to four per main lift. Load increases every session where top-of-range reps are cleared. Calorie intake rises on training days to fuel the heavier work and support recovery."
+            : "Sessions add an extra working set and conditioning work extends by five minutes. Energy and sleep quality are the lead indicators to track in this phase, alongside the training log.",
+    },
+    {
+      name: "Push",
+      weeks: "Weeks 9 to 12",
+      focus:
+        "Consolidate the gains from the first two months and drive intensity. The habits are locked. The work is harder and the progress is visible.",
+      whatChanges:
+        goal === "fat"
+          ? "Conditioning frequency increases to two or three sessions per week. Strength sessions keep three to four sets at a higher load than Foundation. A two-week maintenance break at the end of this phase resets metabolic adaptation before the next cycle."
+          : goal === "strength"
+            ? "Rep ranges shift: main lifts drop to four to six reps at a heavier load for two to three weeks, then return to eight to ten for one consolidation week before the maintenance hand-off. This variation drives strength adaptation beyond the initial linear gains."
+            : "All session parameters are at their highest for this programme. Daily steps, training sessions, and sleep windows are protected as non-negotiables. A lighter deload in week 12 allows the body to consolidate before maintenance.",
+    },
+    {
+      name: "Maintenance",
+      weeks: "Beyond week 12",
+      focus:
+        "Sustain the gains, prevent regression, and recalibrate for the next cycle. The habits built in the first 90 days are your new baseline. This phase has no end date.",
+      whatChanges:
+        goal === "fat"
+          ? "Training volume reduces slightly, two to three sets per movement on most sessions, to be sustainable long term. Nutrition stays at the protein and vegetable targets from the Build phase. A measurement review every four weeks keeps the trend honest without obsession."
+          : goal === "strength"
+            ? "Main lifts run on two or three heavy days per week rather than four. Deload weeks are built in every fourth or fifth week automatically. If strength has plateaued, a new eight-week block with adjusted rep ranges restarts progress."
+            : "The daily habits are the programme. Training three days a week at a comfortable but progressive effort, protein at every meal, seven to eight hours of sleep, and daily steps are the four levers to protect. Review your dashboard numbers every four weeks and adjust one thing at a time.",
+    },
+  ];
+
+  // Monthly reviews are goal-personalised where the metrics and decisions differ
+  // meaningfully; otherwise they use broadly applicable coaching language.
+  const month1Checkpoints: string[] = [
+    "Weigh and measure your waist on the same morning, in the same conditions, three days in a row and take the average",
+    "Review your training log: how many sessions did you complete out of the planned total?",
+    "Rate your average sleep quality over the last two weeks on a scale from 1 to 10",
+    "Note your energy level at 3pm on most days: stable or crashing?",
+  ];
+  if (goal === "fat") month1Checkpoints.push("Take a front-on photo in the same lighting and clothing as Day 1");
+  if (goal === "strength") month1Checkpoints.push("Record your working weight on the squat and press from your last session of the month");
+
+  const month1AdjustRules: string[] = [
+    "Completed fewer than 70 percent of planned sessions: keep the load and structure identical for two more weeks rather than progressing. Consistency is the missing variable, not programme design.",
+    "Sleep score below 6: fix the sleep before tightening any training or nutrition variable. Everything else depends on sleep quality.",
+    "Waist or weight trending up despite good adherence: check protein first, then total food volume. Do not change the training.",
+  ];
+  if (goal === "fat") {
+    month1AdjustRules.push("Scale did not move but clothes fit differently: the measurement is more reliable than the scale in month 1. Continue on the current plan.");
+  } else if (goal === "strength") {
+    month1AdjustRules.push("Working weights are the same as Day 1: add one extra rest day per week and raise calories on training days. Underrecovery is the most common ceiling in month 1.");
+  } else {
+    month1AdjustRules.push("Energy is still crashing at 3pm: pair a protein source with your lunch carbs and add a 10-minute walk after the meal. Blood sugar stability is the lever to pull.");
+  }
+
+  const month2Checkpoints: string[] = [
+    "Repeat the waist and weight measurement from month 1 and compare the trends, not the single numbers",
+    "Training log review: are working weights or rep counts higher than they were four weeks ago?",
+    "Review the six dashboard metrics from your Your Numbers section and note which are moving and which are flat",
+    "How are you sleeping compared to week 1? Rate it and note any consistent disruptors.",
+  ];
+  if (goal === "fat") month2Checkpoints.push("Compare the month 2 photo to month 1 in the same conditions. The visual change is the most motivating measure at this stage.");
+  if (goal === "strength") month2Checkpoints.push("Note your one-rep feel on the main lifts: can you complete all sets with one to two reps in reserve?");
+
+  const month2AdjustRules: string[] = [
+    "Progress has stalled for two consecutive weeks: take a deload week at two-thirds of normal load and effort, then return and push slightly past the stall point. Deloads are where adaptation consolidates.",
+    "All metrics are moving: add one new variable only, an extra training day, a longer conditioning block, or a tighter nutrition window. Never change more than one thing at once.",
+    "Read the trend across four weeks, not a single bad week. One rough week followed by three strong ones is a good month.",
+  ];
+  if (goal === "fat") {
+    month2AdjustRules.push("Fat loss has stopped for two full weeks despite good adherence: spend two weeks at maintenance calories to reset metabolic adaptation before returning to a mild deficit.");
+    month2AdjustRules.push("Progress is faster than 0.5 to 1 kg per week: slightly increase carbohydrate portions at meals to slow the rate. Fast loss in month 2 is usually muscle and water, not fat.");
+  } else if (goal === "strength") {
+    month2AdjustRules.push("A lift has not increased in three consecutive sessions: drop the load by 10 percent, focus on technique for one week, then rebuild. Technique is usually the real ceiling.");
+  } else {
+    month2AdjustRules.push("Dashboard numbers are flat across all metrics: the most common cause is inconsistent sleep. Fix the one variable with the most room to improve before adjusting anything else.");
+  }
+
+  const month3Checkpoints: string[] = [
+    "Full dashboard review: compare all six metrics to your Day 1 starting bands. That gap is what 90 days built.",
+    "Training log review across all 12 weeks: what is your average session completion rate?",
+    "Qualitative check: how does the body feel compared to day 1? Note two or three specific improvements.",
+    "Identify the one habit that has been most consistently kept and the one that has been hardest.",
+  ];
+  if (goal === "fat") month3Checkpoints.push("Final measurement photo and waist tape in the same conditions as month 1 and month 2.");
+  if (goal === "strength") month3Checkpoints.push("Record the working weights on all main lifts and compare them to month 1. The strength delta is the most objective output of the 90-day block.");
+
+  const month3AdjustRules: string[] = [
+    "Use the 90-day data to identify your next one or two focus areas. Your scan gave you a starting point; your 90-day log gives you a more accurate, personal one.",
+    "If all metrics are moving and the habits are locked in: start a second 90-day block with one new progressive variable, a fourth training day, a new compound lift, or a longer conditioning window.",
+    "If progress has been uneven: pick the one metric furthest from target and design the next 30 days around it specifically. Focused effort on one variable beats vague effort on all of them.",
+    "Maintenance is a legitimate goal. If the habits are now automatic and the numbers are in a healthy range, a lower-intensity maintenance block for one to two months before the next progressive cycle is a valid and sustainable choice.",
+  ];
+  if (goal === "fat") {
+    month3AdjustRules.push("If fat loss is complete or close to target: shift to a maintenance calorie intake and recomposition focus. Keep protein high and training consistent. The physique change phase transitions to a strength-building phase naturally.");
+  } else if (goal === "strength") {
+    month3AdjustRules.push("If strength gains have plateaued: consider a periodisation shift for the next block. Move from your current rep range to a heavier range for four weeks, then a lighter volume week, then rebuild. Variation in rep ranges drives long-term strength better than staying in the same range.");
+  }
+
+  const monthlyReviews: MonthlyReview[] = [
+    {
+      month: "Month 1 review (end of week 4)",
+      checkpoints: month1Checkpoints,
+      adjustRules: month1AdjustRules,
+    },
+    {
+      month: "Month 2 review (end of week 8)",
+      checkpoints: month2Checkpoints,
+      adjustRules: month2AdjustRules,
+    },
+    {
+      month: "Month 3 review (end of week 12)",
+      checkpoints: month3Checkpoints,
+      adjustRules: month3AdjustRules,
+    },
+  ];
+
+  const goalSummary: Record<string, string> = {
+    fat: "This 90-day arc takes you from building the core habits in weeks 1 to 4, through a progressive load and nutrition phase in weeks 5 to 8, to a harder push in weeks 9 to 12 before handing off to a sustainable maintenance pattern. Each month ends with a structured review so you know exactly what to adjust and why.",
+    strength: "This 90-day arc builds a movement foundation in weeks 1 to 4, applies progressive overload in earnest through weeks 5 to 8, then drives intensity and rep-range variation in weeks 9 to 12 before settling into a maintenance rhythm. Monthly reviews track working weights and recovery so adjustments are data-driven, not guesswork.",
+    heart: "This 90-day arc builds consistent cardiorespiratory and strength stimulus from a solid foundation in weeks 1 to 4, expands volume and intensity through weeks 5 to 12, then transitions to a sustainable maintenance pattern that protects the cardiovascular gains long term. Monthly reviews track the markers that matter most for heart health.",
+    energy: "This 90-day arc starts by locking in the sleep, movement, and protein habits that drive energy in weeks 1 to 4, builds on them with progressive training and tighter nutrition through weeks 5 to 8, and consolidates the gains in weeks 9 to 12 before settling into a long-term maintenance pattern.",
+  };
+  const summary =
+    (goal && goalSummary[goal]) ??
+    "This 90-day arc builds the habits and physical base in weeks 1 to 4, applies progressive overload and tighter nutrition through weeks 5 to 12, and then hands off to a sustainable maintenance pattern. Monthly reviews give you concrete data checkpoints and clear decision rules so your adjustments are always grounded in evidence, not guesswork.";
+
+  return { summary, phases, monthlyReviews };
+}
+
 // Phase-based themes keep weeks coherent as a training progression.
 // Risk personalization lives in riskBriefings/yourSituation/strategy; it
 // must not bleed into the weekly grid where it would read as mismatched
@@ -1398,5 +1561,6 @@ export function buildGuide(result: ScanResult, answers: Answers): GuideDoc {
     recipeBank: buildRecipeBank(goal, diet),
     exerciseLibrary: buildExerciseLibrary(workouts),
     scienceNotes: buildScienceNotes(result),
+    programArc: buildProgramArc(goal),
   };
 }

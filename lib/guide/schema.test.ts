@@ -213,6 +213,70 @@ const validGuide = {
       },
     ],
   },
+  programArc: {
+    summary: "This 90-day arc builds the habits and physical base in weeks 1 to 4, applies progressive overload and tighter nutrition through weeks 5 to 12, and then hands off to a sustainable maintenance pattern.",
+    phases: [
+      {
+        name: "Foundation",
+        weeks: "Weeks 1 to 4",
+        focus: "Establish the movement patterns, sleep schedule, and protein habits.",
+        whatChanges: "Load stays light and volume builds from two to three sets per movement.",
+      },
+      {
+        name: "Build",
+        weeks: "Weeks 5 to 8",
+        focus: "Progressive overload takes over. Each session adds a small increment of load, reps, or duration.",
+        whatChanges: "Training volume increases to three to four working sets per movement. Nutrition portions tighten slightly.",
+      },
+      {
+        name: "Push",
+        weeks: "Weeks 9 to 12",
+        focus: "Consolidate the gains from the first two months and drive intensity.",
+        whatChanges: "Conditioning frequency increases. Strength sessions keep three to four sets at a higher load than Foundation.",
+      },
+      {
+        name: "Maintenance",
+        weeks: "Beyond week 12",
+        focus: "Sustain the gains, prevent regression, and recalibrate for the next cycle.",
+        whatChanges: "Training volume reduces slightly to be sustainable long term. A measurement review every four weeks keeps the trend honest.",
+      },
+    ],
+    monthlyReviews: [
+      {
+        month: "Month 1 review (end of week 4)",
+        checkpoints: [
+          "Weigh and measure your waist on the same morning, in the same conditions, three days in a row and take the average.",
+          "Review your training log: how many sessions did you complete out of the planned total?",
+        ],
+        adjustRules: [
+          "Completed fewer than 70 percent of planned sessions: keep the load and structure identical for two more weeks rather than progressing.",
+          "Sleep score below 6: fix the sleep before tightening any training or nutrition variable.",
+        ],
+      },
+      {
+        month: "Month 2 review (end of week 8)",
+        checkpoints: [
+          "Repeat the waist and weight measurement from month 1 and compare the trends, not the single numbers.",
+          "Training log review: are working weights or rep counts higher than they were four weeks ago?",
+        ],
+        adjustRules: [
+          "Progress has stalled for two consecutive weeks: take a deload week at two-thirds of normal load and effort.",
+          "All metrics are moving: add one new variable only, an extra training day or a longer conditioning block.",
+        ],
+      },
+      {
+        month: "Month 3 review (end of week 12)",
+        checkpoints: [
+          "Full dashboard review: compare all six metrics to your Day 1 starting bands.",
+          "Training log review across all 12 weeks: what is your average session completion rate?",
+        ],
+        adjustRules: [
+          "Use the 90-day data to identify your next one or two focus areas.",
+          "If all metrics are moving and the habits are locked in: start a second 90-day block with one new progressive variable.",
+        ],
+      },
+    ],
+  },
 };
 
 describe("GuideDocSchema", () => {
