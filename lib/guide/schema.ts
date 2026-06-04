@@ -154,6 +154,23 @@ export const TrackersSchema = z.object({
   dailyChecklist: z.array(z.string().min(1)).min(3),
 });
 
+// --- Exercise library (Layer B) ---
+
+// Each entry covers one movement the plan can prescribe. Names must match
+// exactly what build-guide.ts helper functions emit (lowerBody / pushEx / etc.)
+// so that per-user selection finds them by exact string match.
+export const ExerciseEntrySchema = z.object({
+  name: z.string().min(1),
+  pattern: z.string().min(1),   // e.g. "Squat" | "Push" | "Hinge" | "Pull" | "Core" | "Conditioning"
+  targets: z.string().min(1),
+  setup: z.array(z.string().min(1)).min(1),
+  execution: z.array(z.string().min(1)).min(1),
+  mistakes: z.array(z.string().min(1)).min(1),
+  easier: z.string().min(1),
+  harder: z.string().min(1),
+  learn: z.string().min(1),
+});
+
 // --- Recipe bank (Layer A) ---
 
 // Calories and proteinG are clearly ESTIMATES per serving, as noted in the
@@ -209,6 +226,8 @@ export const GuideDocSchema = z.object({
   trackers: TrackersSchema,
   // Layer A: real recipe and meal bank, personalised by goal/diet/bodycomp.
   recipeBank: RecipeBankSchema,
+  // Layer B: exercise library covering every movement the plan can prescribe.
+  exerciseLibrary: z.array(ExerciseEntrySchema).min(1),
 });
 
 export type DeepDive = z.infer<typeof DeepDiveSchema>;
@@ -222,6 +241,7 @@ export type YourNumbersMilestone = z.infer<typeof YourNumbersMilestoneSchema>;
 export type YourNumbers = z.infer<typeof YourNumbersSchema>;
 export type GroceryAisle = z.infer<typeof GroceryAisleSchema>;
 export type Trackers = z.infer<typeof TrackersSchema>;
+export type ExerciseEntry = z.infer<typeof ExerciseEntrySchema>;
 export type Recipe = z.infer<typeof RecipeSchema>;
 export type RecipeBank = z.infer<typeof RecipeBankSchema>;
 export type GuideDoc = z.infer<typeof GuideDocSchema>;

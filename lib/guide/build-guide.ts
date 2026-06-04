@@ -12,8 +12,10 @@ import type {
   YourNumbersMetric,
   GroceryAisle,
   RecipeBank,
+  ExerciseEntry,
 } from "@/lib/guide/schema";
 import { RECIPES } from "@/lib/guide/recipes";
+import { EXERCISE_ENTRIES } from "@/lib/guide/exercises";
 
 type Level = "beginner" | "intermediate";
 
@@ -1240,6 +1242,39 @@ function buildRecipeBank(goal: string | null, diet: string): RecipeBank {
   return { recipes: picks, shoppingList };
 }
 
+/* ─── Exercise library (Layer B) ────────────────────────────────────────────
+   Deterministically returns the subset of EXERCISE_ENTRIES that are actually
+   prescribed in the user's training.workouts. Stable order: iterate the
+   EXERCISE_ENTRIES array in its declared order, include entries whose name
+   appears among the prescribed exercises. If an injury flag is set, also
+   include the relevant low-impact entries even if they are not the primary
+   prescription (so the reader can compare). */
+
+function buildExerciseLibrary(workouts: Workout[], injury: boolean): ExerciseEntry[] {
+  // Collect distinct prescribed names across all workout sessions.
+  const prescribed = new Set<string>();
+  for (const w of workouts) {
+    for (const e of w.exercises) {
+      prescribed.add(e.name);
+    }
+  }
+
+  // When the user has an injury flag, add the injury-variant names so the
+  // library section also covers those entries even for intermediate profiles.
+  if (injury) {
+    // Names produced by helpers when injury=true
+    prescribed.add("Box squat to a chair");
+    prescribed.add("Incline push-up on a counter");
+    prescribed.add("Glute bridge");
+    prescribed.add("Band row");
+    prescribed.add("Dead bug");
+    prescribed.add("Brisk walk");
+  }
+
+  // Return entries in the stable order declared in EXERCISE_ENTRIES.
+  return EXERCISE_ENTRIES.filter((entry) => prescribed.has(entry.name));
+}
+
 // Phase-based themes keep weeks coherent as a training progression.
 // Risk personalization lives in riskBriefings/yourSituation/strategy; it
 // must not bleed into the weekly grid where it would read as mismatched
@@ -1323,5 +1358,6 @@ export function buildGuide(result: ScanResult, answers: Answers): GuideDoc {
     bonusModules: buildBonusModules(answers, result),
     trackers: buildTrackers(answers),
     recipeBank: buildRecipeBank(goal, diet),
+    exerciseLibrary: buildExerciseLibrary(workouts, injury),
   };
 }

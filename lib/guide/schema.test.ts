@@ -164,6 +164,19 @@ const validGuide = {
       { aisle: "Protein", items: ["Chicken breast", "Eggs"] },
     ],
   },
+  exerciseLibrary: [
+    {
+      name: "Goblet squat",
+      pattern: "Squat",
+      targets: "Quadriceps, glutes, and hamstrings.",
+      setup: ["Hold a dumbbell at chest height.", "Stand feet shoulder-width apart."],
+      execution: ["Brace your core.", "Squat down to parallel.", "Drive through your heels to stand."],
+      mistakes: ["Heels rising off the floor.", "Chest falling forward."],
+      easier: "Use a lighter dumbbell.",
+      harder: "Increase the dumbbell weight each week.",
+      learn: "Search 'goblet squat tutorial' for a side-on demo.",
+    },
+  ],
 };
 
 describe("GuideDocSchema", () => {

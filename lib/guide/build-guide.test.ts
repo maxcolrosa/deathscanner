@@ -166,4 +166,43 @@ describe("buildGuide", () => {
       expect(g1).toEqual(g2);
     }
   });
+
+  // ─── Exercise library (Layer B) ──────────────────────────────────────────
+
+  it("exerciseLibrary: every exercise name in training.workouts has a matching entry", () => {
+    for (const a of [sedentary, active, injured]) {
+      const guide = buildGuide(computeResult(a), a);
+      const libraryNames = new Set(guide.exerciseLibrary.map((e) => e.name));
+      for (const workout of guide.training.workouts) {
+        for (const exercise of workout.exercises) {
+          expect(libraryNames.has(exercise.name)).toBe(true);
+        }
+      }
+    }
+  });
+
+  it("exerciseLibrary: each entry has non-empty setup, execution, and mistakes arrays", () => {
+    for (const a of [sedentary, active, injured]) {
+      const guide = buildGuide(computeResult(a), a);
+      for (const entry of guide.exerciseLibrary) {
+        expect(entry.setup.length).toBeGreaterThan(0);
+        expect(entry.execution.length).toBeGreaterThan(0);
+        expect(entry.mistakes.length).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it("exerciseLibrary is deterministic for fixed inputs", () => {
+    for (const a of [sedentary, active, injured]) {
+      const r = computeResult(a);
+      expect(buildGuide(r, a).exerciseLibrary).toEqual(buildGuide(r, a).exerciseLibrary);
+    }
+  });
+
+  it("exerciseLibrary is non-empty for all profiles", () => {
+    for (const a of [sedentary, active, injured]) {
+      const guide = buildGuide(computeResult(a), a);
+      expect(guide.exerciseLibrary.length).toBeGreaterThan(0);
+    }
+  });
 });
