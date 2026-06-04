@@ -13,9 +13,11 @@ import type {
   GroceryAisle,
   RecipeBank,
   ExerciseEntry,
+  ScienceNotes,
 } from "@/lib/guide/schema";
 import { RECIPES } from "@/lib/guide/recipes";
 import { EXERCISE_ENTRIES } from "@/lib/guide/exercises";
+import { SCIENCE_ENTRIES } from "@/lib/guide/science";
 
 type Level = "beginner" | "intermediate";
 
@@ -1264,6 +1266,48 @@ function buildExerciseLibrary(workouts: Workout[]): ExerciseEntry[] {
   return EXERCISE_ENTRIES.filter((entry) => prescribed.has(entry.name));
 }
 
+/* ─── Science notes (Layer C) ───────────────────────────────────────────────
+   Builds a personalised summary framing the science layer in terms of the
+   user's top risk categories, then returns the full fixed entry list.
+   The entries themselves are authored in lib/guide/science.ts.
+   No Math.random. Deterministic. */
+
+function buildScienceNotes(result: ScanResult): ScienceNotes {
+  // Map risk category names to lever keywords that appear in SCIENCE_ENTRIES.
+  const RISK_TO_LEVER: Record<string, string> = {
+    "Physical activity": "cardiorespiratory fitness and muscle strength",
+    "Diet quality": "protein intake and daily movement",
+    "Body composition": "body fat and visceral fat",
+    "Sleep": "sleep quality and recovery",
+    "Stress": "chronic stress and cortisol",
+  };
+
+  // Build a personalised intro from the top one or two risk categories.
+  const topCategories = result.topRisks.slice(0, 2).map((r) => r.category);
+  let summaryIntro: string;
+  if (topCategories.length === 0) {
+    summaryIntro = "The eight levers below are the most evidence-supported ways to extend healthspan.";
+  } else {
+    const leverPhrases = topCategories
+      .map((cat) => RISK_TO_LEVER[cat] ?? cat.toLowerCase())
+      .filter(Boolean);
+    if (leverPhrases.length === 1) {
+      summaryIntro = `Your scan flagged ${leverPhrases[0]} as your highest-impact area. The science below explains why these levers work at a physiological level and what the research broadly shows.`;
+    } else {
+      summaryIntro = `Your scan flagged ${leverPhrases[0]} and ${leverPhrases[1]} as your two highest-impact areas. The science below explains why each lever works at a physiological level and what the research broadly shows.`;
+    }
+  }
+
+  const summary = `${summaryIntro} Understanding the mechanisms helps you make better tradeoffs and stay committed when progress is slow.`;
+
+  return {
+    summary,
+    disclaimer:
+      "This section is general educational information about health and exercise science. It is not medical advice. Consult a qualified healthcare professional before making changes to your health or fitness programme.",
+    entries: SCIENCE_ENTRIES,
+  };
+}
+
 // Phase-based themes keep weeks coherent as a training progression.
 // Risk personalization lives in riskBriefings/yourSituation/strategy; it
 // must not bleed into the weekly grid where it would read as mismatched
@@ -1348,5 +1392,6 @@ export function buildGuide(result: ScanResult, answers: Answers): GuideDoc {
     trackers: buildTrackers(answers),
     recipeBank: buildRecipeBank(goal, diet),
     exerciseLibrary: buildExerciseLibrary(workouts),
+    scienceNotes: buildScienceNotes(result),
   };
 }

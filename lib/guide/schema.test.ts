@@ -177,6 +177,42 @@ const validGuide = {
       learn: "Search 'goblet squat tutorial' for a side-on demo.",
     },
   ],
+  scienceNotes: {
+    summary: "Your scan flagged cardiorespiratory fitness as your highest-impact area. The science below explains why these levers work at a physiological level.",
+    disclaimer: "This section is general educational information about health and exercise science. It is not medical advice.",
+    entries: [
+      {
+        lever: "Cardiorespiratory fitness",
+        mechanism: "Higher fitness improves how efficiently your heart and lungs deliver oxygen to working muscles, lowering resting heart rate and blood pressure.",
+        evidence: "A large cohort study by Mandsager et al. published in JAMA Network Open in 2018 found that low cardiorespiratory fitness was associated with a higher risk of all-cause mortality than most other traditional risk factors.",
+      },
+      {
+        lever: "Strength and muscle mass",
+        mechanism: "Skeletal muscle is the largest site of glucose disposal, absorbing blood sugar after meals and keeping insulin working properly.",
+        evidence: "Large meta-analyses consistently show that higher muscle strength is associated with lower all-cause mortality.",
+      },
+      {
+        lever: "Protein intake",
+        mechanism: "Protein provides the amino acids muscles use to repair and rebuild after training, supporting muscle protein synthesis.",
+        evidence: "Systematic reviews consistently show that protein intakes around 1.6 to 2.2 g per kg of body weight per day maximise muscle-building responses to training.",
+      },
+      {
+        lever: "Progressive overload",
+        mechanism: "Muscles adapt only when exposed to a demand that slightly exceeds what they are accustomed to.",
+        evidence: "The US Physical Activity Guidelines and WHO Physical Activity Guidelines both recommend muscle-strengthening at progressive intensity on at least two days per week.",
+      },
+      {
+        lever: "Sleep",
+        mechanism: "During deep sleep the body releases growth hormone, repairs muscle tissue, and resets cortisol and hunger hormones.",
+        evidence: "Major sleep bodies recommend seven or more hours per night for adults based on consistent evidence linking shorter sleep to higher rates of obesity, diabetes, and cardiovascular disease.",
+      },
+      {
+        lever: "Daily movement and NEAT",
+        mechanism: "Non-exercise activity thermogenesis (NEAT) accounts for more daily calorie expenditure than structured workouts for most people.",
+        evidence: "The WHO Physical Activity Guidelines note that any amount of additional physical activity confers health benefit beyond being sedentary.",
+      },
+    ],
+  },
 };
 
 describe("GuideDocSchema", () => {

@@ -199,6 +199,25 @@ export const RecipeBankSchema = z.object({
   shoppingList: z.array(GroceryAisleSchema).min(1),
 });
 
+// --- Science & authority layer (Layer C) ---
+
+// One entry per major modifiable lever. mechanism explains WHY the lever works
+// at a physiology level a smart non-specialist can follow. evidence describes
+// what the research broadly shows without fabricating specific citations.
+export const ScienceEntrySchema = z.object({
+  lever: z.string().min(1),
+  mechanism: z.string().min(1),
+  evidence: z.string().min(1),
+});
+
+export const ScienceNotesSchema = z.object({
+  // 1-2 sentence framing lightly tied to the user's top risks.
+  summary: z.string().min(1),
+  // One line: general educational information, not medical advice.
+  disclaimer: z.string().min(1),
+  entries: z.array(ScienceEntrySchema).min(6),
+});
+
 export const GuideDocSchema = z.object({
   title: z.string().min(1),
   intro: z.string().min(1),
@@ -228,6 +247,8 @@ export const GuideDocSchema = z.object({
   recipeBank: RecipeBankSchema,
   // Layer B: exercise library covering every movement the plan can prescribe.
   exerciseLibrary: z.array(ExerciseEntrySchema).min(1),
+  // Layer C: science and authority layer with per-lever mechanism explanations.
+  scienceNotes: ScienceNotesSchema,
 });
 
 export type DeepDive = z.infer<typeof DeepDiveSchema>;
@@ -244,6 +265,8 @@ export type Trackers = z.infer<typeof TrackersSchema>;
 export type ExerciseEntry = z.infer<typeof ExerciseEntrySchema>;
 export type Recipe = z.infer<typeof RecipeSchema>;
 export type RecipeBank = z.infer<typeof RecipeBankSchema>;
+export type ScienceEntry = z.infer<typeof ScienceEntrySchema>;
+export type ScienceNotes = z.infer<typeof ScienceNotesSchema>;
 export type GuideDoc = z.infer<typeof GuideDocSchema>;
 
 // Loose validation for the raw scan answers carried into checkout. Keys are

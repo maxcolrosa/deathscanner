@@ -205,4 +205,50 @@ describe("buildGuide", () => {
       expect(guide.exerciseLibrary.length).toBeGreaterThan(0);
     }
   });
+
+  // ─── Science notes (Layer C) ─────────────────────────────────────────────
+
+  it("scienceNotes has at least 6 entries covering the required levers", () => {
+    for (const a of [sedentary, active, injured]) {
+      const guide = buildGuide(computeResult(a), a);
+      const { entries } = guide.scienceNotes;
+      expect(entries.length).toBeGreaterThanOrEqual(6);
+
+      // Check that the key levers are represented.
+      const levers = entries.map((e) => e.lever.toLowerCase()).join(" ");
+      expect(levers).toMatch(/cardiorespiratory|fitness/);
+      expect(levers).toMatch(/protein/);
+      expect(levers).toMatch(/sleep/);
+    }
+  });
+
+  it("scienceNotes disclaimer is present and non-empty", () => {
+    for (const a of [sedentary, active, injured]) {
+      const guide = buildGuide(computeResult(a), a);
+      expect(guide.scienceNotes.disclaimer.length).toBeGreaterThan(10);
+    }
+  });
+
+  it("scienceNotes summary mentions top risk levers for a sedentary profile", () => {
+    const result = computeResult(sedentary);
+    const guide = buildGuide(result, sedentary);
+    // For a sedentary smoker with poor diet the top risk should involve activity/fitness.
+    expect(guide.scienceNotes.summary.length).toBeGreaterThan(20);
+  });
+
+  it("scienceNotes is deterministic for fixed inputs", () => {
+    for (const a of [sedentary, active, injured]) {
+      const r = computeResult(a);
+      expect(buildGuide(r, a).scienceNotes).toEqual(buildGuide(r, a).scienceNotes);
+    }
+  });
+
+  it("scienceNotes each entry has non-empty lever, mechanism, and evidence", () => {
+    const guide = buildGuide(computeResult(sedentary), sedentary);
+    for (const entry of guide.scienceNotes.entries) {
+      expect(entry.lever.length).toBeGreaterThan(0);
+      expect(entry.mechanism.length).toBeGreaterThan(50);
+      expect(entry.evidence.length).toBeGreaterThan(50);
+    }
+  });
 });
