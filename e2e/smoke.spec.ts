@@ -73,17 +73,28 @@ test("buying builds and shows the generated guide", async ({ page }) => {
     page.getByRole("heading", { name: /second wind protocol/i })
   ).toBeVisible({ timeout: 20000 });
   await expect(
-    page.getByText(/your 8-week plan/i)
+    page.getByText("Your 8-week plan", { exact: true })
   ).toBeVisible({ timeout: 20000 });
   // New depth sections are present.
   await expect(page.getByText(/your biggest risks, in depth/i)).toBeVisible();
+  await expect(page.getByText("Your numbers", { exact: true })).toBeVisible();
+  // The download kit offers the workbook plus the tracker pack and quick-start.
   await expect(
-    page.getByRole("link", { name: /download your full pdf/i })
+    page.getByRole("link", { name: /download your workbook pdf/i })
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /printable tracker pack/i })
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /one-page quick-start/i })
   ).toBeVisible();
 
-  // The PDF actually renders at runtime (exercises @react-pdf renderToBuffer).
+  // Every asset actually renders at runtime (exercises @react-pdf
+  // renderToBuffer for each document, the guard against fixed-element crashes).
   const guideUrl = page.url();
-  const pdf = await page.request.get(`${guideUrl}/pdf`);
-  expect(pdf.status()).toBe(200);
-  expect(pdf.headers()["content-type"]).toContain("application/pdf");
+  for (const asset of ["workbook", "trackers", "quickstart"]) {
+    const pdf = await page.request.get(`${guideUrl}/download/${asset}`);
+    expect(pdf.status()).toBe(200);
+    expect(pdf.headers()["content-type"]).toContain("application/pdf");
+  }
 });
