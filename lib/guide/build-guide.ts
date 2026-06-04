@@ -1073,7 +1073,28 @@ function normaliseIngredient(raw: string): string {
     .trim();
 }
 
+// Returns true for pure seasoning/salt/pepper strings that should be omitted
+// from the shopping list (everyone already has these).
+// Careful: "red pepper" and "bell pepper" must NOT be filtered - they are
+// real produce items. The check only fires when the entire normalised string
+// is dominated by salt/pepper/seasoning language.
+function isBasicSeasoning(normalised: string): boolean {
+  // Must NOT contain any real ingredient word that would indicate it is
+  // something other than a pure condiment/seasoning.
+  const realIngredientWords = ["red pepper", "bell pepper", "chili", "chilli", "cayenne", "paprika"];
+  for (const word of realIngredientWords) {
+    if (normalised.includes(word)) return false;
+  }
+  // Matches strings whose entire content is salt, pepper, or generic seasoning phrases.
+  return /^(salt|pepper|black pepper|white pepper|sea salt|kosher salt|salt and (black )?pepper|salt and pepper|seasoning|to taste|pinch of salt|pinch of pepper)(\s*(to taste|and pepper|and salt))*$/.test(normalised.trim());
+}
+
 // Look up an aisle for a normalised ingredient. Falls back to "Other".
+// IMPORTANT: The RECIPE_AISLE_MAP insertion order is load-bearing for the
+// partial-match loop below. More specific keys (e.g. "baby spinach", "cherry
+// tomatoes") must appear before generic ones ("spinach", "tomatoes") so that
+// partial matching assigns them to the correct aisle rather than an earlier,
+// wrong hit. Do not reorder this map without re-verifying aisle assignments.
 function aisleFor(normalised: string): string {
   // Exact match first.
   if (RECIPE_AISLE_MAP[normalised]) return RECIPE_AISLE_MAP[normalised];
@@ -1084,8 +1105,7 @@ function aisleFor(normalised: string): string {
   return "Other";
 }
 
-function buildRecipeBank(goal: string | null, diet: string, bodycomp: string): RecipeBank {
-  void bodycomp; // Reserved for future use; diet already proxies complexity.
+function buildRecipeBank(goal: string | null, diet: string): RecipeBank {
 
   // --- Tag-score each recipe for this user profile ---
   // Higher score = better fit. Selection is by descending score then id for
@@ -1144,6 +1164,9 @@ function buildRecipeBank(goal: string | null, diet: string, bodycomp: string): R
 
   // Pick top N from each meal type to reach ~12 to 16 total. Spread:
   // 4 breakfast, 4 lunch, 5 dinner, 3 snack = 16 recipes.
+  // This array is mutated in-place below (index swap + sort), so it is a
+  // mutable array; const is correct because the binding itself is never
+  // reassigned.
   const picks = [
     ...sortedGroup(byMeal["breakfast"]).slice(0, 4),
     ...sortedGroup(byMeal["lunch"]).slice(0, 4),
@@ -1184,12 +1207,14 @@ function buildRecipeBank(goal: string | null, diet: string, bodycomp: string): R
   // Collect all ingredients from the selected recipes.
   const allIngredients: string[] = picks.flatMap((r) => r.ingredients);
 
-  // Normalise, dedupe, and bucket into aisles.
+  // Normalise, dedupe, and bucket into aisles. Skip pure seasoning strings
+  // (salt, pepper, "salt and pepper to taste", etc.) since everyone has these.
   const seenNormalised = new Set<string>();
   const aisleItems: Record<string, Set<string>> = {};
   for (const raw of allIngredients) {
     const norm = normaliseIngredient(raw);
     if (!norm || seenNormalised.has(norm)) continue;
+    if (isBasicSeasoning(norm)) continue;
     seenNormalised.add(norm);
 
     // Use the first-matching raw ingredient text (cleaner than the norm) as the
@@ -1297,6 +1322,6 @@ export function buildGuide(result: ScanResult, answers: Answers): GuideDoc {
     yourNumbers: buildYourNumbers(result, answers),
     bonusModules: buildBonusModules(answers, result),
     trackers: buildTrackers(answers),
-    recipeBank: buildRecipeBank(goal, diet, bodycomp),
+    recipeBank: buildRecipeBank(goal, diet),
   };
 }

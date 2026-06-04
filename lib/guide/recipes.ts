@@ -2,19 +2,7 @@
 // All macros are ESTIMATES per serving. No em-dashes anywhere in this file.
 // Tags drive selection in buildRecipeBank: goal, diet, and vegetarian filtering.
 
-export interface Recipe {
-  id: string;
-  name: string;
-  meal: "breakfast" | "lunch" | "dinner" | "snack";
-  tags: string[];
-  servings: number;
-  timeMins: number;
-  calories: number;
-  proteinG: number;
-  ingredients: string[];
-  steps: string[];
-  note?: string;
-}
+import type { Recipe } from "@/lib/guide/schema";
 
 export const RECIPES: Recipe[] = [
   // ─── Breakfast ───────────────────────────────────────────────────────────────
@@ -101,8 +89,8 @@ export const RECIPES: Recipe[] = [
     tags: ["high-protein", "higher-carb", "low-cal", "quick"],
     servings: 2,
     timeMins: 15,
-    calories: 280,
-    proteinG: 28,
+    calories: 140,
+    proteinG: 14,
     ingredients: [
       "4 egg whites (or 120 ml carton egg whites)",
       "1 whole egg",
@@ -121,7 +109,7 @@ export const RECIPES: Recipe[] = [
       "Flip and cook for another 1 to 2 minutes until golden.",
       "Serve topped with fresh berries or banana.",
     ],
-    note: "Estimates: 280 kcal, 28 g protein for 2 servings. Makes about 6 small pancakes.",
+    note: "Estimates: 140 kcal, 14 g protein per serving. Makes about 6 small pancakes (3 per serving).",
   },
   {
     id: "b05",

@@ -174,8 +174,9 @@ export const RecipeSchema = z.object({
 });
 
 export const RecipeBankSchema = z.object({
-  // A personalised subset from the full library. At least 8 recipes to ensure
-  // meaningful coverage across all meal types.
+  // A personalised subset from the full library. Normal output is 16 recipes
+  // (4 breakfast + 4 lunch + 5 dinner + 3 snack); min(8) is the validation
+  // floor, not the expected output size.
   recipes: z.array(RecipeSchema).min(8),
   // Consolidated ingredient list from the selected recipes, aisle-grouped.
   shoppingList: z.array(GroceryAisleSchema).min(1),
