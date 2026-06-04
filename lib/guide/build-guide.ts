@@ -1246,29 +1246,18 @@ function buildRecipeBank(goal: string | null, diet: string): RecipeBank {
    Deterministically returns the subset of EXERCISE_ENTRIES that are actually
    prescribed in the user's training.workouts. Stable order: iterate the
    EXERCISE_ENTRIES array in its declared order, include entries whose name
-   appears among the prescribed exercises. If an injury flag is set, also
-   include the relevant low-impact entries even if they are not the primary
-   prescription (so the reader can compare). */
+   appears among the prescribed exercises. The helper functions (lowerBody,
+   pushEx, hingeEx, pullEx, coreEx, conditioning) already emit the correct
+   injury-variant names when injury=true, so the prescribed set is always
+   accurate and no extra entries need to be added here. */
 
-function buildExerciseLibrary(workouts: Workout[], injury: boolean): ExerciseEntry[] {
+function buildExerciseLibrary(workouts: Workout[]): ExerciseEntry[] {
   // Collect distinct prescribed names across all workout sessions.
   const prescribed = new Set<string>();
   for (const w of workouts) {
     for (const e of w.exercises) {
       prescribed.add(e.name);
     }
-  }
-
-  // When the user has an injury flag, add the injury-variant names so the
-  // library section also covers those entries even for intermediate profiles.
-  if (injury) {
-    // Names produced by helpers when injury=true
-    prescribed.add("Box squat to a chair");
-    prescribed.add("Incline push-up on a counter");
-    prescribed.add("Glute bridge");
-    prescribed.add("Band row");
-    prescribed.add("Dead bug");
-    prescribed.add("Brisk walk");
   }
 
   // Return entries in the stable order declared in EXERCISE_ENTRIES.
@@ -1358,6 +1347,6 @@ export function buildGuide(result: ScanResult, answers: Answers): GuideDoc {
     bonusModules: buildBonusModules(answers, result),
     trackers: buildTrackers(answers),
     recipeBank: buildRecipeBank(goal, diet),
-    exerciseLibrary: buildExerciseLibrary(workouts, injury),
+    exerciseLibrary: buildExerciseLibrary(workouts),
   };
 }
