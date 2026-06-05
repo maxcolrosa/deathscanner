@@ -85,13 +85,11 @@ export default function Home() {
           </div>
 
           <h1 className="text-[2.7rem] font-semibold leading-[0.96] tracking-tighter text-monitor-fg sm:text-[4.2rem]">
-            The body you are
-            <br />
-            wasting has a
+            Your body has a
             <br />
             <span className="text-monitor-alert">deadline.</span>
             <span className="mt-3 block text-monitor-accent">
-              We will show you the date.
+              Find out when it is.
             </span>
           </h1>
 
