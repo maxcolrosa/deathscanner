@@ -10,10 +10,10 @@ import type { Answers } from "@/lib/longevity";
 // generation and redirects to the tokenized guide URL. Without `answers` (the
 // generic /guide page), it keeps the placeholder message.
 export function CheckoutButton({ label, answers }: { label?: string; answers?: Answers }) {
-  const { price } = useSale();
+  const { price, symbol } = useSale();
   const { start, pending, error, ready } = useCheckout(answers);
   const [placeholder, setPlaceholder] = useState(false);
-  const text = label ?? `Get instant access for $${price}`;
+  const text = label ?? `Get instant access for ${symbol}${price}`;
 
   const onClick = () => {
     if (!ready) {

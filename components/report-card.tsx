@@ -25,7 +25,7 @@ export function ReportCard({
   result: ScanResult;
   answers: Answers;
 }) {
-  const { price, expired } = useSale();
+  const { price, expired, symbol } = useSale();
   const deathLabel = dateFormatter.format(result.predictedDeathDate);
   const years = result.recoverableYears.toFixed(0);
   const hasYears = result.recoverableYears > 0;
@@ -103,7 +103,7 @@ export function ReportCard({
           </span>
           <span className="ml-auto font-mono text-[10px] text-monitor-muted">
             {expired ? (
-              <>now ${price}</>
+              <>now {symbol}{price}</>
             ) : (
               <>
                 ends in <SaleCountdown className="text-monitor-accent" />
@@ -122,13 +122,13 @@ export function ReportCard({
                   {years} years
                 </span>
                 . Your personalized 90-day protocol goes after them, in order,
-                for ${price} today.
+                for {symbol}{price} today.
               </>
             ) : (
               <>
                 Your risks are already low. Your personalized 90-day protocol
                 pushes you toward the top of your range and holds it there, for
-                ${price} today.
+                {symbol}{price} today.
               </>
             )}
           </p>

@@ -1,28 +1,48 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { PRODUCT } from "@/lib/product";
+import { PRICES, stackValueFor, type Currency } from "@/lib/product";
 
 interface SaleState {
   /** Seconds left on the offer, or null when there is no active timer. */
   remaining: number | null;
   expired: boolean;
+  /** Currency being shown and charged. */
+  currency: Currency;
+  /** Inline symbol for that currency (e.g. "$", "£", "CA$"). */
+  symbol: string;
   /** Current price (sale price, or the higher price once the timer expires). */
   price: number;
+  /** The live launch price (before expiry). */
+  launchPrice: number;
   /** The price the offer rises to when the countdown ends. */
   expiredPrice: number;
+  /** Recovery price the email win-back coupon resolves to. */
+  winbackPrice: number;
   listPrice: number;
+  /** Total value-stack worth in the active currency. */
+  stackValue: number;
+}
+
+function stateForCurrency(currency: Currency, expired: boolean, remaining: number | null): SaleState {
+  const tier = PRICES[currency] ?? PRICES.USD;
+  return {
+    remaining,
+    expired,
+    currency,
+    symbol: tier.symbol,
+    price: expired ? tier.expiredPrice : tier.price,
+    launchPrice: tier.price,
+    expiredPrice: tier.expiredPrice,
+    winbackPrice: tier.winbackPrice,
+    listPrice: tier.listPrice,
+    stackValue: stackValueFor(currency),
+  };
 }
 
 // Default used when a consumer renders outside a provider (e.g. the evergreen
-// /guide page): no timer, standard sale price, never expired.
-const DEFAULT: SaleState = {
-  remaining: null,
-  expired: false,
-  price: PRODUCT.price,
-  expiredPrice: PRODUCT.expiredPrice,
-  listPrice: PRODUCT.listPrice,
-};
+// /guide page): no timer, standard USD sale price, never expired.
+const DEFAULT: SaleState = stateForCurrency("USD", false, null);
 
 const SaleContext = createContext<SaleState>(DEFAULT);
 
@@ -38,9 +58,11 @@ const STORAGE_KEY = "sw_offer_deadline";
 
 export function SaleProvider({
   durationSeconds = 900,
+  currency = "USD",
   children,
 }: {
   durationSeconds?: number;
+  currency?: Currency;
   children: React.ReactNode;
 }) {
   // The deadline is PERSISTED in the browser, so a refresh or a fresh scan does
@@ -80,13 +102,7 @@ export function SaleProvider({
   }, [deadline]);
 
   const expired = remaining <= 0;
-  const value: SaleState = {
-    remaining,
-    expired,
-    price: expired ? PRODUCT.expiredPrice : PRODUCT.price,
-    expiredPrice: PRODUCT.expiredPrice,
-    listPrice: PRODUCT.listPrice,
-  };
+  const value = stateForCurrency(currency, expired, remaining);
 
   return <SaleContext.Provider value={value}>{children}</SaleContext.Provider>;
 }

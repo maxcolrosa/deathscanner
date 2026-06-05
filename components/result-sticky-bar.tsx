@@ -12,7 +12,7 @@ export function ResultStickyBar({
   recoverableYears: number;
   answers: Answers;
 }) {
-  const { price, expired } = useSale();
+  const { price, expired, symbol } = useSale();
   const { start, pending } = useCheckout(answers);
 
   return (
@@ -33,10 +33,10 @@ export function ResultStickyBar({
         <div className="flex w-full items-center gap-4 sm:w-auto">
           <span className="hidden font-mono text-xs text-monitor-muted sm:inline">
             {expired ? (
-              <>${price} now</>
+              <>{symbol}{price} now</>
             ) : (
               <>
-                ${price} today, expires in <SaleCountdown className="text-monitor-accent" />
+                {symbol}{price} today, expires in <SaleCountdown className="text-monitor-accent" />
               </>
             )}
           </span>

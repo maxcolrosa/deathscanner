@@ -3,7 +3,7 @@
 import { CheckoutButton } from "@/components/checkout-button";
 import { SaleCountdown } from "@/components/sale-countdown";
 import { useSale } from "@/components/sale-context";
-import { PRODUCT, INCLUDED } from "@/lib/product";
+import { PRODUCT, INCLUDED, localizedValue } from "@/lib/product";
 import { Reviews } from "@/components/reviews";
 import { TransformationsGallery } from "@/components/transformations-gallery";
 import type { Answers, Outcome, ScanResult } from "@/lib/longevity";
@@ -51,10 +51,11 @@ function OfferModule({
   recoverableYears: number;
   answers?: Answers;
 }) {
-  const { price, expiredPrice, listPrice, expired, remaining } = useSale();
+  const { price, expiredPrice, listPrice, expired, remaining, symbol, stackValue } =
+    useSale();
   const hasTimer = remaining !== null;
   const hasYears = recoverableYears > 0;
-  const savings = Math.round((1 - price / PRODUCT.stackValue) * 100);
+  const savings = Math.round((1 - price / stackValue) * 100);
 
   return (
     <div className="overflow-hidden rounded-xl border border-monitor-accent/40 bg-monitor-panel shadow-[inset_0_1px_0_rgba(46,230,201,0.08)]">
@@ -71,7 +72,7 @@ function OfferModule({
         </span>
         <span className="ml-auto font-mono text-[11px] text-monitor-muted">
           {expired ? (
-            <>now ${price}</>
+            <>now {symbol}{price}</>
           ) : hasTimer ? (
             <>
               ends in{" "}
@@ -89,16 +90,16 @@ function OfferModule({
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-sm text-monitor-muted">
             <span>
               Total value{" "}
-              <span className="line-through">${PRODUCT.stackValue}</span>
+              <span className="line-through">{symbol}{stackValue}</span>
             </span>
             <span className="text-monitor-line">/</span>
             <span>
-              Normally <span className="line-through">${listPrice}</span>
+              Normally <span className="line-through">{symbol}{listPrice}</span>
             </span>
           </div>
           <div className="flex items-end gap-4">
             <span className="font-mono text-7xl font-semibold leading-none tracking-tighter text-monitor-fg">
-              ${price}
+              {symbol}{price}
             </span>
             <div className="mb-1 flex flex-col">
               <span className="font-mono text-xs uppercase tracking-[0.16em] text-monitor-accent">
@@ -138,7 +139,7 @@ function OfferModule({
         {/* Price-jump warning */}
         {hasTimer && !expired && (
           <p className="text-center font-mono text-xs text-monitor-muted">
-            When the timer hits zero the price returns to ${expiredPrice}.
+            When the timer hits zero the price returns to {symbol}{expiredPrice}.
           </p>
         )}
       </div>
@@ -153,6 +154,7 @@ export function GuidePitch({
   result?: ScanResult;
   answers?: Answers;
 }) {
+  const { symbol, currency, stackValue } = useSale();
   const recoverableYears = result?.recoverableYears ?? 0;
   const outcomes = result?.outcomes?.length ? result.outcomes : GENERIC_OUTCOMES;
   const topRisk = result?.topRisks?.[0];
@@ -198,7 +200,7 @@ export function GuidePitch({
               Everything in your protocol
             </h3>
             <span className="font-mono text-xs text-monitor-muted">
-              value <span className="text-monitor-fg">${PRODUCT.stackValue}</span>
+              value <span className="text-monitor-fg">{symbol}{stackValue}</span>
             </span>
           </div>
           <ul className="divide-y divide-monitor-line border-y border-monitor-line">
@@ -219,7 +221,7 @@ export function GuidePitch({
                   </span>
                 </div>
                 <span className="shrink-0 font-mono text-xs text-monitor-muted line-through">
-                  ${item.value}
+                  {symbol}{localizedValue(item.value, currency)}
                 </span>
               </li>
             ))}

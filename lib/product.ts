@@ -1,19 +1,48 @@
 // The single place to edit the funnel product. Swap these values, or wire the
 // CheckoutButton to Stripe later, without touching the UI.
+//
+// Pricing is multi-currency. PRICES holds the authored "charm" price points per
+// currency (launch / expired / win-back / list anchor). The value-stack line
+// items live in INCLUDED in USD and are converted to each currency with the
+// tier `rate` (see localizedValue / stackValueFor), so the anchor math stays
+// consistent everywhere without a second hand-maintained table.
+
 export const PRODUCT = {
   name: "The Second Wind Protocol",
   tagline: "A complete, personalized 90-day program built from your scan.",
-  /** Live (sale) price the user pays before the countdown ends. */
-  price: 13,
-  /** Price after the on-page countdown expires. */
-  expiredPrice: 24,
-  /** Anchor: the "normal" price, shown struck through. */
-  listPrice: 129,
-  /** Anchor: total itemized value of everything included. */
-  stackValue: 492,
 } as const;
 
-// Itemized value stack. Sum of `value` equals PRODUCT.stackValue (492).
+export const SUPPORTED_CURRENCIES = ["USD", "GBP", "EUR", "CAD", "AUD"] as const;
+export type Currency = (typeof SUPPORTED_CURRENCIES)[number];
+
+export interface PriceTier {
+  code: Currency;
+  /** Symbol shown inline, kept deadpan and minimal (e.g. "$", "£", "CA$"). */
+  symbol: string;
+  /** Live (sale) price the user pays before the on-page countdown ends. */
+  price: number;
+  /** Price after the countdown expires. */
+  expiredPrice: number;
+  /** Recovery price the email win-back coupon resolves to (undercuts launch). */
+  winbackPrice: number;
+  /** Anchor: the "normal" price, shown struck through. */
+  listPrice: number;
+  /** USD -> currency multiplier used only to localize the value-stack items. */
+  rate: number;
+}
+
+// Authored charm price points per currency. USD is the source of truth for the
+// value stack (rate 1); the rest are rounded to believable local points.
+export const PRICES: Record<Currency, PriceTier> = {
+  USD: { code: "USD", symbol: "$", price: 13, expiredPrice: 24, winbackPrice: 9, listPrice: 129, rate: 1 },
+  GBP: { code: "GBP", symbol: "£", price: 11, expiredPrice: 19, winbackPrice: 7, listPrice: 99, rate: 0.79 },
+  EUR: { code: "EUR", symbol: "€", price: 12, expiredPrice: 22, winbackPrice: 8, listPrice: 119, rate: 0.92 },
+  CAD: { code: "CAD", symbol: "CA$", price: 18, expiredPrice: 33, winbackPrice: 12, listPrice: 179, rate: 1.36 },
+  AUD: { code: "AUD", symbol: "A$", price: 19, expiredPrice: 35, winbackPrice: 13, listPrice: 189, rate: 1.52 },
+};
+
+// Itemized value stack, authored in USD. Sum of `value` equals the USD stack
+// value (492); other currencies derive their stack value via stackValueFor().
 export const INCLUDED = [
   {
     label: "Your custom 90-day program, built from your scan",
@@ -56,3 +85,13 @@ export const INCLUDED = [
     value: 39,
   },
 ] as const;
+
+/** A single USD value-stack item converted to `currency`, rounded to a whole. */
+export function localizedValue(usdValue: number, currency: Currency): number {
+  return Math.round(usdValue * PRICES[currency].rate);
+}
+
+/** Total value-stack worth in `currency` (the honest sum of localized items). */
+export function stackValueFor(currency: Currency): number {
+  return INCLUDED.reduce((sum, item) => sum + localizedValue(item.value, currency), 0);
+}
