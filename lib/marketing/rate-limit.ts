@@ -1,8 +1,7 @@
-// Best-effort in-process fixed-window rate limiter. It is NOT durable across
-// serverless instances, so it is defense-in-depth, not a hard guarantee; a
-// pre-launch hardening item is a shared store (Upstash / Supabase) plus a
-// CAPTCHA on the capture form. Good enough to blunt casual abuse of the public
-// capture endpoint in a single instance / local dev.
+// In-process fixed-window rate limiter, plus a durable Supabase-backed variant
+// (rateLimitDurable). Prefer the durable one for anything that must actually
+// hold on Vercel: the in-process map below resets per serverless instance, so
+// on its own it only blunts casual abuse in a single instance / local dev.
 
 declare const globalThis: {
   __rateBuckets?: Map<string, { count: number; reset: number }>;
@@ -27,4 +26,32 @@ export function rateLimit(key: string, max: number, windowMs: number): boolean {
 
 export function __clearRateBuckets(): void {
   buckets.clear();
+}
+
+// Durable, cross-instance rate limit backed by the public.rate_limit_hit
+// Postgres function (atomic check-and-increment). Falls back to the in-process
+// limiter above when Supabase is not configured (local dev, tests, e2e) or if
+// the RPC errors, so a transient DB hiccup still leaves per-instance protection
+// in place rather than failing fully open. Returns true if allowed.
+export async function rateLimitDurable(
+  key: string,
+  max: number,
+  windowMs: number
+): Promise<boolean> {
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return rateLimit(key, max, windowMs);
+  }
+  try {
+    const { supabaseServer } = await import("@/lib/supabase/server");
+    const { data, error } = await supabaseServer().rpc("rate_limit_hit", {
+      p_key: key,
+      p_max: max,
+      p_window_ms: windowMs,
+    });
+    if (error) throw new Error(error.message);
+    return data === true;
+  } catch (err) {
+    console.error("[rate-limit] durable check failed, falling back:", err);
+    return rateLimit(key, max, windowMs);
+  }
 }
