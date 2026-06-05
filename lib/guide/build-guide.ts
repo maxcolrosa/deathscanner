@@ -43,7 +43,7 @@ function lowerBody(level: Level, injury: boolean): Exercise {
   if (injury)
     return ex("Box squat to a chair", "3", "8-10", "75s", "Sit back to the chair, stand tall, no knee pain", "Lower the chair height as you get stronger");
   if (level === "beginner")
-    return ex("Goblet squat", "3", "8-10", "75s", "Chest tall, knees tracking over your toes", "Add 2.5 kg once you hit 10 clean reps");
+    return ex("Goblet squat", "3", "8-10", "75s", "Chest tall, knees tracking over your toes", "Add 5 lbs once you hit 10 clean reps");
   return ex("Back squat", "4", "5-8", "120s", "Brace, full depth, drive through mid-foot", "Add a small amount of load each week you complete all sets");
 }
 
@@ -145,9 +145,9 @@ function dietBriefing(diet: string): DeepDive {
   return {
     heading: poor ? "Your diet is mostly working against you" : "Your diet is close, but leaking years",
     problem: poor
-      ? "Most of what you eat is processed or fast food. That means a steady drip of refined carbs, industrial oils, and very little protein or fibre."
+      ? "Most of what you eat is processed or fast food. That means a steady drip of refined carbs, industrial oils, and very little protein or fiber."
       : "You eat a mix of fresh and processed food. The fresh part helps, but the processed twenty percent, the snacks, the liquid calories, the late-night grazing, is where the damage hides.",
-    why: "Processed-heavy eating drives chronic inflammation, insulin resistance, and slow weight gain around the organs that matters most. It also crowds out protein and fibre, the two things that keep you full, hold onto muscle, and steady your blood sugar. Over years this is the engine behind type 2 diabetes, high blood pressure, and heart disease.",
+    why: "Processed-heavy eating drives chronic inflammation, insulin resistance, and slow weight gain around the organs that matters most. It also crowds out protein and fiber, the two things that keep you full, hold onto muscle, and steady your blood sugar. Over years this is the engine behind type 2 diabetes, high blood pressure, and heart disease.",
     whenFixed: "Shift the base of your plate to protein, vegetables, and whole-food carbs and the effects compound fast: steadier energy, fewer cravings, easier fat loss, and blood markers that move in the right direction within a month or two. You are not chasing a perfect diet, just a defensible one.",
     actions: [
       poor
@@ -171,7 +171,7 @@ function bodycompBriefing(bodycomp: string): DeepDive {
     whenFixed: "You do not need to reach a six-pack to win here. Losing even 5 to 10 percent of your body weight measurably lowers blood pressure, blood sugar, and inflammation. Joints stop aching, energy climbs, and your projected date moves in the right direction.",
     actions: [
       "Prioritize protein and strength training so the weight you lose is fat, not muscle",
-      "Aim for slow, steady loss of around 0.5 kg a week; faster is mostly water and muscle",
+      "Aim for slow, steady loss of around 1 lb a week; faster is mostly water and muscle",
       "Use the daily blueprint to stack movement into the gaps in your day",
       "Track the trend with how your clothes fit, not a daily number on the scale",
     ],
@@ -425,19 +425,19 @@ function goalCalibration(goal: string | null): string[] {
     return [
       "Pair protein or fat with every carb source to slow digestion and keep blood sugar steady rather than spiking and crashing",
       "Eat within an hour of waking to set your metabolism in motion and avoid the mid-morning energy dip",
-      "Aim for 25 to 30 g of fibre a day from vegetables, legumes, and whole grains; fibre is the main driver of steady energy and satiety",
+      "Aim for 25 to 30 g of fiber a day from vegetables, legumes, and whole grains; fiber is the main driver of steady energy and satiety",
     ];
   }
   if (goal === "heart") {
     return [
-      "Prioritise fibre at most meals, two fists of vegetables and a legume or whole grain, because soluble fibre actively lowers cholesterol",
+      "Prioritize fiber at most meals, two fists of vegetables and a legume or whole grain, because soluble fiber actively lowers cholesterol",
       "Use olive oil as your main fat and get oily fish, salmon, mackerel, or sardines, twice a week for the omega-3 benefit",
       "Cut added salt and ultra-processed meat first; they have the largest effect on blood pressure",
     ];
   }
   // Default: sensible for any profile
   return [
-    "Aim for 25 to 30 g of fibre a day via vegetables, legumes, oats, and whole grains to support digestion, satiety, and cardiovascular health",
+    "Aim for 25 to 30 g of fiber a day via vegetables, legumes, oats, and whole grains to support digestion, satiety, and cardiovascular health",
     "Pair protein with every meal to steady your blood sugar and keep hunger manageable across the day",
     "Limit ultra-processed food to less than 20 percent of your meals; that single shift removes most of the dietary damage without requiring perfection",
   ];
@@ -453,8 +453,8 @@ function buildNutritionPlan(diet: string, goal: string | null, bodycomp: string)
   const portionTarget = proteinTarget(bodycomp);
   const proteinNote =
     bodycomp === "over" || bodycomp === "obese"
-      ? `${portionTarget}. For most adults this lands around 1.8 to 2.2 g of protein per kg of target bodyweight per day, if you would rather not count portions. The larger-palm guidance here is intentional and matches the higher end of that range.`
-      : `${portionTarget}. For most adults this lands around 1.6 to 2.0 g of protein per kg of bodyweight per day, if you would rather not count. Prioritise real food sources first, lean meat, fish, eggs, Greek yogurt, and legumes, before turning to protein powder.`;
+      ? `${portionTarget}. For most adults this lands around 0.8 to 1 g of protein per lb of target bodyweight per day, if you would rather not count portions. The larger-palm guidance here is intentional and matches the higher end of that range.`
+      : `${portionTarget}. For most adults this lands around 0.7 to 0.9 g of protein per lb of bodyweight per day, if you would rather not count. Prioritize real food sources first, lean meat, fish, eggs, Greek yogurt, and legumes, before turning to protein powder.`;
 
   const principles: string[] = [
     "Stop eating about three hours before bed to protect sleep quality and overnight blood-sugar regulation",
@@ -626,7 +626,7 @@ function buildTroubleshooting(barrier: string) {
     { problem: "No time this week", fix: "Fall back to the 10-minute plan; it still counts. Two short walks beat one skipped session" },
     { problem: "Lost motivation", fix: "Shrink the task. Do only the first two minutes; momentum almost always carries you further" },
     { problem: "Sore or run down", fix: "Swap a strength day for a walk and a full night of sleep, then resume" },
-    { problem: "The scale will not move", fix: "Judge a fortnight, not a morning. Check the trend, your measurements, and your protein before changing anything" },
+    { problem: "The scale will not move", fix: "Judge two weeks, not a morning. Check the trend, your measurements, and your protein before changing anything" },
     { problem: "Travelling or away from home", fix: "Bodyweight circuit in the room, protein at every meal, and walk the new place" },
   ];
   if (barrier === "injury")
@@ -1311,7 +1311,7 @@ function buildScienceNotes(result: ScanResult): ScienceNotes {
   return {
     summary,
     disclaimer:
-      "This section is general educational information about health and exercise science. It is not medical advice. Consult a qualified healthcare professional before making changes to your health or fitness programme.",
+      "This section is general educational information about health and exercise science. It is not medical advice. Consult a qualified healthcare professional before making changes to your health or fitness program.",
     entries: SCIENCE_ENTRIES,
   };
 }
@@ -1338,7 +1338,7 @@ function buildProgramArc(goal: string | null): ProgramArc {
           : goal === "strength"
             ? "Load is deliberately conservative. Sets build from two to three across the four-week block. Protein intake rises to support early muscle-protein synthesis. The movement patterns must be clean before load increases."
             : goal === "heart"
-              ? "Conditioning sessions prioritise zone-2 effort, a pace you can hold a short conversation through, and run for 20 to 25 minutes. Strength work uses lighter loads and controlled tempos to keep blood pressure steady. The habit of daily movement is the primary output."
+              ? "Conditioning sessions favor zone-2 effort, a pace you can hold a short conversation through, and run for 20 to 25 minutes. Strength work uses lighter loads and controlled tempos to keep blood pressure steady. The habit of daily movement is the primary output."
               : goal === "energy"
                 ? "Sessions are short and consistent rather than intense. Showing up on schedule matters more than effort level. Sleep windows are set and protected from day one, and protein at every meal is the single nutrition non-negotiable for this phase."
                 : "Load is light and sessions are short. The habit of showing up and protecting sleep is the primary output of this phase. Nutrition anchors on protein at every meal and one daily vegetable target.",
@@ -1370,10 +1370,10 @@ function buildProgramArc(goal: string | null): ProgramArc {
           : goal === "strength"
             ? "Rep ranges shift: main lifts drop to four to six reps at a heavier load for two to three weeks, then return to eight to ten for one consolidation week before the maintenance hand-off. This variation drives strength adaptation beyond the initial linear gains."
             : goal === "heart"
-              ? "Zone-2 sessions reach their peak duration and frequency for this programme. Strength work maintains three to four sets with blood-pressure-friendly rest periods. A lighter deload in week 12 lets the body consolidate the cardiovascular gains before the maintenance hand-off."
+              ? "Zone-2 sessions reach their peak duration and frequency for this program. Strength work maintains three to four sets with blood-pressure-friendly rest periods. A lighter deload in week 12 lets the body consolidate the cardiovascular gains before the maintenance hand-off."
               : goal === "energy"
-                ? "All session parameters are at their highest for this programme, but intensity remains secondary to consistency. Daily steps, sleep windows, and training sessions are protected as non-negotiables. A lighter deload in week 12 consolidates the habit before maintenance."
-                : "All session parameters are at their highest for this programme. Daily steps, training sessions, and sleep windows are protected as non-negotiables. A lighter deload in week 12 allows the body to consolidate before maintenance.",
+                ? "All session parameters are at their highest for this program, but intensity remains secondary to consistency. Daily steps, sleep windows, and training sessions are protected as non-negotiables. A lighter deload in week 12 consolidates the habit before maintenance."
+                : "All session parameters are at their highest for this program. Daily steps, training sessions, and sleep windows are protected as non-negotiables. A lighter deload in week 12 allows the body to consolidate before maintenance.",
     },
     {
       name: "Maintenance",
@@ -1385,7 +1385,7 @@ function buildProgramArc(goal: string | null): ProgramArc {
           ? "Training volume reduces slightly, two to three sets per movement on most sessions, to be sustainable long term. Nutrition stays at the protein and vegetable targets from the Build phase. A measurement review every four weeks keeps the trend honest without obsession."
           : goal === "strength"
             ? "Main lifts run on two or three heavy days per week rather than four. Deload weeks are built in every fourth or fifth week automatically. If strength has plateaued, a new eight-week block with adjusted rep ranges restarts progress."
-            : "The daily habits are the programme. Training three days a week at a comfortable but progressive effort, protein at every meal, seven to eight hours of sleep, and daily steps are the four levers to protect. Review your dashboard numbers every four weeks and adjust one thing at a time.",
+            : "The daily habits are the program. Training three days a week at a comfortable but progressive effort, protein at every meal, seven to eight hours of sleep, and daily steps are the four levers to protect. Review your dashboard numbers every four weeks and adjust one thing at a time.",
     },
   ];
 
@@ -1401,7 +1401,7 @@ function buildProgramArc(goal: string | null): ProgramArc {
   if (goal === "strength") month1Checkpoints.push("Record your working weight on the squat and press from your last session of the month");
 
   const month1AdjustRules: string[] = [
-    "Completed fewer than 70 percent of planned sessions: keep the load and structure identical for two more weeks rather than progressing. Consistency is the missing variable, not programme design.",
+    "Completed fewer than 70 percent of planned sessions: keep the load and structure identical for two more weeks rather than progressing. Consistency is the missing variable, not program design.",
     "Sleep score below 6: fix the sleep before tightening any training or nutrition variable. Everything else depends on sleep quality.",
     "Waist or weight trending up despite good adherence: check protein first, then total food volume. Do not change the training.",
   ];
@@ -1429,7 +1429,7 @@ function buildProgramArc(goal: string | null): ProgramArc {
   ];
   if (goal === "fat") {
     month2AdjustRules.push("Fat loss has stopped for two full weeks despite good adherence: spend two weeks at maintenance calories to reset metabolic adaptation before returning to a mild deficit.");
-    month2AdjustRules.push("Progress is faster than 0.5 to 1 kg per week: slightly increase carbohydrate portions at meals to slow the rate. Fast loss in month 2 is usually muscle and water, not fat.");
+    month2AdjustRules.push("Progress is faster than 1 to 2 lbs per week: slightly increase carbohydrate portions at meals to slow the rate. Fast loss in month 2 is usually muscle and water, not fat.");
   } else if (goal === "strength") {
     month2AdjustRules.push("A lift has not increased in three consecutive sessions: drop the load by 10 percent, focus on technique for one week, then rebuild. Technique is usually the real ceiling.");
   } else {

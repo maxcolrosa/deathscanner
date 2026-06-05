@@ -37,54 +37,54 @@ export interface Transformation {
 export const TESTIMONIALS: Testimonial[] = [
   {
     quote:
-      "My scan put my date at 71 and I genuinely did not sleep that night. What changed it was that the plan gave me one thing to do each morning instead of a vague 'get healthier.' I am down 8 kg and my partner says I look ten years younger. First program I have ever actually finished.",
+      "My scan came back at 71 and I did not sleep that night. What flipped it for me was that the plan handed me one thing to do every morning instead of a vague 'eat better, move more.' Down 18 lbs, my wedding ring spins on my finger again, and my wife keeps saying I look ten years younger. First program I have ever actually finished.",
     name: "Daniel R.",
-    meta: "Logistics manager, 44 · Manchester",
-    detail: "Down 8 kg",
+    meta: "Warehouse supervisor, 44 · Columbus, OH",
+    detail: "Down 18 lbs",
     rating: 5,
     verifiedAgo: "5 days ago",
   },
   {
     quote:
-      "I almost did not pay, because I assumed it would be the same generic plan everyone gets. It was not. It used my actual answers about my sleep and my stress and built the start around fixing those. My resting heart rate dropped 11 points and the brain fog I had blamed on work is just gone.",
-    name: "Mei L.",
-    meta: "Product designer, 33 · San Jose",
+      "I almost did not pay because I figured it was the same cookie-cutter plan everybody gets. Nope. It pulled my actual answers about my garbage sleep and my stress and built the first two weeks around fixing those. My resting heart rate went from 78 down to 67, and the brain fog I kept blaming on work is just gone.",
+    name: "Megan L.",
+    meta: "Product designer, 33 · Sacramento, CA",
     detail: "Resting HR 78 to 67 bpm",
     rating: 5,
     verifiedAgo: "1 week ago",
   },
   {
     quote:
-      "The report did not lecture me about smoking. It just showed me, in plain numbers, the years it was costing me. Using the training sessions as my craving ritual is the only thing that has ever worked for me. I am off cigarettes now, and last weekend I climbed three flights without stopping for the first time since college.",
+      "The report did not lecture me about smoking. It just laid out, in plain numbers, exactly how many years a pack a day was costing me. Swapping my smoke breaks for the short workouts is the only thing that has ever stuck. I am off the cigarettes, and last weekend I carried the groceries up three flights without stopping for the first time since high school.",
     name: "Marcus T.",
-    meta: "Electrician, 39 · Atlanta",
+    meta: "Electrician, 39 · Nashville, TN",
     detail: "Off cigarettes",
     rating: 5,
     verifiedAgo: "2 weeks ago",
   },
   {
     quote:
-      "Two kids and a full time job meant every other plan I tried was dead almost immediately. The 10-minute fallback for the bad days is the thing that kept the streak alive. I am back under a barbell for the first time since my second was born, and I actually look forward to it now instead of dreading it.",
+      "Two kids and a 12-hour shift killed every other plan I tried inside a week. The 10-minute backup workout for the days everything falls apart is the only reason my streak survived. I am back under a barbell for the first time since my second was born, and now I actually look forward to it in the garage instead of dreading it.",
     name: "Elena K.",
-    meta: "Nurse, 41 · Austin",
+    meta: "ER nurse, 41 · Dallas, TX",
     detail: "Lifting again",
     rating: 5,
     verifiedAgo: "3 weeks ago",
   },
   {
     quote:
-      "I will be honest, the death-date thing felt like a gimmick and the countdown timer is a bit much. But I bought it anyway, and the grocery staples list on its own was worth the money. I stopped overthinking food and lost the gut I had carried for ten years. Would have given five stars if the checkout had not fought me twice.",
+      "I will be straight with you, the death-date thing felt like a gimmick and the countdown timer is a bit much. But I bought it anyway, and the grocery list alone paid for itself. I quit overthinking every meal and finally lost the gut I had hauled around for ten years. Would have given five stars if the checkout had not made me enter my card twice.",
     name: "Tom B.",
-    meta: "Teacher, 52 · Leeds",
+    meta: "High school teacher, 52 · Tampa, FL",
     detail: "Lost a decade-old gut",
     rating: 4,
     verifiedAgo: "6 days ago",
   },
   {
     quote:
-      "I have wasted hundreds on programs I quit by February. This is the first one that adjusted as I went instead of making me feel like a failure when I fell behind. I stopped needing the 3pm coffee to function. I cancelled the gym membership I never used and just do this in the front room.",
-    name: "Sarah L.",
-    meta: "Account manager, 36 · Brighton",
+      "I have blown hundreds on programs I quit by February. This is the first one that adjusted when I fell behind instead of making me feel like a failure. I stopped needing the 3pm energy drink to make it to dinner. I cancelled the gym membership I never used and do the whole thing in my living room.",
+    name: "Sarah M.",
+    meta: "Account manager, 36 · Phoenix, AZ",
     detail: "Energy back",
     rating: 5,
     verifiedAgo: "yesterday",
@@ -94,7 +94,7 @@ export const TESTIMONIALS: Testimonial[] = [
 // Fixed shared set. Images live in /public/transformations/ and are imported
 // above so a file swap busts caches automatically. 2 female, 2 male.
 export const TRANSFORMATIONS: Transformation[] = [
-  { name: "Mei L.", beforeSrc: meiBefore, afterSrc: meiAfter },
+  { name: "Megan L.", beforeSrc: meiBefore, afterSrc: meiAfter },
   { name: "Daniel R.", beforeSrc: danielBefore, afterSrc: danielAfter },
   { name: "Elena K.", beforeSrc: elenaBefore, afterSrc: elenaAfter },
   { name: "Marcus T.", beforeSrc: marcusBefore, afterSrc: marcusAfter },

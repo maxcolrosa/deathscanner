@@ -8,13 +8,13 @@ const PHASES = ["Intake", "Risk scoring", "Simulation", "Projection"];
 
 const MIDDLE_POOL = [
   "Normalizing your health markers...",
-  "Validating biometric inputs...",
-  "Scoring cardiovascular and metabolic risk...",
+  "Checking your inputs...",
+  "Scoring heart and metabolic risk...",
   "Estimating your biological age...",
-  "Cross-referencing 2.1M actuarial mortality records...",
+  "Cross-referencing 2.1M mortality records...",
   "Running 10,000 survival simulations...",
-  "Separating modifiable risk from fixed risk...",
-  "Calibrating the confidence interval...",
+  "Splitting what you can change from what you cannot...",
+  "Locking in the confidence range...",
 ];
 
 function shuffle<T>(arr: T[]): T[] {
@@ -37,7 +37,7 @@ function buildLines(answers: Answers): string[] {
   return [
     "Loading AI longevity model v4.2...",
     ...body,
-    "Compiling your longevity report...",
+    "Building your longevity report...",
   ];
 }
 

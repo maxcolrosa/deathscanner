@@ -10,10 +10,10 @@ import type { Answers, Outcome, ScanResult } from "@/lib/longevity";
 
 // Shown on the standalone /guide page where there is no scan result.
 const GENERIC_OUTCOMES: Outcome[] = [
-  { id: "fat", label: "Lose stubborn body fat" },
-  { id: "cardio", label: "Rebuild your cardiovascular fitness" },
-  { id: "energy", label: "Stabilize your energy and sleep" },
-  { id: "longevity", label: "Move your projected date in the right direction" },
+  { id: "fat", label: "Lose the stubborn body fat" },
+  { id: "cardio", label: "Rebuild your heart and lung fitness" },
+  { id: "energy", label: "Steady out your energy and sleep" },
+  { id: "longevity", label: "Push your date in the right direction" },
 ];
 
 // Objection-handling FAQ shown at the bottom of the pitch. Keeps the parody
@@ -22,19 +22,19 @@ const GENERIC_OUTCOMES: Outcome[] = [
 const PITCH_FAQS = [
   {
     q: "Is this a subscription?",
-    a: "No. It is a one-time payment. You get instant access and the whole kit is yours to keep.",
+    a: "No. You pay once. You get instant access and the whole kit is yours to keep, forever.",
   },
   {
     q: "How fast do I get it?",
-    a: "Immediately. The moment you check out, your protocol and the full download kit are ready.",
+    a: "Right away. The second you check out, your plan and the full download kit are ready.",
   },
   {
     q: "Do I need a gym or equipment?",
-    a: "No. The plan runs at home with minimal kit, and every movement has an easier and a harder version.",
+    a: "No. The plan works at home with almost nothing, and every move has an easier and a harder version.",
   },
   {
     q: "How is this different from a free plan online?",
-    a: "It is built from your actual scan answers and ordered by the risks costing you the most, not a generic template.",
+    a: "It is built from your own scan answers and ordered by what is costing you the most years, not some generic template.",
   },
 ];
 
@@ -111,8 +111,8 @@ function OfferModule({
             </div>
           </div>
           <span className="font-mono text-xs text-monitor-muted">
-            That is {savings}% off, about the price of one takeaway, for a
-            90-day program built around your scan.
+            That is {savings}% off, less than one takeout dinner, for a 90-day
+            program built around your scan.
           </span>
         </div>
 
@@ -123,13 +123,13 @@ function OfferModule({
               <span className="font-mono text-monitor-alert">
                 {formatYears(recoverableYears)} years
               </span>{" "}
-              are still on the table. The date you saw assumes you do nothing.
-              Doing nothing is the expensive choice.
+              are still up for grabs. That date you saw assumes you do nothing.
+              Doing nothing is what costs you.
             </>
           ) : (
             <>
               Your risks are already low. This locks in the years you have and
-              pushes you toward the top of your range.
+              pushes you to the top of your range.
             </>
           )}
         </p>
@@ -164,10 +164,10 @@ export function GuidePitch({
   const headline = outcomes[0]?.label ?? "Add years back to your life";
 
   const subline = !personalized
-    ? `${PRODUCT.tagline} A day-by-day plan you will actually follow.`
+    ? `${PRODUCT.tagline} A day-by-day plan you will actually stick to.`
     : hasYears
-      ? `As much as ${formatYears(recoverableYears)} of those years are still reachable, and they come from the exact habits this protocol is built to change.`
-      : "This is the plan to push your date later and hold it there.";
+      ? `As much as ${formatYears(recoverableYears)} of those years are still yours to take back, and they come from the exact habits this plan is built to change.`
+      : "This is the plan that pushes your date later and keeps it there.";
 
   return (
     <section className="border-t border-monitor-line px-6 py-20">
@@ -185,9 +185,9 @@ export function GuidePitch({
             {personalized && topRisk ? (
               <>
                 {" "}
-                It leads with {topRisk.category.toLowerCase()}, the single
-                biggest drag on your projection, then works down your list in
-                order of impact.
+                It starts with {topRisk.category.toLowerCase()}, the single
+                biggest thing dragging your number down, then works down your
+                list in order of impact.
               </>
             ) : null}
           </p>
@@ -258,10 +258,10 @@ export function GuidePitch({
         <div className="flex flex-col items-center gap-5 text-center">
           <p className="max-w-[44ch] text-lg leading-relaxed text-monitor-fg">
             {hasYears
-              ? "You already did the hard part by looking. Now take the next step and change the answer."
+              ? "You already did the hard part by looking. Now do something about it and change the number."
               : "You already did the hard part by looking. Now build the plan that keeps it that way."}
           </p>
-          <CheckoutButton label="Start reclaiming your years" answers={answers} />
+          <CheckoutButton label="Start winning back your years" answers={answers} />
         </div>
       </div>
     </section>

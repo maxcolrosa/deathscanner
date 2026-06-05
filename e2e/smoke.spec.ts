@@ -38,7 +38,7 @@ test("full scan flow reaches the report and pitch", async ({ page }) => {
 
   // Report appears (waits out the analyzing animation).
   await expect(
-    page.getByRole("heading", { name: /your estimated lifespan/i })
+    page.getByRole("heading", { name: /how long you have left/i })
   ).toBeVisible({ timeout: 15000 });
 
   await expect(page.getByText(/estimated date of death/i)).toBeVisible();
@@ -56,7 +56,7 @@ test("buying builds and shows the generated guide", async ({ page }) => {
   await completeScan(page);
 
   await expect(
-    page.getByRole("heading", { name: /your estimated lifespan/i })
+    page.getByRole("heading", { name: /how long you have left/i })
   ).toBeVisible({ timeout: 15000 });
 
   // Start checkout via the report's direct CTA (no scroll-jump).

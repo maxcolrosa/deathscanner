@@ -39,7 +39,7 @@ export function ReportCard({
           AI analysis complete
         </span>
         <h2 className="text-3xl font-semibold tracking-tight text-monitor-fg">
-          Your estimated lifespan
+          How long you have left
         </h2>
       </div>
 
@@ -116,24 +116,24 @@ export function ReportCard({
           <p className="text-base leading-relaxed text-monitor-fg">
             {hasYears ? (
               <>
-                That date is not fixed. Fixing your top risks could buy back as
-                much as{" "}
+                That date is not locked in. Fix your top risks and you could win
+                back as much as{" "}
                 <span className="font-mono text-monitor-accent">
                   {years} years
                 </span>
-                . Your personalized 90-day protocol goes after them, in order,
-                for {symbol}{price} today.
+                . Your personalized 90-day plan goes after them, one by one, for{" "}
+                {symbol}{price} today.
               </>
             ) : (
               <>
-                Your risks are already low. Your personalized 90-day protocol
-                pushes you toward the top of your range and holds it there, for
+                Your risks are already low. Your personalized 90-day plan pushes
+                you to the top of your range and keeps you there, for{" "}
                 {symbol}{price} today.
               </>
             )}
           </p>
           <CheckoutButton
-            label={hasYears ? `Build my plan and reclaim ${years} years` : "Build my plan"}
+            label={hasYears ? `Build my plan and win back ${years} years` : "Build my plan"}
             answers={answers}
           />
         </div>

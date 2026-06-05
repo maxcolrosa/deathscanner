@@ -120,8 +120,8 @@ export const QUESTIONS: QuizQuestion[] = [
   {
     id: "age",
     kind: "age",
-    prompt: "What is your current age?",
-    helper: "Used to calibrate your baseline mortality curve.",
+    prompt: "How old are you?",
+    helper: "Sets the starting point for your survival curve.",
     category: "Age",
     recoverable: false,
     min: MIN_AGE,
@@ -131,40 +131,40 @@ export const QUESTIONS: QuizQuestion[] = [
     id: "sex",
     kind: "choice",
     prompt: "What is your biological sex?",
-    helper: "Baseline life expectancy differs measurably by sex.",
+    helper: "Baseline life expectancy is measurably different by sex.",
     category: "Biological sex",
     recoverable: false,
     options: [
-      { value: "female", label: "Female", yearsDelta: 2.4, detail: "Females carry a higher baseline life expectancy." },
-      { value: "male", label: "Male", yearsDelta: -2.4, detail: "Males carry a lower baseline life expectancy." },
+      { value: "female", label: "Female", yearsDelta: 2.4, detail: "Women start with a higher baseline life expectancy." },
+      { value: "male", label: "Male", yearsDelta: -2.4, detail: "Men start with a lower baseline life expectancy." },
     ],
   },
   {
     id: "bodycomp",
     kind: "choice",
-    prompt: "How would you describe your body composition?",
-    helper: "Pick the description that fits you best, no measuring needed.",
+    prompt: "What does your body look like right now?",
+    helper: "Just pick what fits. No scale, no measuring tape.",
     category: "Body composition",
     recoverable: true,
     options: [
-      { value: "lean", label: "Lean and physically fit", yearsDelta: 1.6, detail: "Healthy body fat and muscle mass lower metabolic and cardiac risk." },
-      { value: "healthy", label: "Around a healthy weight", yearsDelta: 0.8, detail: "A normal weight range is protective." },
-      { value: "over", label: "Carrying some excess weight", yearsDelta: -1.9, detail: "Excess adiposity raises cardiovascular and metabolic load." },
-      { value: "obese", label: "Significantly overweight", yearsDelta: -4.6, detail: "Obesity is linked to diabetes, hypertension, and shorter lifespan." },
+      { value: "lean", label: "Lean and in shape", yearsDelta: 1.6, detail: "Low body fat and real muscle cut your heart and metabolic risk." },
+      { value: "healthy", label: "Pretty average", yearsDelta: 0.8, detail: "A normal weight range works in your favor." },
+      { value: "over", label: "Carrying some extra weight", yearsDelta: -1.9, detail: "Extra body fat puts more load on your heart and metabolism." },
+      { value: "obese", label: "A lot of extra weight", yearsDelta: -4.6, detail: "Heavy excess weight is tied to diabetes, high blood pressure, and a shorter life." },
     ],
   },
   {
     id: "activity",
     kind: "choice",
-    prompt: "How often do you exercise?",
-    helper: "Cardiorespiratory fitness is among the strongest survival predictors.",
+    prompt: "How often do you actually work out?",
+    helper: "Your fitness level is one of the strongest predictors of how long you live.",
     category: "Physical activity",
     recoverable: true,
     options: [
-      { value: "none", label: "Rarely or never", yearsDelta: -3.9, detail: "A sedentary lifestyle rivals smoking in mortality impact." },
-      { value: "light", label: "1 to 2 days a week", yearsDelta: -1.2, detail: "Some activity helps but falls short of protective thresholds." },
-      { value: "moderate", label: "3 to 4 days a week", yearsDelta: 1.8, detail: "Meets the activity guidelines associated with longer life." },
-      { value: "high", label: "5 or more days a week", yearsDelta: 3.2, detail: "High cardiorespiratory fitness strongly predicts longevity." },
+      { value: "none", label: "Pretty much never", yearsDelta: -3.9, detail: "Sitting all day hits your lifespan about as hard as smoking does." },
+      { value: "light", label: "Once or twice a week", yearsDelta: -1.2, detail: "A little movement helps, but it is not enough to move the needle." },
+      { value: "moderate", label: "3 to 4 days a week", yearsDelta: 1.8, detail: "This hits the activity level tied to a longer life." },
+      { value: "high", label: "5 or more days a week", yearsDelta: 3.2, detail: "High fitness is one of the strongest signs of a long life." },
     ],
   },
   {
@@ -172,103 +172,103 @@ export const QUESTIONS: QuizQuestion[] = [
     // build the plan around every real barrier (unscored personalization).
     id: "activity_barrier",
     kind: "choice",
-    prompt: "What gets in the way of training?",
-    helper: "Select all that apply. Your plan is built around these.",
+    prompt: "What stops you from working out?",
+    helper: "Check all that apply. We build your plan around these.",
     category: "Training barrier",
     recoverable: false,
     scored: false,
     multi: true,
     showIf: (a) => a.activity === "none" || a.activity === "light",
     options: [
-      { value: "time", label: "I never have the time", yearsDelta: 0, detail: "Time-efficient sessions." },
-      { value: "motivation", label: "I struggle to stay motivated", yearsDelta: 0, detail: "Accountability and momentum." },
-      { value: "injury", label: "Past injury or pain", yearsDelta: 0, detail: "Low-impact progressions." },
-      { value: "howto", label: "I never learned how", yearsDelta: 0, detail: "Guided, step-by-step start." },
+      { value: "time", label: "I never have the time", yearsDelta: 0, detail: "Short, time-efficient workouts." },
+      { value: "motivation", label: "I cannot stay motivated", yearsDelta: 0, detail: "Built-in accountability and momentum." },
+      { value: "injury", label: "An old injury or pain", yearsDelta: 0, detail: "Low-impact, joint-friendly progressions." },
+      { value: "howto", label: "I never learned how", yearsDelta: 0, detail: "A guided, step-by-step start." },
     ],
   },
   {
     id: "diet",
     kind: "choice",
-    prompt: "How would you rate your diet?",
-    helper: "Based on processed food, vegetables, and added sugar.",
+    prompt: "How do you eat on a normal day?",
+    helper: "Think drive-thru and soda versus real, home-cooked food.",
     category: "Diet quality",
     recoverable: true,
     options: [
-      { value: "poor", label: "Mostly processed and fast food", yearsDelta: -3.4, detail: "Processed-heavy diets drive inflammation and metabolic disease." },
-      { value: "average", label: "A mix of fresh and processed", yearsDelta: -0.6, detail: "An average diet still leaves measurable risk on the table." },
-      { value: "good", label: "Mostly whole foods", yearsDelta: 1.6, detail: "Whole-food diets reduce cardiovascular and metabolic risk." },
-      { value: "excellent", label: "Whole foods, low sugar, high vegetable", yearsDelta: 2.7, detail: "Mediterranean-style eating is consistently linked to longevity." },
+      { value: "poor", label: "Mostly fast food and takeout", yearsDelta: -3.4, detail: "A diet heavy on processed food fuels inflammation and metabolic disease." },
+      { value: "average", label: "Half real food, half junk", yearsDelta: -0.6, detail: "An average diet still leaves real risk on the table." },
+      { value: "good", label: "Mostly real, whole food", yearsDelta: 1.6, detail: "Eating mostly whole food lowers your heart and metabolic risk." },
+      { value: "excellent", label: "Clean, low sugar, lots of veggies", yearsDelta: 2.7, detail: "Eating this way is tied again and again to a longer life." },
     ],
   },
   {
     id: "alcohol",
     kind: "choice",
-    prompt: "How much alcohol do you drink?",
-    helper: "Measured in standard drinks per week.",
+    prompt: "How much do you drink?",
+    helper: "Beer, wine, or liquor. Count a normal week.",
     category: "Alcohol intake",
     recoverable: true,
     options: [
-      { value: "none", label: "I do not drink", yearsDelta: 0.4, detail: "Avoiding alcohol avoids related liver and cardiovascular risk." },
-      { value: "light", label: "A few drinks a week", yearsDelta: -0.4, detail: "Light drinking carries a small but real risk." },
-      { value: "moderate", label: "Most days", yearsDelta: -3.2, detail: "Regular drinking elevates liver, heart, and cancer risk." },
-      { value: "heavy", label: "Heavily, most days", yearsDelta: -6.1, detail: "Heavy drinking sharply raises mortality across multiple systems." },
+      { value: "none", label: "I do not drink", yearsDelta: 0.4, detail: "Skipping alcohol skips the liver and heart risk that comes with it." },
+      { value: "light", label: "A few drinks a week", yearsDelta: -0.4, detail: "A few drinks a week carries a small but real cost." },
+      { value: "moderate", label: "Most days", yearsDelta: -3.2, detail: "Drinking most days raises your liver, heart, and cancer risk." },
+      { value: "heavy", label: "A lot, most days", yearsDelta: -6.1, detail: "Heavy drinking sharply raises your risk of dying across the board." },
     ],
   },
   {
     id: "smoking",
     kind: "choice",
-    prompt: "Do you use tobacco or nicotine?",
-    helper: "The single most studied modifiable mortality factor.",
+    prompt: "Do you smoke or vape?",
+    helper: "The most studied habit that changes how long you live.",
     category: "Tobacco use",
     recoverable: true,
     options: [
-      { value: "never", label: "Never used", yearsDelta: 0.4, detail: "Non-users retain full baseline pulmonary and vascular function." },
-      { value: "former", label: "Quit over a year ago", yearsDelta: -1.2, detail: "Risk falls sharply after quitting but does not fully reset." },
-      { value: "light", label: "Occasional or light use", yearsDelta: -3.5, detail: "Even light use elevates cardiovascular and cancer risk." },
-      { value: "heavy", label: "Daily, half a pack or more", yearsDelta: -9.2, detail: "Heavy smoking is the largest single modifiable loss of years." },
+      { value: "never", label: "Never have", yearsDelta: 0.4, detail: "Never smoking keeps your lungs and blood vessels at full strength." },
+      { value: "former", label: "Quit over a year ago", yearsDelta: -1.2, detail: "Risk drops fast after you quit, but it does not fully reset." },
+      { value: "light", label: "Once in a while", yearsDelta: -3.5, detail: "Even once in a while raises your heart and cancer risk." },
+      { value: "heavy", label: "Every day, half a pack or more", yearsDelta: -9.2, detail: "Heavy smoking is the single biggest chunk of years you can win back." },
     ],
   },
   {
     // Branching follow-up: only relevant if they use tobacco at all.
     id: "smoking_years",
     kind: "choice",
-    prompt: "How long have you used tobacco?",
-    helper: "Cumulative exposure compounds the risk.",
+    prompt: "How long have you smoked?",
+    helper: "The longer you have done it, the more it adds up.",
     category: "Tobacco exposure",
     recoverable: true,
     showIf: (a) => typeof a.smoking === "string" && a.smoking !== "never",
     options: [
-      { value: "under5", label: "Less than 5 years", yearsDelta: -0.4, detail: "Shorter exposure means more of the damage is still reversible." },
-      { value: "5to15", label: "5 to 15 years", yearsDelta: -1.3, detail: "Sustained exposure has begun to accumulate measurable risk." },
-      { value: "over15", label: "More than 15 years", yearsDelta: -2.4, detail: "Long-term exposure compounds cardiovascular and pulmonary damage." },
+      { value: "under5", label: "Less than 5 years", yearsDelta: -0.4, detail: "Less time smoking means more of the damage can still be undone." },
+      { value: "5to15", label: "5 to 15 years", yearsDelta: -1.3, detail: "Years of smoking have started to stack up real risk." },
+      { value: "over15", label: "More than 15 years", yearsDelta: -2.4, detail: "Decades of smoking pile up damage to your heart and lungs." },
     ],
   },
   {
     id: "sleep",
     kind: "choice",
-    prompt: "How many hours do you sleep on a typical night?",
-    helper: "Both too little and too much sleep raise risk.",
+    prompt: "How much sleep do you get on a normal night?",
+    helper: "Too little and too much both work against you.",
     category: "Sleep",
     recoverable: true,
     options: [
-      { value: "low", label: "Less than 5 hours", yearsDelta: -3.1, detail: "Chronic short sleep raises cardiovascular and metabolic risk." },
-      { value: "belowavg", label: "5 to 6 hours", yearsDelta: -1.3, detail: "Slightly low sleep accumulates measurable risk over time." },
-      { value: "optimal", label: "7 to 8 hours", yearsDelta: 1.3, detail: "Optimal sleep supports cardiovascular and immune health." },
-      { value: "high", label: "More than 9 hours", yearsDelta: -0.9, detail: "Consistently long sleep can signal underlying issues." },
+      { value: "low", label: "Less than 5 hours", yearsDelta: -3.1, detail: "Running on too little sleep raises your heart and metabolic risk." },
+      { value: "belowavg", label: "5 to 6 hours", yearsDelta: -1.3, detail: "A little short on sleep adds up over the years." },
+      { value: "optimal", label: "7 to 8 hours", yearsDelta: 1.3, detail: "The sweet spot for your heart and immune system." },
+      { value: "high", label: "More than 9 hours", yearsDelta: -0.9, detail: "Always needing 9-plus hours can be a sign something else is off." },
     ],
   },
   {
     id: "stress",
     kind: "choice",
-    prompt: "How would you rate your day-to-day stress?",
-    helper: "Sustained stress affects cardiovascular and immune function.",
+    prompt: "How stressed are you day to day?",
+    helper: "Long-term stress wears on your heart and immune system.",
     category: "Chronic stress",
     recoverable: true,
     options: [
-      { value: "low", label: "Low and well managed", yearsDelta: 1.0, detail: "Low chronic stress supports cardiovascular health." },
-      { value: "moderate", label: "Manageable most days", yearsDelta: -0.5, detail: "Moderate stress carries a small ongoing cost." },
-      { value: "high", label: "Frequently high", yearsDelta: -1.8, detail: "Chronic high stress elevates cortisol and cardiovascular load." },
-      { value: "severe", label: "Constant, with poor recovery", yearsDelta: -3.1, detail: "Sustained severe stress is linked to measurable mortality risk." },
+      { value: "low", label: "Low, I have got a handle on it", yearsDelta: 1.0, detail: "Low ongoing stress is good for your heart." },
+      { value: "moderate", label: "Manageable most days", yearsDelta: -0.5, detail: "A moderate stress load carries a small steady cost." },
+      { value: "high", label: "High a lot of the time", yearsDelta: -1.8, detail: "High stress keeps cortisol up and strains your heart." },
+      { value: "severe", label: "Constant, and I never recover", yearsDelta: -3.1, detail: "Nonstop stress with no recovery is tied to a real rise in mortality." },
     ],
   },
   {
@@ -276,16 +276,16 @@ export const QUESTIONS: QuizQuestion[] = [
     // through the same dampening curve. "None diagnosed" is exclusive.
     id: "conditions",
     kind: "choice",
-    prompt: "Have you been diagnosed with any of these?",
-    helper: "Select all that apply. These are common, and most are modifiable.",
+    prompt: "Has a doctor ever told you that you have any of these?",
+    helper: "Check all that apply. These are common, and most can be turned around.",
     category: "Diagnosed conditions",
     recoverable: true,
     multi: true,
     options: [
-      { value: "highbp", label: "High blood pressure", yearsDelta: -2.2, detail: "Raised blood pressure quietly strains the heart and arteries." },
-      { value: "cholesterol", label: "High cholesterol", yearsDelta: -1.8, detail: "Elevated cholesterol accelerates arterial plaque build-up." },
-      { value: "prediabetes", label: "Type 2 or pre-diabetes", yearsDelta: -3.0, detail: "Blood-sugar dysregulation drives long-term vascular damage." },
-      { value: "none", label: "None diagnosed", yearsDelta: 0.8, detail: "No diagnosed metabolic or cardiovascular conditions.", exclusive: true },
+      { value: "highbp", label: "High blood pressure", yearsDelta: -2.2, detail: "High blood pressure quietly wears on your heart and arteries." },
+      { value: "cholesterol", label: "High cholesterol", yearsDelta: -1.8, detail: "High cholesterol speeds up plaque building in your arteries." },
+      { value: "prediabetes", label: "Type 2 or pre-diabetes", yearsDelta: -3.0, detail: "Blood sugar that runs high slowly damages your blood vessels." },
+      { value: "none", label: "None of these", yearsDelta: 0.8, detail: "No diagnosed heart or metabolic conditions.", exclusive: true },
     ],
   },
   {
@@ -294,27 +294,27 @@ export const QUESTIONS: QuizQuestion[] = [
     id: "social",
     kind: "choice",
     prompt: "How connected do you feel to other people?",
-    helper: "Social connection is one of the most studied predictors of a long life.",
+    helper: "How tight your relationships are is one of the best-studied predictors of a long life.",
     category: "Social connection",
     recoverable: true,
     options: [
-      { value: "strong", label: "Strong, I have people I lean on", yearsDelta: 1.4, detail: "Strong social ties are consistently linked to longer life." },
-      { value: "few", label: "A few close relationships", yearsDelta: 0.4, detail: "Some reliable connection is protective." },
-      { value: "some", label: "Somewhat isolated", yearsDelta: -1.6, detail: "Limited connection raises cardiovascular and mortality risk." },
-      { value: "lonely", label: "Often lonely or disconnected", yearsDelta: -2.8, detail: "Chronic loneliness rivals smoking in some mortality studies." },
+      { value: "strong", label: "Strong, I have people I lean on", yearsDelta: 1.4, detail: "Close relationships are tied again and again to a longer life." },
+      { value: "few", label: "A few close people", yearsDelta: 0.4, detail: "Having a few people you can count on protects you." },
+      { value: "some", label: "Kind of on my own", yearsDelta: -1.6, detail: "Not having much connection raises your heart and mortality risk." },
+      { value: "lonely", label: "Lonely a lot of the time", yearsDelta: -2.8, detail: "Chronic loneliness rivals smoking in some studies." },
     ],
   },
   {
     id: "genetics",
     kind: "choice",
-    prompt: "How is longevity in your immediate family?",
-    helper: "Genetics set a baseline you can work within, not change.",
+    prompt: "How long do people in your family tend to live?",
+    helper: "Your genes set a starting point. You cannot change them, but you can work with them.",
     category: "Family history",
     recoverable: false,
     options: [
-      { value: "poor", label: "Early deaths from heart disease or cancer", yearsDelta: -3.1, detail: "A family history of early disease raises baseline risk." },
-      { value: "mixed", label: "About average", yearsDelta: -0.4, detail: "A typical family history is roughly neutral." },
-      { value: "strong", label: "Many relatives lived into their 90s", yearsDelta: 3.0, detail: "Exceptional family longevity is strongly heritable." },
+      { value: "poor", label: "Early deaths from heart disease or cancer", yearsDelta: -3.1, detail: "Early disease in the family raises your starting risk." },
+      { value: "mixed", label: "About average", yearsDelta: -0.4, detail: "A typical family history is roughly a wash." },
+      { value: "strong", label: "Lots of them lived into their 90s", yearsDelta: 3.0, detail: "Long life that runs in the family is strongly inherited." },
     ],
   },
   {
@@ -322,15 +322,15 @@ export const QUESTIONS: QuizQuestion[] = [
     // estimate. Multi-select so the plan can serve more than one goal.
     id: "goal",
     kind: "choice",
-    prompt: "What would you most like to improve?",
-    helper: "Select all that apply. We tailor your protocol to these.",
+    prompt: "What do you most want to fix?",
+    helper: "Check all that apply. We build your plan around these.",
     category: "Goal",
     recoverable: false,
     scored: false,
     multi: true,
     options: [
       { value: "fat", label: "Lose body fat", yearsDelta: 0, detail: "Fat loss focus." },
-      { value: "strength", label: "Build strength and muscle", yearsDelta: 0, detail: "Strength focus." },
+      { value: "strength", label: "Get stronger and build muscle", yearsDelta: 0, detail: "Strength focus." },
       { value: "energy", label: "More energy and better sleep", yearsDelta: 0, detail: "Energy focus." },
       { value: "heart", label: "Protect my heart and live longer", yearsDelta: 0, detail: "Longevity focus." },
     ],
@@ -430,45 +430,45 @@ function deriveOutcomes(answers: Answers): { result: Outcome; theme: string; wei
     out.push({ result: { id, label }, theme, weight });
 
   switch (answers.bodycomp) {
-    case "obese": add("fat", "Lose around 9 kg of body fat", "fat", 9); break;
-    case "over": add("fat", "Lose around 5 kg of body fat", "fat", 6); break;
+    case "obese": add("fat", "Drop around 20 lbs of body fat", "fat", 9); break;
+    case "over": add("fat", "Drop around 10 lbs of body fat", "fat", 6); break;
     case "healthy": add("muscle", "Build lean, visible muscle", "strength", 2); break;
     case "lean": add("muscle", "Add strength to an already lean frame", "strength", 1); break;
   }
   switch (answers.activity) {
-    case "none": add("cardio", "Rebuild your cardiovascular fitness from the ground up", "heart", 8); break;
-    case "light": add("cardio", "Sharpen your cardiovascular fitness", "heart", 5); break;
-    default: add("cardio", "Push your fitness toward the top percentile", "heart", 2);
+    case "none": add("cardio", "Rebuild your heart and lung fitness from scratch", "heart", 8); break;
+    case "light": add("cardio", "Sharpen your heart and lung fitness", "heart", 5); break;
+    default: add("cardio", "Push your fitness into the top tier", "heart", 2);
   }
   switch (answers.diet) {
-    case "poor": add("energy", "Stabilize your energy and blood sugar", "energy", 6); break;
-    case "average": add("energy", "Clean up the part of your diet that actually matters", "energy", 3); break;
+    case "poor": add("energy", "Steady out your energy and blood sugar", "energy", 6); break;
+    case "average": add("energy", "Fix the part of your diet that actually matters", "energy", 3); break;
   }
   switch (answers.sleep) {
-    case "low": add("sleep", "Add 1 to 2 hours of restorative sleep", "energy", 6); break;
-    case "belowavg": add("sleep", "Deepen and extend your sleep", "energy", 4); break;
+    case "low": add("sleep", "Get 1 to 2 more hours of real sleep", "energy", 6); break;
+    case "belowavg": add("sleep", "Sleep deeper and longer", "energy", 4); break;
   }
   switch (answers.stress) {
-    case "severe": add("stress", "Bring your chronic stress back under control", "energy", 6); break;
-    case "high": add("stress", "Lower your day-to-day stress load", "energy", 4); break;
+    case "severe": add("stress", "Get your stress back under control", "energy", 6); break;
+    case "high": add("stress", "Bring your day-to-day stress down", "energy", 4); break;
   }
   switch (answers.alcohol) {
-    case "heavy": add("liver", "Cut the alcohol load on your liver and heart", "heart", 6); break;
-    case "moderate": add("liver", "Reduce alcohol's drag on your recovery", "heart", 3); break;
+    case "heavy": add("liver", "Take the alcohol load off your liver and heart", "heart", 6); break;
+    case "moderate": add("liver", "Stop alcohol from dragging down your recovery", "heart", 3); break;
   }
   switch (answers.smoking) {
-    case "heavy": add("lungs", "Start reversing smoking-related cardiovascular damage", "heart", 7); break;
+    case "heavy": add("lungs", "Start undoing the damage smoking did to your heart", "heart", 7); break;
     case "light":
-    case "former": add("lungs", "Protect and rebuild lung and vascular function", "heart", 3); break;
+    case "former": add("lungs", "Protect and rebuild your lungs and blood vessels", "heart", 3); break;
   }
   const conditions = toValues(answers.conditions);
-  if (conditions.includes("prediabetes")) add("metabolic", "Pull your blood sugar back toward a healthy range", "heart", 7);
-  if (conditions.includes("highbp")) add("bp", "Bring your blood pressure down without more medication", "heart", 6);
+  if (conditions.includes("prediabetes")) add("metabolic", "Pull your blood sugar back toward normal", "heart", 7);
+  if (conditions.includes("highbp")) add("bp", "Bring your blood pressure down without more pills", "heart", 6);
   if (answers.social === "lonely" || answers.social === "some")
-    add("connection", "Rebuild the social connection that protects your health", "energy", 5);
+    add("connection", "Rebuild the connections that protect your health", "energy", 5);
 
   // Always include a baseline longevity outcome so the list is never empty.
-  add("longevity", "Move your projected date in the right direction", "heart", 0.5);
+  add("longevity", "Push your date in the right direction", "heart", 0.5);
   return out;
 }
 
@@ -502,13 +502,13 @@ export function analysisSignals(answers: Answers): string[] {
   const signals: string[] = [];
   if (answers.smoking && answers.smoking !== "never") signals.push("tobacco exposure");
   if (answers.activity === "none" || answers.activity === "light")
-    signals.push("low cardiorespiratory output");
+    signals.push("low fitness output");
   if (answers.bodycomp === "over" || answers.bodycomp === "obese")
     signals.push("elevated body-fat markers");
   if (answers.diet === "poor" || answers.diet === "average")
-    signals.push("dietary risk signal");
+    signals.push("poor diet quality");
   if (answers.sleep === "low" || answers.sleep === "belowavg")
-    signals.push("accumulated sleep debt");
+    signals.push("built-up sleep debt");
   if (answers.stress === "high" || answers.stress === "severe")
     signals.push("chronic stress load");
   if (answers.alcohol === "moderate" || answers.alcohol === "heavy")
@@ -516,8 +516,8 @@ export function analysisSignals(answers: Answers): string[] {
   const conditions = toValues(answers.conditions);
   if (conditions.some((c) => c !== "none")) signals.push("metabolic markers");
   if (answers.social === "some" || answers.social === "lonely")
-    signals.push("social isolation signal");
-  if (answers.genetics === "poor") signals.push("adverse family history");
+    signals.push("social isolation");
+  if (answers.genetics === "poor") signals.push("family history risk");
   return signals;
 }
 
