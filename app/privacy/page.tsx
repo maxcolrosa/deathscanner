@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { LegalPage } from "@/components/legal-page";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | The Longevity Scan",
+  title: "Privacy Policy | Vivrun",
 };
 
 export default function PrivacyPage() {
@@ -12,8 +12,8 @@ export default function PrivacyPage() {
       <p>
         This site is operated by <strong>ColrosaStudios LTD</strong>, a company
         registered in England and Wales [company number to be added]. Registered
-        office: [registered office address to be added]. &ldquo;Longevity
-        Scan&rdquo; is a trading name of ColrosaStudios LTD. ColrosaStudios LTD
+        office: [registered office address to be added]. &ldquo;Vivrun&rdquo;
+        is a trading name of ColrosaStudios LTD. ColrosaStudios LTD
         is the data controller for any personal data processed in connection
         with this site and the purchase of The Second Wind Protocol.
       </p>

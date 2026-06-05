@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { LegalPage } from "@/components/legal-page";
 
 export const metadata: Metadata = {
-  title: "Cookies Policy | The Longevity Scan",
+  title: "Cookies Policy | Vivrun",
 };
 
 export default function CookiesPage() {
@@ -11,7 +11,7 @@ export default function CookiesPage() {
       <h2>About this policy</h2>
       <p>
         This site is operated by <strong>ColrosaStudios LTD</strong>, trading
-        as Longevity Scan. This policy explains how we use cookies and similar
+        as Vivrun. This policy explains how we use cookies and similar
         browser storage technologies. For broader details about data we hold,
         see our <a href="/privacy">Privacy Policy</a>.
       </p>

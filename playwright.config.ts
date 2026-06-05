@@ -17,6 +17,10 @@ export default defineConfig({
       // generation and never redirects to real Stripe Checkout.
       STRIPE_SECRET_KEY: "",
       STRIPE_WEBHOOK_SECRET: "",
+      // Keep e2e hermetic: no real email sends during the run (capture would
+      // otherwise hit Resend for the test address).
+      RESEND_API_KEY: "",
+      EMAIL_FROM: "",
     },
   },
 });

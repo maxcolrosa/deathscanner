@@ -1,4 +1,4 @@
-// Deterministic, offline longevity model for The Longevity Scan parody.
+// Deterministic, offline longevity model for the Vivrun parody.
 // Presented to users as an "AI longevity model". Under the hood it is a
 // transparent, deterministic actuarial-style estimate: no network, no
 // randomness. Same inputs + same `today` => same output.

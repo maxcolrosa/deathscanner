@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { LegalPage } from "@/components/legal-page";
 
 export const metadata: Metadata = {
-  title: "Terms and Conditions | The Longevity Scan",
+  title: "Terms and Conditions | Vivrun",
 };
 
 export default function TermsPage() {
@@ -13,7 +13,7 @@ export default function TermsPage() {
         This site and <strong>The Second Wind Protocol</strong> are operated by{" "}
         <strong>ColrosaStudios LTD</strong> (&ldquo;we&rdquo;, &ldquo;us&rdquo;,
         &ldquo;our&rdquo;), a company registered in England and Wales [company
-        number to be added]. &ldquo;Longevity Scan&rdquo; is a trading name and
+        number to be added]. &ldquo;Vivrun&rdquo; is a trading name and
         brand of ColrosaStudios LTD. Our registered office address is [registered
         office address to be added].
       </p>
@@ -21,7 +21,7 @@ export default function TermsPage() {
       <h2>The important part: this is a parody</h2>
       <p>
         <strong>
-          The Longevity Scan is a work of parody, satire, and entertainment.
+          Vivrun is a work of parody, satire, and entertainment.
         </strong>{" "}
         The &ldquo;AI detection&rdquo;, the longevity model, the estimated date
         of death, the risk analysis, the model confidence figure, and the

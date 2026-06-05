@@ -11,10 +11,10 @@ export function SiteFooter() {
     <footer className="border-t border-monitor-line px-6 py-10">
       <div className="mx-auto flex max-w-7xl flex-col gap-4">
         <span className="font-mono text-sm tracking-tight text-monitor-fg">
-          LONGEVITY SCAN
+          VIVRUN
         </span>
         <span className="font-mono text-xs text-monitor-muted">
-          Longevity Scan is a brand of ColrosaStudios LTD.
+          Vivrun is a brand of ColrosaStudios LTD.
         </span>
         <nav className="flex flex-wrap gap-x-6 gap-y-2">
           {LINKS.map((link) => (

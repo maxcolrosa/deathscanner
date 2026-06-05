@@ -19,7 +19,7 @@ import {
 } from "@/components/guide/pdf-shared";
 
 /* ─── Brand ──────────────────────────────────────────────────────────────────── */
-const BRAND = "LONGEVITY SCAN";
+const BRAND = "VIVRUN";
 
 /* ─── Pattern display order ─────────────────────────────────────────────────── */
 const PATTERN_ORDER = [

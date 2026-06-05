@@ -88,7 +88,7 @@ export async function sendReportEmail(
   const html = await renderReportEmail(data);
   return sendEmail({
     to,
-    subject: "Your longevity scan result is ready",
+    subject: "Your Vivrun result is ready",
     html,
   });
 }

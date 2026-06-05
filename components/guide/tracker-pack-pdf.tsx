@@ -23,7 +23,7 @@ import {
 } from "@/components/guide/pdf-shared";
 
 /* ─── Brand ──────────────────────────────────────────────────────────────────── */
-const BRAND = "LONGEVITY SCAN";
+const BRAND = "VIVRUN";
 
 /* ─── StyleSheet ─────────────────────────────────────────────────────────────── */
 const styles = StyleSheet.create({

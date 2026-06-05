@@ -13,7 +13,7 @@ import type { GuideDoc } from "@/lib/guide/schema";
 import { SANS, MONO, C, trackerStyles } from "@/components/guide/pdf-shared";
 
 /* ─── Brand ──────────────────────────────────────────────────────────────────── */
-const BRAND = "LONGEVITY SCAN";
+const BRAND = "VIVRUN";
 
 /* ─── StyleSheet ─────────────────────────────────────────────────────────────── */
 const styles = StyleSheet.create({
@@ -190,7 +190,7 @@ export function QuickstartPdfDocument({ guide }: { guide: GuideDoc }) {
         {/* ── Footer ────────────────────────────────────────────────────────── */}
         <View style={styles.rule} />
         <Text style={styles.footerNote}>
-          Second Wind Protocol - built from your scan - longevityscan.com
+          Second Wind Protocol - built from your scan - vivrun.com
         </Text>
       </Page>
     </Document>

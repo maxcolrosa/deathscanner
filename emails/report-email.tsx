@@ -58,7 +58,7 @@ export function ReportEmail({
   return (
     <Html lang="en">
       <Head />
-      <Preview>Your longevity scan result is ready inside.</Preview>
+      <Preview>Your Vivrun result is ready inside.</Preview>
       <Body
         style={{
           margin: 0,

@@ -80,7 +80,7 @@ export default function Home() {
               <span className="relative inline-flex h-2 w-2 rounded-full bg-monitor-accent" />
             </span>
             <span className="font-mono text-xs uppercase tracking-[0.22em] text-monitor-accent">
-              AI Longevity Scan
+              Vivrun
             </span>
           </div>
 

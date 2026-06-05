@@ -20,7 +20,7 @@ import {
 } from "@/components/guide/pdf-shared";
 
 /* ─── Brand ──────────────────────────────────────────────────────────────────── */
-const BRAND = "LONGEVITY SCAN";
+const BRAND = "VIVRUN";
 
 /* ─── Meal order ─────────────────────────────────────────────────────────────── */
 const MEAL_ORDER = ["breakfast", "lunch", "dinner", "snack"] as const;

@@ -14,7 +14,7 @@ export function LegalPage({
           href="/"
           className="font-mono text-xs uppercase tracking-[0.18em] text-monitor-accent"
         >
-          Longevity Scan
+          Vivrun
         </Link>
         <h1 className="text-4xl font-semibold tracking-tight text-monitor-fg">
           {title}
