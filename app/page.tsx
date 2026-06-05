@@ -96,11 +96,9 @@ export default function Home() {
           </h1>
 
           <p className="max-w-[48ch] text-lg leading-relaxed text-monitor-muted sm:text-xl">
-            Answer 90 seconds of honest questions and a diagnostic model weighs
-            how you live against population mortality data, then returns your
-            projected date of death. Not to scare you. To show you, factor by
-            factor, exactly how many years you are still leaving on the table,
-            and how to take them back.
+            Every wasted day has a cost you cannot feel adding up. Our AI turns
+            how you live into one number: the date, the reasons behind it, and
+            the years you can still take back. 90 seconds to see it.
           </p>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">

@@ -15,11 +15,13 @@ describe("ReportEmail render", () => {
         { category: "Physical activity", detail: "Low fitness is a strong predictor." },
       ],
       priceLabel: "$13",
-      offerUrl: "https://example.com/scan",
+      offerUrl: "https://example.com/result/tok",
+      unsubscribeUrl: "https://example.com/api/unsubscribe/utok",
     });
     expect(html).toContain("June 2061");
     expect(html).toContain("Tobacco use");
-    expect(html).toContain("https://example.com/scan");
+    expect(html).toContain("https://example.com/result/tok");
+    expect(html).toContain("https://example.com/api/unsubscribe/utok");
     expect(html.length).toBeGreaterThan(500);
   });
 
@@ -30,7 +32,8 @@ describe("ReportEmail render", () => {
       recoverableYears: 0,
       topRisks: [],
       priceLabel: "£11",
-      offerUrl: "https://example.com/scan",
+      offerUrl: "https://example.com/result/tok",
+      unsubscribeUrl: "https://example.com/api/unsubscribe/utok",
     });
     expect(html).toContain("March 2058");
     expect(html.length).toBeGreaterThan(300);

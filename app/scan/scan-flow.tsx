@@ -4,15 +4,11 @@ import { useMemo, useState } from "react";
 import { QuizStep } from "@/components/quiz-step";
 import { AnalyzingSequence } from "@/components/analyzing-sequence";
 import { EmailGate } from "@/components/email-gate";
-import { ReportCard } from "@/components/report-card";
-import { GuidePitch } from "@/components/guide-pitch";
-import { ResultStickyBar } from "@/components/result-sticky-bar";
-import { SaleProvider } from "@/components/sale-context";
+import { ResultView } from "@/components/result-view";
 import type { Currency } from "@/lib/product";
 import {
   QUESTIONS,
   getActiveQuestions,
-  computeResult,
   type Answers,
   type AnswerValue,
 } from "@/lib/longevity";
@@ -54,11 +50,6 @@ export function ScanFlow({ currency = "USD" }: { currency?: Currency }) {
   // unlocked once the visitor submits their email (captured into the list).
   const handleAnalysisComplete = () => setPhase("capture");
 
-  const result = useMemo(
-    () => (phase === "result" ? computeResult(answers) : null),
-    [phase, answers]
-  );
-
   if (phase === "quiz") {
     return (
       <QuizStep
@@ -89,16 +80,7 @@ export function ScanFlow({ currency = "USD" }: { currency?: Currency }) {
     );
   }
 
-  // The SaleProvider mounts here, so the countdown starts when the result lands.
-  // The deadline is persisted per visitor; `currency` is resolved server-side
-  // from geo and threaded in so every price reads the visitor's local currency.
-  return (
-    <SaleProvider currency={currency}>
-      <main className="pb-24">
-        <ReportCard result={result!} answers={answers} />
-        <GuidePitch result={result!} answers={answers} />
-        <ResultStickyBar recoverableYears={result!.recoverableYears} answers={answers} />
-      </main>
-    </SaleProvider>
-  );
+  // The reveal + pitch. `currency` is resolved server-side from geo and threaded
+  // in so every price reads the visitor's local currency.
+  return <ResultView answers={answers} currency={currency} />;
 }

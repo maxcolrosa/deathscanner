@@ -48,7 +48,7 @@ function ReviewCard({ t }: { t: Testimonial }) {
       />
 
       <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 items-center gap-3">
           <span
             aria-hidden
             className="grid size-10 shrink-0 place-items-center rounded-lg border border-monitor-accent/20 bg-monitor-accent/10 font-mono text-xs font-semibold tracking-tight text-monitor-accent"
@@ -64,7 +64,7 @@ function ReviewCard({ t }: { t: Testimonial }) {
             </span>
           </div>
         </div>
-        <Stars rating={t.rating} />
+        <Stars rating={t.rating} className="shrink-0" />
       </div>
 
       <blockquote className="text-[0.95rem] leading-[1.65] tracking-[-0.01em] text-monitor-fg">
@@ -143,7 +143,7 @@ export function LandingProof() {
       </Reveal>
 
       {/* Detailed reviews. The 4-star critical one is included for credibility. */}
-      <div className="mt-4 grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-4 grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {TESTIMONIALS.map((t, i) => (
           <Reveal key={t.name} delay={Math.min(i, 3) * 0.05} className="h-full">
             <ReviewCard t={t} />

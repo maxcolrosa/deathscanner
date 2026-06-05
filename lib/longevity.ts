@@ -142,8 +142,8 @@ export const QUESTIONS: QuizQuestion[] = [
   {
     id: "bodycomp",
     kind: "choice",
-    prompt: "What does your body look like right now?",
-    helper: "Just pick what fits. No scale, no measuring tape.",
+    prompt: "Which of these best matches your body right now?",
+    helper: "Go by how your clothes fit and what you see in the mirror, not a number on a scale.",
     category: "Body composition",
     recoverable: true,
     options: [
@@ -156,8 +156,8 @@ export const QUESTIONS: QuizQuestion[] = [
   {
     id: "activity",
     kind: "choice",
-    prompt: "How often do you actually work out?",
-    helper: "Your fitness level is one of the strongest predictors of how long you live.",
+    prompt: "In a normal week, how often do you train hard enough to sweat or get out of breath?",
+    helper: "Count workouts that raise your heart rate: lifting, running, hard cardio, or sports. Walking the dog does not count.",
     category: "Physical activity",
     recoverable: true,
     options: [
@@ -172,7 +172,7 @@ export const QUESTIONS: QuizQuestion[] = [
     // build the plan around every real barrier (unscored personalization).
     id: "activity_barrier",
     kind: "choice",
-    prompt: "What stops you from working out?",
+    prompt: "What actually gets in the way of working out?",
     helper: "Check all that apply. We build your plan around these.",
     category: "Training barrier",
     recoverable: false,
@@ -189,8 +189,8 @@ export const QUESTIONS: QuizQuestion[] = [
   {
     id: "diet",
     kind: "choice",
-    prompt: "How do you eat on a normal day?",
-    helper: "Think drive-thru and soda versus real, home-cooked food.",
+    prompt: "On a normal day, what does most of your food look like?",
+    helper: "Picture a typical weekday, not a holiday: drive-thru and soda, or real food you cooked yourself.",
     category: "Diet quality",
     recoverable: true,
     options: [
@@ -203,8 +203,8 @@ export const QUESTIONS: QuizQuestion[] = [
   {
     id: "alcohol",
     kind: "choice",
-    prompt: "How much do you drink?",
-    helper: "Beer, wine, or liquor. Count a normal week.",
+    prompt: "In a normal week, how much alcohol do you drink?",
+    helper: "One drink means a beer, a glass of wine, or a single shot. Add up a typical week.",
     category: "Alcohol intake",
     recoverable: true,
     options: [
@@ -217,8 +217,8 @@ export const QUESTIONS: QuizQuestion[] = [
   {
     id: "smoking",
     kind: "choice",
-    prompt: "Do you smoke or vape?",
-    helper: "The most studied habit that changes how long you live.",
+    prompt: "Do you currently smoke or vape?",
+    helper: "Cigarettes, vapes, or other tobacco. This is the single most studied habit for how long you live.",
     category: "Tobacco use",
     recoverable: true,
     options: [
@@ -232,8 +232,8 @@ export const QUESTIONS: QuizQuestion[] = [
     // Branching follow-up: only relevant if they use tobacco at all.
     id: "smoking_years",
     kind: "choice",
-    prompt: "How long have you smoked?",
-    helper: "The longer you have done it, the more it adds up.",
+    prompt: "In total, how many years have you smoked or vaped?",
+    helper: "Add up all the years you have used it, even if you had breaks. The longer it ran, the more it stacks up.",
     category: "Tobacco exposure",
     recoverable: true,
     showIf: (a) => typeof a.smoking === "string" && a.smoking !== "never",
@@ -246,8 +246,8 @@ export const QUESTIONS: QuizQuestion[] = [
   {
     id: "sleep",
     kind: "choice",
-    prompt: "How much sleep do you get on a normal night?",
-    helper: "Too little and too much both work against you.",
+    prompt: "On a normal night, how many hours do you actually sleep?",
+    helper: "Time asleep, not time in bed. Both too little and too much work against you.",
     category: "Sleep",
     recoverable: true,
     options: [
@@ -260,8 +260,8 @@ export const QUESTIONS: QuizQuestion[] = [
   {
     id: "stress",
     kind: "choice",
-    prompt: "How stressed are you day to day?",
-    helper: "Long-term stress wears on your heart and immune system.",
+    prompt: "Thinking about the last month, how stressed have you felt most days?",
+    helper: "Go by a normal month, not your single worst week. Long-term stress wears on your heart and immune system.",
     category: "Chronic stress",
     recoverable: true,
     options: [
@@ -276,8 +276,8 @@ export const QUESTIONS: QuizQuestion[] = [
     // through the same dampening curve. "None diagnosed" is exclusive.
     id: "conditions",
     kind: "choice",
-    prompt: "Has a doctor ever told you that you have any of these?",
-    helper: "Check all that apply. These are common, and most can be turned around.",
+    prompt: "Has a doctor ever diagnosed you with any of these?",
+    helper: "Check all that apply, even if it is managed with medication. These are common, and most can be turned around.",
     category: "Diagnosed conditions",
     recoverable: true,
     multi: true,
@@ -293,8 +293,8 @@ export const QUESTIONS: QuizQuestion[] = [
     // predictors, and self-reportable without any measurement.
     id: "social",
     kind: "choice",
-    prompt: "How connected do you feel to other people?",
-    helper: "How tight your relationships are is one of the best-studied predictors of a long life.",
+    prompt: "How connected do you feel to the people around you?",
+    helper: "Think about whether you have people you can lean on. It is one of the best-studied predictors of a long life.",
     category: "Social connection",
     recoverable: true,
     options: [
@@ -307,8 +307,8 @@ export const QUESTIONS: QuizQuestion[] = [
   {
     id: "genetics",
     kind: "choice",
-    prompt: "How long do people in your family tend to live?",
-    helper: "Your genes set a starting point. You cannot change them, but you can work with them.",
+    prompt: "How long do blood relatives in your family usually live?",
+    helper: "Think parents and grandparents. Your genes set a starting point you cannot change, but you can work with.",
     category: "Family history",
     recoverable: false,
     options: [
@@ -322,7 +322,7 @@ export const QUESTIONS: QuizQuestion[] = [
     // estimate. Multi-select so the plan can serve more than one goal.
     id: "goal",
     kind: "choice",
-    prompt: "What do you most want to fix?",
+    prompt: "What do you most want to fix first?",
     helper: "Check all that apply. We build your plan around these.",
     category: "Goal",
     recoverable: false,

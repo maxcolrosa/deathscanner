@@ -57,10 +57,12 @@ function ReviewCard({ t, index }: { t: Testimonial; index: number }) {
         </span>
         <div className="flex min-w-0 flex-col gap-1">
           <div className="flex items-center gap-2">
-            <figcaption className="truncate text-sm font-semibold tracking-tight text-monitor-fg">
+            <figcaption className="min-w-0 truncate text-sm font-semibold tracking-tight text-monitor-fg">
               {t.name}
             </figcaption>
-            <Stars rating={t.rating} />
+            <span className="shrink-0">
+              <Stars rating={t.rating} />
+            </span>
           </div>
           <span className="truncate font-mono text-[10px] tracking-tight text-monitor-muted">
             {t.meta}
@@ -128,7 +130,7 @@ export function Reviews({ heading = "What people say" }: { heading?: string }) {
       </div>
 
       {/* Grid */}
-      <div className="grid items-stretch gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 items-stretch gap-3 sm:grid-cols-2">
         {TESTIMONIALS.map((t, i) => (
           <ReviewCard key={t.name} t={t} index={i} />
         ))}

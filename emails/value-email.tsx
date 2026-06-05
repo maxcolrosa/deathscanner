@@ -6,6 +6,7 @@ import {
   Heading,
   Hr,
   Html,
+  Link,
   Preview,
   Section,
   Text,
@@ -28,11 +29,12 @@ export interface ValueEmailData {
   recoverableYears: number;
   topRiskCategory: string | null;
   offerUrl: string;
+  unsubscribeUrl: string;
 }
 
 // Drip email 2 (+1 day): reinforce value and answer the objections that stall
 // the purchase. No discount yet, no fake urgency, no result-speed claims.
-export function ValueEmail({ recoverableYears, topRiskCategory, offerUrl }: ValueEmailData) {
+export function ValueEmail({ recoverableYears, topRiskCategory, offerUrl, unsubscribeUrl }: ValueEmailData) {
   const years = Math.max(0, Math.round(recoverableYears));
   return (
     <Html lang="en">
@@ -69,8 +71,11 @@ export function ValueEmail({ recoverableYears, topRiskCategory, offerUrl }: Valu
           </Button>
 
           <Text style={{ margin: "24px 0 0", fontFamily: mono, fontSize: "11px", lineHeight: 1.6, color: "#6b7a87" }}>
-            Sent by ColrosaStudios LTD. You are getting this because you opted in
-            for tips and offers. Reply to stop, or use the unsubscribe link.
+            Sent by ColrosaStudios LTD because you opted in for tips and offers.{" "}
+            <Link href={unsubscribeUrl} style={{ color: C.muted, textDecoration: "underline" }}>
+              Unsubscribe
+            </Link>{" "}
+            any time and we will stop.
           </Text>
         </Container>
       </Body>

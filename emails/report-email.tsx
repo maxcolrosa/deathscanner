@@ -42,6 +42,7 @@ export interface ReportEmailData {
   topRisks: ReportEmailRisk[];
   priceLabel: string;
   offerUrl: string;
+  unsubscribeUrl: string;
 }
 
 export function ReportEmail({
@@ -51,6 +52,7 @@ export function ReportEmail({
   topRisks,
   priceLabel,
   offerUrl,
+  unsubscribeUrl,
 }: ReportEmailData) {
   const years = Math.max(0, Math.round(recoverableYears));
   const risks = topRisks.slice(0, 3);
@@ -248,18 +250,16 @@ export function ReportEmail({
 
           <Text
             style={{
-              margin: "24px 0 0",
+              margin: "16px 0 0",
               fontFamily: mono,
               fontSize: "12px",
               lineHeight: 1.6,
               color: "#6b7a87",
-              wordBreak: "break-all",
             }}
           >
-            Or paste this into your browser:
-            <br />
-            <Link href={offerUrl} style={{ color: C.muted }}>
-              {offerUrl}
+            Button not working?{" "}
+            <Link href={offerUrl} style={{ color: C.muted, textDecoration: "underline" }}>
+              Open your result here.
             </Link>
           </Text>
         </Container>
@@ -278,6 +278,11 @@ export function ReportEmail({
           >
             Sent by ColrosaStudios LTD because you ran a scan and asked for your
             report. The estimate is generated for entertainment, not medical use.
+            <br />
+            <Link href={unsubscribeUrl} style={{ color: "#6b7a87", textDecoration: "underline" }}>
+              Unsubscribe from tips and offers
+            </Link>
+            .
           </Text>
         </Container>
       </Body>

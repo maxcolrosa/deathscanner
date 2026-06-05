@@ -8,6 +8,16 @@ import {
 import { renderValueEmail, type ValueEmailData } from "@/emails/value-email";
 import { renderWinbackEmail, type WinbackEmailData } from "@/emails/winback-email";
 
+// RFC 8058 one-click unsubscribe headers, so Gmail/Apple Mail can offer a native
+// unsubscribe and our marketing mail lands in the inbox. Only attached to
+// marketing sends (the report is transactional).
+function listUnsubscribeHeaders(unsubscribeUrl: string): Record<string, string> {
+  return {
+    "List-Unsubscribe": `<${unsubscribeUrl}>`,
+    "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+  };
+}
+
 // Thin Resend wrapper. Email is best-effort and never blocks fulfillment: when
 // RESEND_API_KEY / EMAIL_FROM are unset (local dev, CI), sends are a logged
 // no-op so the guide is still delivered via the success redirect.
@@ -24,6 +34,7 @@ export async function sendEmail(opts: {
   to: string;
   subject: string;
   html: string;
+  headers?: Record<string, string>;
 }): Promise<boolean> {
   const key = process.env.RESEND_API_KEY;
   const from = process.env.EMAIL_FROM;
@@ -40,6 +51,7 @@ export async function sendEmail(opts: {
       to: opts.to,
       subject: opts.subject,
       html: opts.html,
+      headers: opts.headers,
     });
     if (error) {
       console.error("[email] send failed:", error);
@@ -100,6 +112,7 @@ export async function sendValueEmail(to: string, data: ValueEmailData): Promise<
     to,
     subject: "The years your scan flagged are the reachable kind",
     html,
+    headers: listUnsubscribeHeaders(data.unsubscribeUrl),
   });
 }
 
@@ -110,5 +123,6 @@ export async function sendWinbackEmail(to: string, data: WinbackEmailData): Prom
     to,
     subject: `One-time price: start your plan for ${data.winbackPriceLabel}`,
     html,
+    headers: listUnsubscribeHeaders(data.unsubscribeUrl),
   });
 }

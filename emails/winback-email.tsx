@@ -5,6 +5,7 @@ import {
   Head,
   Heading,
   Html,
+  Link,
   Preview,
   Section,
   Text,
@@ -27,13 +28,14 @@ export interface WinbackEmailData {
   winbackPriceLabel: string;
   listPriceLabel: string;
   winbackUrl: string;
+  unsubscribeUrl: string;
 }
 
 // Drip email 3 (+2 days): an honest one-time win-back. The on-page launch
 // countdown really has ended by now, so this is a genuine new, lower offer, not
 // a reset of a fake timer. The link carries a signed token that unlocks the
 // winback price server-side.
-export function WinbackEmail({ winbackPriceLabel, listPriceLabel, winbackUrl }: WinbackEmailData) {
+export function WinbackEmail({ winbackPriceLabel, listPriceLabel, winbackUrl, unsubscribeUrl }: WinbackEmailData) {
   return (
     <Html lang="en">
       <Head />
@@ -70,8 +72,11 @@ export function WinbackEmail({ winbackPriceLabel, listPriceLabel, winbackUrl }: 
           </Section>
 
           <Text style={{ margin: "24px 0 0", fontFamily: mono, fontSize: "11px", lineHeight: 1.6, color: "#6b7a87" }}>
-            Sent by ColrosaStudios LTD. You are getting this because you opted in
-            for tips and offers. Use the unsubscribe link to stop.
+            Sent by ColrosaStudios LTD because you opted in for tips and offers.{" "}
+            <Link href={unsubscribeUrl} style={{ color: C.muted, textDecoration: "underline" }}>
+              Unsubscribe
+            </Link>{" "}
+            any time and we will stop.
           </Text>
         </Container>
       </Body>

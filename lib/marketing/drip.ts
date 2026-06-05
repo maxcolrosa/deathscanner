@@ -10,6 +10,7 @@ import { hasPaidOrderForEmail } from "@/lib/guide/orders";
 import { computeResult } from "@/lib/longevity";
 import { sendValueEmail, sendWinbackEmail, siteUrl } from "@/lib/email/send";
 import { signWinbackToken } from "@/lib/marketing/winback";
+import { signResultToken, signUnsubscribeToken } from "@/lib/marketing/email-links";
 import { PRICES, type Currency } from "@/lib/product";
 import { formatMoney, isCurrency } from "@/lib/money";
 
@@ -66,12 +67,15 @@ async function sendJob(
   currency: Currency
 ): Promise<void> {
   const base = siteUrl();
+  const unsubscribeUrl = `${base}/api/unsubscribe/${signUnsubscribeToken(job.email)}`;
   if (job.kind === "value") {
     const result = computeResult(answers);
     await sendValueEmail(job.email, {
       recoverableYears: result.recoverableYears,
       topRiskCategory: result.topRisks[0]?.category ?? null,
-      offerUrl: `${base}/scan`,
+      // Send them back to THEIR result, not a blank scan.
+      offerUrl: `${base}/result/${signResultToken(job.email, currency)}`,
+      unsubscribeUrl,
     });
     return;
   }
@@ -82,5 +86,6 @@ async function sendJob(
     winbackPriceLabel: formatMoney(tier.winbackPrice, currency),
     listPriceLabel: formatMoney(tier.listPrice, currency),
     winbackUrl: `${base}/api/winback/${token}`,
+    unsubscribeUrl,
   });
 }

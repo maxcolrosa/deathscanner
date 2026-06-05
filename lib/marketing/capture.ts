@@ -10,6 +10,7 @@ import { sendReportEmail, siteUrl } from "@/lib/email/send";
 import { PRICES, type Currency } from "@/lib/product";
 import { formatMoney, isCurrency } from "@/lib/money";
 import { rateLimitDurable } from "@/lib/marketing/rate-limit";
+import { signResultToken, signUnsubscribeToken } from "@/lib/marketing/email-links";
 
 const deathDateFormatter = new Intl.DateTimeFormat("en-US", {
   month: "long",
@@ -118,7 +119,10 @@ export async function captureLead(
           detail: r.detail,
         })),
         priceLabel: formatMoney(PRICES[currency].price, currency),
-        offerUrl: `${siteUrl()}/scan`,
+        // Take them back to THEIR result (reveal + pitch), not a blank scan, via
+        // a signed link that reloads their stored answers. No re-quizzing.
+        offerUrl: `${siteUrl()}/result/${signResultToken(email, currency)}`,
+        unsubscribeUrl: `${siteUrl()}/api/unsubscribe/${signUnsubscribeToken(email)}`,
       });
     } catch (err) {
       console.error("[capture] report email failed:", err);
