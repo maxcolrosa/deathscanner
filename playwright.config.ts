@@ -13,6 +13,10 @@ export default defineConfig({
       // Force the in-process order store so e2e never touches a real Supabase.
       SUPABASE_URL: "",
       SUPABASE_SERVICE_ROLE_KEY: "",
+      // Force the no-payment fallback so the smoke test exercises direct
+      // generation and never redirects to real Stripe Checkout.
+      STRIPE_SECRET_KEY: "",
+      STRIPE_WEBHOOK_SECRET: "",
     },
   },
 });

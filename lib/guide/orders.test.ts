@@ -5,6 +5,8 @@ import {
   getOrderByToken,
   markReady,
   markFailed,
+  markPaid,
+  markEmailed,
   __clearMemory,
 } from "@/lib/guide/orders";
 import { buildGuide } from "@/lib/guide/build-guide";
@@ -54,5 +56,39 @@ describe("orders store (in-memory)", () => {
 
   it("returns null for an unknown token", async () => {
     expect(await getOrderByToken("nope")).toBeNull();
+  });
+});
+
+describe("markPaid (Stripe fulfillment)", () => {
+  it("flips an awaiting_payment order to generating exactly once", async () => {
+    const order = await createOrder(answers, "awaiting_payment");
+    expect(order.status).toBe("awaiting_payment");
+
+    const first = await markPaid(order.token, { sessionId: "cs_1", email: "a@b.com" });
+    expect(first).toBe(true);
+
+    const paid = await getOrderByToken(order.token);
+    expect(paid?.status).toBe("generating");
+    expect(paid?.stripe_session_id).toBe("cs_1");
+    expect(paid?.customer_email).toBe("a@b.com");
+    expect(paid?.paid_at).toBeTruthy();
+
+    // Webhook retry / success-page race: second call is a no-op.
+    const second = await markPaid(order.token, { sessionId: "cs_2", email: "x@y.com" });
+    expect(second).toBe(false);
+    const after = await getOrderByToken(order.token);
+    expect(after?.stripe_session_id).toBe("cs_1");
+  });
+
+  it("never pays an order that was not awaiting payment", async () => {
+    const order = await createOrder(answers); // 'generating'
+    expect(await markPaid(order.token, { sessionId: "cs_3", email: null })).toBe(false);
+  });
+
+  it("markEmailed records the delivery timestamp", async () => {
+    const order = await createOrder(answers, "awaiting_payment");
+    await markPaid(order.token, { sessionId: "cs_4", email: "c@d.com" });
+    await markEmailed(order.token);
+    expect((await getOrderByToken(order.token))?.emailed_at).toBeTruthy();
   });
 });

@@ -2,7 +2,7 @@ import { randomBytes } from "node:crypto";
 import type { Answers } from "@/lib/longevity";
 import type { GuideDoc } from "@/lib/guide/schema";
 
-export type OrderStatus = "generating" | "ready" | "failed";
+export type OrderStatus = "awaiting_payment" | "generating" | "ready" | "failed";
 
 export interface OrderRow {
   id: string;
@@ -13,6 +13,11 @@ export interface OrderRow {
   model: string | null;
   error: string | null;
   created_at: string;
+  // Payment fields (null until a Stripe checkout is paid).
+  stripe_session_id?: string | null;
+  customer_email?: string | null;
+  paid_at?: string | null;
+  emailed_at?: string | null;
 }
 
 export function newToken(): string {
@@ -45,25 +50,35 @@ async function client() {
   return supabaseServer();
 }
 
-export async function createOrder(answers: Answers): Promise<OrderRow> {
+// `status` defaults to "generating" (today's direct path). A Stripe checkout
+// creates the order as "awaiting_payment" and a verified payment flips it via
+// markPaid().
+export async function createOrder(
+  answers: Answers,
+  status: OrderStatus = "generating"
+): Promise<OrderRow> {
   const token = newToken();
   if (memoryEnabled()) {
     const row: OrderRow = {
       id: token,
       token,
       answers,
-      status: "generating",
+      status,
       guide: null,
       model: null,
       error: null,
       created_at: new Date().toISOString(),
+      stripe_session_id: null,
+      customer_email: null,
+      paid_at: null,
+      emailed_at: null,
     };
     memory.set(token, row);
     return row;
   }
   const { data, error } = await (await client())
     .from("orders")
-    .insert({ token, answers, status: "generating" })
+    .insert({ token, answers, status })
     .select()
     .single();
   if (error) throw new Error(error.message);
@@ -94,6 +109,55 @@ export async function markReady(token: string, guide: GuideDoc, model: string): 
   const { error } = await (await client())
     .from("orders")
     .update({ status: "ready", guide, model, updated_at: new Date().toISOString() })
+    .eq("token", token);
+  if (error) throw new Error(error.message);
+}
+
+// Flip a pending order to "generating" after a verified payment. Returns true
+// only on the transition that actually happened, so the caller knows whether to
+// send the delivery email. Idempotent: it only acts when the order is currently
+// "awaiting_payment", so the webhook and the success-page fallback can both run
+// and exactly one wins. The Supabase path makes this atomic with a conditional
+// update (eq status), avoiding a read-then-write race across instances.
+export async function markPaid(
+  token: string,
+  payment: { sessionId: string; email: string | null }
+): Promise<boolean> {
+  if (memoryEnabled()) {
+    const row = memory.get(token);
+    if (!row || row.status !== "awaiting_payment") return false;
+    row.status = "generating";
+    row.stripe_session_id = payment.sessionId;
+    row.customer_email = payment.email;
+    row.paid_at = new Date().toISOString();
+    return true;
+  }
+  const { data, error } = await (await client())
+    .from("orders")
+    .update({
+      status: "generating",
+      stripe_session_id: payment.sessionId,
+      customer_email: payment.email,
+      paid_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("token", token)
+    .eq("status", "awaiting_payment")
+    .select("token");
+  if (error) throw new Error(error.message);
+  return (data?.length ?? 0) > 0;
+}
+
+export async function markEmailed(token: string): Promise<void> {
+  const now = new Date().toISOString();
+  if (memoryEnabled()) {
+    const row = memory.get(token);
+    if (row) row.emailed_at = now;
+    return;
+  }
+  const { error } = await (await client())
+    .from("orders")
+    .update({ emailed_at: now, updated_at: now })
     .eq("token", token);
   if (error) throw new Error(error.message);
 }

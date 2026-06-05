@@ -95,3 +95,11 @@ export function localizedValue(usdValue: number, currency: Currency): number {
 export function stackValueFor(currency: Currency): number {
   return INCLUDED.reduce((sum, item) => sum + localizedValue(item.value, currency), 0);
 }
+
+// The amount to charge, in Stripe minor units (cents). Server-authoritative: the
+// only inputs are the resolved currency and whether the on-page countdown has
+// expired. All supported currencies are 2-decimal, so * 100 is correct.
+export function chargeAmountMinor(currency: Currency, expired: boolean): number {
+  const tier = PRICES[currency];
+  return (expired ? tier.expiredPrice : tier.price) * 100;
+}
