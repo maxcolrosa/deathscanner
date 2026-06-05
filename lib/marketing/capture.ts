@@ -35,12 +35,12 @@ export interface CaptureLeadInput {
 // regardless of `consented`. Throws on invalid input or abuse so the client
 // surfaces a generic error; email delivery is best-effort and never throws.
 //
-// Abuse controls on this public, unauthenticated endpoint: bounded input
-// (AnswersSchema caps + email max length), a best-effort per-IP rate limit, and
-// the report email is sent ONLY on the first capture of an address (so it cannot
-// be used to repeatedly mail a target). NOTE pre-launch hardening before Resend
-// goes live: a CAPTCHA/Turnstile check, a durable shared-store rate limit, and
-// optionally double opt-in for marketing consent. See AppState.md.
+// The report is a transactional "here is the result you asked for" email, so it
+// sends on every scan. Abuse controls on this public, unauthenticated endpoint:
+// bounded input (AnswersSchema caps + email max length) and a best-effort per-IP
+// rate limit. NOTE pre-launch hardening before high-volume sending: a CAPTCHA/
+// Turnstile check (the real per-recipient control), a durable shared-store rate
+// limit, and optionally double opt-in for marketing consent. See AppState.md.
 export async function captureLead(
   input: CaptureLeadInput
 ): Promise<{ ok: true }> {
@@ -63,15 +63,13 @@ export async function captureLead(
     throw new Error("rate_limited");
   }
 
-  // Only the first capture of an address sends the report email and enrolls the
-  // drip, so a repeated post cannot be used to mail a target over and over.
+  // Look up any existing subscriber so we do not re-enroll one who unsubscribed.
   const existing = await getSubscriberByEmail(email);
-  const isNew = !existing;
 
   await upsertSubscriber({ email, consented, answers, currency });
 
-  // Enroll the marketing drip for fresh, consented, not-already-unsubscribed
-  // addresses (enqueue is idempotent per email + kind).
+  // Enroll the marketing drip for consented, not-already-unsubscribed addresses
+  // (enqueue is idempotent per email + kind).
   if (consented && !existing?.unsubscribed_at) {
     try {
       await enqueueDrip(email);
@@ -80,23 +78,22 @@ export async function captureLead(
     }
   }
 
-  if (isNew) {
-    try {
-      const result = computeResult(answers);
-      await sendReportEmail(email, {
-        deathDate: deathDateFormatter.format(result.predictedDeathDate),
-        ageAtDeath: result.ageAtDeath,
-        recoverableYears: result.recoverableYears,
-        topRisks: result.topRisks.slice(0, 3).map((r) => ({
-          category: r.category,
-          detail: r.detail,
-        })),
-        priceLabel: formatMoney(PRICES[currency].price, currency),
-        offerUrl: `${siteUrl()}/scan`,
-      });
-    } catch (err) {
-      console.error("[capture] report email failed:", err);
-    }
+  // Send the personalized report email every time someone completes a scan.
+  try {
+    const result = computeResult(answers);
+    await sendReportEmail(email, {
+      deathDate: deathDateFormatter.format(result.predictedDeathDate),
+      ageAtDeath: result.ageAtDeath,
+      recoverableYears: result.recoverableYears,
+      topRisks: result.topRisks.slice(0, 3).map((r) => ({
+        category: r.category,
+        detail: r.detail,
+      })),
+      priceLabel: formatMoney(PRICES[currency].price, currency),
+      offerUrl: `${siteUrl()}/scan`,
+    });
+  } catch (err) {
+    console.error("[capture] report email failed:", err);
   }
 
   return { ok: true };
