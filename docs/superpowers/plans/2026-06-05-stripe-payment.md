@@ -1,6 +1,7 @@
 # Wire real payment: Stripe hosted Checkout + email delivery
 
 Status: planned (not yet executed). Trigger to build: "execute the Stripe plan".
+Design spec: `docs/superpowers/specs/2026-06-05-stripe-payment-design.md`.
 
 ## Context
 
