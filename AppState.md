@@ -34,9 +34,15 @@ Tech: Next.js 16 (App Router) / React 19 / TS / Tailwind v4 / Motion / Geist / s
 
 ## 2. What does NOT exist yet (the next phase)
 
-**Real payment is DONE (Stripe hosted Checkout, test mode).** `beginCheckout` (`lib/guide/checkout.ts`) creates an `awaiting_payment` order + Stripe Checkout Session; the webhook (`app/api/stripe/webhook/route.ts`) and a success-page `?session_id=` fallback both call `fulfillPaidOrder` (`lib/guide/fulfill.ts`) -> `markPaid` (idempotent) -> Resend email. Amount is server-clamped via `chargeAmountMinor(currency, expired)`. Verified live: USD session = 1300, GBP = 1100. **Open item: the `awaiting_payment` orders migration (`supabase/migrations/20260605130000_orders_payment.sql`) must be applied to the live Supabase project** (until then, real Stripe + Supabase together 500 on the status-check constraint; dev/e2e use the in-memory store and are fine).
+**Payment + email list + drip are DONE (test mode / no-op email).** Stripe hosted Checkout (`beginCheckout` in `lib/guide/checkout.ts`) creates an `awaiting_payment` order + session; the webhook (`app/api/stripe/webhook/route.ts`) and a success-page `?session_id=` fallback both call `fulfillPaidOrder` (`lib/guide/fulfill.ts`) -> `markPaid` (idempotent) -> Resend email. An email wall (`components/email-gate.tsx`, the `capture` phase) collects the email + opt-in consent and a personalized report email goes out (`emails/report-email.tsx`). Consented leads enter a 3-email drip (report, +1d value, +2d win-back) via `lib/marketing/email-jobs.ts` + the `app/api/cron/email-drip` Vercel Cron (`lib/marketing/drip.ts`), with a signed win-back link (`lib/marketing/winback.ts`) to `app/api/winback/[token]` that checks out at `winbackPrice`. Verified live against the test key: USD 1300, GBP 1100, win-back 900.
 
-Still not present: a marketing email list + drip (Phase 4/5), auth (access is via the unguessable token URL), analytics.
+**OPEN ITEMS before production / before Resend goes live:**
+- Apply the three new migrations to the live Supabase project: `20260605130000_orders_payment.sql` (adds `awaiting_payment` + payment columns), `20260605140000_subscribers.sql`, `20260605150000_email_jobs.sql`. Until applied, real Stripe + Supabase together 500 on the orders status-check constraint; dev/e2e use the in-memory store and are fine.
+- `captureLead` is a public endpoint that sends email. It already bounds input, best-effort per-IP rate-limits, and sends the report only on first capture. Before turning on Resend, add: a CAPTCHA/Turnstile check, a durable shared-store rate limit (the current one is in-memory, not serverless-durable), and consider double opt-in for marketing consent + a consent audit trail.
+- Set `RESEND_API_KEY` + `EMAIL_FROM` (emails are a logged no-op until then), `CRON_SECRET` (protects the drip cron), `WINBACK_SECRET` (signs win-back links), and `STRIPE_WEBHOOK_SECRET` (from `stripe listen`).
+- Vercel Cron is hourly (`vercel.json`); on the Hobby plan reduce to daily if hourly is rejected.
+
+Still not present: auth (access is via the unguessable token URL), analytics.
 
 **Brand rename pending.** The app is still named "Longevity Scan" everywhere; the user is choosing a replacement. Shortlist + available domains are in Claude memory `brand-name-candidates` (Reckon / Mortalis / Span / Hundo, all with free `.co` domains). When chosen, rename across `app/layout.tsx` (note: its `<title>` still has the old name AND an em-dash, which violates the no-em-dash UI rule, fix on rename), `app/page.tsx`, `components/site-footer.tsx`, `components/legal-page.tsx`, the `/privacy` `/terms` `/cookies` `metadata.title`s, and the `BRAND` const which is now **duplicated across the five PDF documents** (`components/guide/guide-pdf.tsx`, `tracker-pack-pdf.tsx`, `quickstart-pdf.tsx`, `recipe-book-pdf.tsx`, `exercise-library-pdf.tsx` - ideally hoist it into `components/guide/pdf-shared.tsx` at the same time). The legal-page contact emails were **removed** (no more `@longevityscan.example`); the company is **ColrosaStudios LTD**, so the rename concerns the consumer brand only. The product name (`PRODUCT.name`, "The Second Wind Protocol") is separate.
 
@@ -68,9 +74,9 @@ ANTHROPIC_API_KEY=...               # NO LONGER USED (guide is deterministic); s
 GUIDE_STUB=                         # legacy flag, no longer read; safe to remove
 ```
 
-Stripe + email (now used): `STRIPE_SECRET_KEY` (test key set), `STRIPE_WEBHOOK_SECRET` (from `stripe listen`, not yet set), `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `RESEND_API_KEY` + `EMAIL_FROM` (unset -> email is a logged no-op), `NEXT_PUBLIC_SITE_URL`. See `.env.example`.
+Stripe + email + drip (now used): `STRIPE_SECRET_KEY` (test key set), `STRIPE_WEBHOOK_SECRET` (from `stripe listen`, not yet set), `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `RESEND_API_KEY` + `EMAIL_FROM` (unset -> email is a logged no-op), `NEXT_PUBLIC_SITE_URL`, `CRON_SECRET` (protects the drip cron), `WINBACK_SECRET` (signs win-back links; has an insecure dev fallback if unset). See `.env.example`.
 
-Note: the secrets were pasted into a chat transcript during setup; consider rotating the Supabase service-role key.
+Note: the Stripe + Supabase secrets were pasted into a chat transcript during setup; consider rotating the Supabase service-role key (the Stripe key is test-mode).
 
 ---
 

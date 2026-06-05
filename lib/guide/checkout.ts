@@ -5,7 +5,12 @@ import { createOrder } from "@/lib/guide/orders";
 import { startGuideGeneration } from "@/lib/guide/start";
 import { getStripe, stripeConfigured } from "@/lib/stripe/server";
 import { siteUrl } from "@/lib/email/send";
-import { PRODUCT, chargeAmountMinor, type Currency } from "@/lib/product";
+import {
+  PRODUCT,
+  chargeAmountMinor,
+  winbackAmountMinor,
+  type Currency,
+} from "@/lib/product";
 import { isCurrency } from "@/lib/money";
 import type { Answers } from "@/lib/longevity";
 
@@ -16,6 +21,8 @@ export interface CheckoutOptions {
   expired?: boolean;
   /** From useSale(): the visitor's resolved currency. */
   currency?: string;
+  /** Server-set only (after verifying a signed win-back token): charge winbackPrice. */
+  winback?: boolean;
 }
 
 export async function beginCheckout(
@@ -45,7 +52,9 @@ export async function beginCheckout(
         quantity: 1,
         price_data: {
           currency: currency.toLowerCase(),
-          unit_amount: chargeAmountMinor(currency, expired),
+          unit_amount: opts.winback
+            ? winbackAmountMinor(currency)
+            : chargeAmountMinor(currency, expired),
           product_data: {
             name: PRODUCT.name,
             description: PRODUCT.tagline,

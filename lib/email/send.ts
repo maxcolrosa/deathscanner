@@ -5,6 +5,8 @@ import {
   renderReportEmail,
   type ReportEmailData,
 } from "@/emails/report-email";
+import { renderValueEmail, type ValueEmailData } from "@/emails/value-email";
+import { renderWinbackEmail, type WinbackEmailData } from "@/emails/winback-email";
 
 // Thin Resend wrapper. Email is best-effort and never blocks fulfillment: when
 // RESEND_API_KEY / EMAIL_FROM are unset (local dev, CI), sends are a logged
@@ -87,6 +89,26 @@ export async function sendReportEmail(
   return sendEmail({
     to,
     subject: "Your longevity scan result is ready",
+    html,
+  });
+}
+
+// Drip email 2 (+1 day): value reinforcement + objection handling.
+export async function sendValueEmail(to: string, data: ValueEmailData): Promise<boolean> {
+  const html = await renderValueEmail(data);
+  return sendEmail({
+    to,
+    subject: "The years your scan flagged are the reachable kind",
+    html,
+  });
+}
+
+// Drip email 3 (+2 days): the one-time win-back offer.
+export async function sendWinbackEmail(to: string, data: WinbackEmailData): Promise<boolean> {
+  const html = await renderWinbackEmail(data);
+  return sendEmail({
+    to,
+    subject: `One-time price: start your plan for ${data.winbackPriceLabel}`,
     html,
   });
 }

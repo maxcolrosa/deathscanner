@@ -148,6 +148,30 @@ export async function markPaid(
   return (data?.length ?? 0) > 0;
 }
 
+// Has this email already paid for a guide? Used by the drip to suppress further
+// upsell emails once someone has bought. Only paid orders carry a customer_email
+// (set by markPaid from the Stripe session), so a non-null paid_at match means a
+// real purchase.
+export async function hasPaidOrderForEmail(email: string): Promise<boolean> {
+  const normalized = email.trim().toLowerCase();
+  if (memoryEnabled()) {
+    for (const row of memory.values()) {
+      if (row.customer_email?.toLowerCase() === normalized && row.paid_at) {
+        return true;
+      }
+    }
+    return false;
+  }
+  const { data, error } = await (await client())
+    .from("orders")
+    .select("token")
+    .eq("customer_email", normalized)
+    .not("paid_at", "is", null)
+    .limit(1);
+  if (error) throw new Error(error.message);
+  return (data?.length ?? 0) > 0;
+}
+
 export async function markEmailed(token: string): Promise<void> {
   const now = new Date().toISOString();
   if (memoryEnabled()) {

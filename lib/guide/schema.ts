@@ -302,9 +302,19 @@ export type MonthlyReview = z.infer<typeof MonthlyReviewSchema>;
 export type ProgramArc = z.infer<typeof ProgramArcSchema>;
 export type GuideDoc = z.infer<typeof GuideDocSchema>;
 
-// Loose validation for the raw scan answers carried into checkout. Keys are
+// Validation for the raw scan answers carried into checkout / capture. Keys are
 // question ids; values are strings, numbers, or string[] (multi-select). Age
-// must be present.
+// must be present. Bounded on every axis (key length, value length, array
+// length, total keys) so this public sink cannot be used to store oversized
+// JSONB: real answers are short option ids well within these caps.
 export const AnswersSchema = z
-  .record(z.string(), z.union([z.string(), z.number(), z.array(z.string())]))
+  .record(
+    z.string().max(40),
+    z.union([
+      z.string().max(80),
+      z.number(),
+      z.array(z.string().max(80)).max(20),
+    ])
+  )
+  .refine((a) => Object.keys(a).length <= 40, { message: "too many answers" })
   .refine((a) => a.age !== undefined, { message: "age is required" });

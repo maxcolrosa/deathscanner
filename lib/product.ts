@@ -103,3 +103,9 @@ export function chargeAmountMinor(currency: Currency, expired: boolean): number 
   const tier = PRICES[currency];
   return (expired ? tier.expiredPrice : tier.price) * 100;
 }
+
+// The recovery amount the email win-back link resolves to, in minor units.
+// Only reachable via a server-verified signed token (see lib/marketing/winback).
+export function winbackAmountMinor(currency: Currency): number {
+  return PRICES[currency].winbackPrice * 100;
+}
