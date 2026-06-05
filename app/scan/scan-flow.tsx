@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { QuizStep } from "@/components/quiz-step";
 import { AnalyzingSequence } from "@/components/analyzing-sequence";
+import { EmailGate } from "@/components/email-gate";
 import { ReportCard } from "@/components/report-card";
 import { GuidePitch } from "@/components/guide-pitch";
 import { ResultStickyBar } from "@/components/result-sticky-bar";
@@ -16,7 +17,7 @@ import {
   type AnswerValue,
 } from "@/lib/longevity";
 
-type Phase = "quiz" | "analyzing" | "result";
+type Phase = "quiz" | "analyzing" | "capture" | "result";
 
 export function ScanFlow({ currency = "USD" }: { currency?: Currency }) {
   const [phase, setPhase] = useState<Phase>("quiz");
@@ -49,7 +50,9 @@ export function ScanFlow({ currency = "USD" }: { currency?: Currency }) {
     if (idx > 0) setCurrentId(active[idx - 1].id);
   };
 
-  const handleAnalysisComplete = () => setPhase("result");
+  // The email wall sits between the analysis and the reveal: the result is only
+  // unlocked once the visitor submits their email (captured into the list).
+  const handleAnalysisComplete = () => setPhase("capture");
 
   const result = useMemo(
     () => (phase === "result" ? computeResult(answers) : null),
@@ -73,6 +76,16 @@ export function ScanFlow({ currency = "USD" }: { currency?: Currency }) {
   if (phase === "analyzing") {
     return (
       <AnalyzingSequence answers={answers} onComplete={handleAnalysisComplete} />
+    );
+  }
+
+  if (phase === "capture") {
+    return (
+      <EmailGate
+        answers={answers}
+        currency={currency}
+        onUnlock={() => setPhase("result")}
+      />
     );
   }
 

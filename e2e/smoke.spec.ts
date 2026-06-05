@@ -26,6 +26,15 @@ async function completeScan(page: Page) {
   }
 }
 
+// After the analysis, an email wall gates the result. Submit an email to unlock
+// it (capture uses the in-memory store + no-op email under the e2e env).
+async function passEmailGate(page: Page) {
+  const emailInput = page.getByLabel("Email", { exact: true });
+  await emailInput.waitFor({ state: "visible", timeout: 15000 });
+  await emailInput.fill("e2e@example.com");
+  await page.getByRole("button", { name: /unlock my results/i }).click();
+}
+
 test("full scan flow reaches the report and pitch", async ({ page }) => {
   await page.goto("/");
   await expect(
@@ -35,6 +44,7 @@ test("full scan flow reaches the report and pitch", async ({ page }) => {
   await page.getByRole("link", { name: /begin/i }).first().click();
 
   await completeScan(page);
+  await passEmailGate(page);
 
   // Report appears (waits out the analyzing animation).
   await expect(
@@ -54,6 +64,7 @@ test("buying builds and shows the generated guide", async ({ page }) => {
   await page.getByRole("link", { name: /begin/i }).first().click();
 
   await completeScan(page);
+  await passEmailGate(page);
 
   await expect(
     page.getByRole("heading", { name: /how long you have left/i })

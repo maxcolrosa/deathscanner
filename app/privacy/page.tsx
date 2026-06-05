@@ -25,24 +25,36 @@ export default function PrivacyPage() {
         in full in our Terms.
       </p>
 
-      <h2>Your scan answers</h2>
+      <h2>Your scan answers and email</h2>
       <p>
-        The questions you answer during the scan are processed entirely within
-        your browser to produce the on-screen result.{" "}
-        <strong>
-          Your answers are not sent to or stored on our servers, and they are
-          not linked to your identity.
-        </strong>{" "}
-        Close the tab and they are gone. We do not process your scan answers as
-        personal data.
+        You can browse the scan questions without giving us anything. To unlock
+        and view your result, we ask for your email address at the end. When you
+        submit it, your scan answers are sent to our servers and stored against
+        your email so that we can email you a copy of your report and, if you go
+        on to buy, build your personalized guide. We use a reputable third-party
+        provider to deliver these emails. Our lawful basis for storing your
+        answers and sending your report is taking steps at your request, and our
+        legitimate interest in delivering the result you asked for.
       </p>
 
-      <h2>What we do not collect through the scan</h2>
+      <h2>Marketing emails (opt-in)</h2>
       <p>
-        We do not require an account to use the scan. We do not ask for your
-        name, email address, or any health records to run the scan. We do not
-        sell or share personal data gathered via the scan, because we do not
-        collect personal data through the scan.
+        At the email step you can separately choose to receive tips and
+        occasional offers. This is optional and is unticked by default. Where you
+        opt in, our lawful basis is your consent, which you can withdraw at any
+        time using the unsubscribe link in any marketing email or by contacting
+        us. Withdrawing consent does not affect the one-off report email you
+        asked for, and does not affect the lawfulness of processing before you
+        withdrew.
+      </p>
+
+      <h2>What we do not do</h2>
+      <p>
+        We do not require you to create an account. We do not sell your personal
+        data, and we do not share it for anyone else&rsquo;s marketing. We share
+        data only with the processors that operate the service for us (such as
+        our email and payment providers), so they can perform those functions on
+        our behalf.
       </p>
 
       <h2>If you buy the guide</h2>
@@ -67,7 +79,10 @@ export default function PrivacyPage() {
 
       <h2>Data retention</h2>
       <p>
-        We retain purchase-related personal data for as long as is necessary to
+        We retain your email and scan answers for as long as you remain on our
+        list or until you ask us to delete them; when you unsubscribe we stop
+        sending marketing emails and remove or anonymize the associated data. We
+        retain purchase-related personal data for as long as is necessary to
         fulfil our contractual obligations to you and to comply with our legal
         obligations (for example, financial record-keeping requirements). Where
         data is held by our third-party processor, their retention policies
@@ -113,10 +128,10 @@ export default function PrivacyPage() {
         format.
       </p>
       <p>
-        Because we do not store personal data from the scan itself, most of
-        these rights are most likely to be relevant in the context of a
-        purchase. To exercise any of these rights, please contact us using the
-        details in the Contact section below.
+        These rights apply to the email and scan answers we store, to your
+        marketing preferences, and to any purchase data. To exercise any of
+        these rights, please contact us using the details in the Contact section
+        below.
       </p>
 
       <h2>Right to complain</h2>

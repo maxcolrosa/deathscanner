@@ -1,6 +1,10 @@
 import "server-only";
 import { Resend } from "resend";
 import { PRODUCT } from "@/lib/product";
+import {
+  renderReportEmail,
+  type ReportEmailData,
+} from "@/emails/report-email";
 
 // Thin Resend wrapper. Email is best-effort and never blocks fulfillment: when
 // RESEND_API_KEY / EMAIL_FROM are unset (local dev, CI), sends are a logged
@@ -68,6 +72,21 @@ export async function sendGuideEmail(to: string, token: string): Promise<boolean
   return sendEmail({
     to,
     subject: `Your ${PRODUCT.name} is ready`,
+    html,
+  });
+}
+
+// The free, instant "here is your scan result" email captured at the email gate.
+// This is the service email the user explicitly asked for, so it sends regardless
+// of marketing consent. It renders the on-brand ReportEmail to HTML.
+export async function sendReportEmail(
+  to: string,
+  data: ReportEmailData
+): Promise<boolean> {
+  const html = await renderReportEmail(data);
+  return sendEmail({
+    to,
+    subject: "Your longevity scan result is ready",
     html,
   });
 }

@@ -102,6 +102,16 @@ export default function TermsPage() {
         should not be expected.
       </p>
 
+      <h2>Email and your results</h2>
+      <p>
+        To view your result, you provide your email address at the end of the
+        scan, and we email you a copy of your report. Receiving tips and offers
+        from us is separate and optional: you opt in with an unticked checkbox,
+        and you can unsubscribe at any time using the link in any such email.
+        Your email and how we handle it are described in our{" "}
+        <a href="/privacy">Privacy Policy</a>.
+      </p>
+
       <h2>The product, pricing and promotions</h2>
       <p>
         The Second Wind Protocol is a digital fitness and lifestyle guide.
