@@ -38,10 +38,10 @@ async function passEmailGate(page: Page) {
 test("full scan flow reaches the report and pitch", async ({ page }) => {
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: /find out when/i })
+    page.getByRole("heading", { name: /has a\s+deadline/i })
   ).toBeVisible();
 
-  await page.getByRole("link", { name: /begin/i }).first().click();
+  await page.getByRole("link", { name: /reveal my date/i }).first().click();
 
   await completeScan(page);
   await passEmailGate(page);
@@ -61,7 +61,7 @@ test("full scan flow reaches the report and pitch", async ({ page }) => {
 
 test("buying builds and shows the generated guide", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("link", { name: /begin/i }).first().click();
+  await page.getByRole("link", { name: /reveal my date/i }).first().click();
 
   await completeScan(page);
   await passEmailGate(page);
