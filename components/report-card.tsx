@@ -31,6 +31,21 @@ export function ReportCard({
   const hasYears = result.recoverableYears > 0;
   const belowAverage = result.yearsVsAverage < 0;
   const vsAverageYears = Math.abs(result.yearsVsAverage).toFixed(1);
+  const sex = answers.sex;
+  // One gender-keyed line of stakes, kept deadpan-clinical. Falls back to a
+  // neutral line if sex was somehow not captured.
+  const stakesLine =
+    sex === "male"
+      ? "Heart disease is the number one killer of American men, and most of what drives it is still reversible at your age."
+      : sex === "female"
+        ? "Women outlive men on paper, then spend more of those years in poor health. The plan protects the quality of your years, not just the count."
+        : "Most of what is dragging your number down is still reversible.";
+  // Per-gender trace tint (a secondary monitor channel color), applied only to
+  // the profile chip and the stakes line. Teal stays the brand accent.
+  const traceText =
+    sex === "male" ? "text-monitor-trace-m" : sex === "female" ? "text-monitor-trace-f" : "text-monitor-muted";
+  const traceBorder =
+    sex === "male" ? "border-monitor-trace-m/50" : sex === "female" ? "border-monitor-trace-f/50" : "border-monitor-line";
 
   return (
     <section className="mx-auto flex max-w-2xl flex-col gap-8 px-6 pt-20 pb-10">
@@ -45,6 +60,11 @@ export function ReportCard({
 
       {/* ── The reveal ─────────────────────────────────────────────── */}
       <div className="rounded-lg border border-monitor-alert/40 bg-monitor-panel p-8">
+        {(sex === "male" || sex === "female") && (
+          <div className={`mb-3 font-mono text-[10px] uppercase tracking-[0.2em] ${traceText}`}>
+            Subject profile: {sex}, {result.currentAge}
+          </div>
+        )}
         <div className="font-mono text-xs uppercase tracking-[0.18em] text-monitor-muted">
           Estimated date of death
         </div>
@@ -121,16 +141,20 @@ export function ReportCard({
                 <span className="font-mono text-monitor-accent">
                   {years} years
                 </span>
-                . Your personalized 90-day plan goes after them, one by one, for{" "}
-                {symbol}{price} today.
+                . Your personalized 90-day plan plus a full AI Deepscan of your
+                health markers goes after them, one by one, for {symbol}{price}{" "}
+                today.
               </>
             ) : (
               <>
-                Your risks are already low. Your personalized 90-day plan pushes
-                you to the top of your range and keeps you there, for{" "}
-                {symbol}{price} today.
+                Your risks are already low. Your personalized 90-day plan plus a
+                full AI Deepscan of your health markers pushes you to the top of
+                your range and keeps you there, for {symbol}{price} today.
               </>
             )}
+          </p>
+          <p className={`border-l-2 ${traceBorder} pl-3 text-sm leading-relaxed text-monitor-muted`}>
+            {stakesLine}
           </p>
           <CheckoutButton
             label={hasYears ? `Build my plan and win back ${years} years` : "Build my plan"}

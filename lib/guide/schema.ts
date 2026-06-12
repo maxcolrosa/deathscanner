@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { DeepscanRecordSchema } from "@/lib/deepscan/schema";
 
 // --- Guide building blocks ---
 
@@ -279,6 +280,9 @@ export const GuideDocSchema = z.object({
   scienceNotes: ScienceNotesSchema,
   // Layer D: 90-day program arc with phase breakdown and monthly progress reviews.
   programArc: ProgramArcSchema,
+  // The AI Deepscan, attached after the buyer completes the post-purchase
+  // intake (lib/deepscan). Absent until they run it; one run per purchase.
+  deepscan: DeepscanRecordSchema.optional(),
 });
 
 export type DeepDive = z.infer<typeof DeepDiveSchema>;

@@ -9,7 +9,8 @@
 
 export const PRODUCT = {
   name: "The Second Wind Protocol",
-  tagline: "A complete, personalized 90-day program built from your scan.",
+  tagline:
+    "Your full AI Deepscan plus a complete, personalized 90-day program built from your scan.",
 } as const;
 
 export const SUPPORTED_CURRENCIES = ["USD", "GBP", "EUR", "CAD", "AUD"] as const;
@@ -33,17 +34,25 @@ export interface PriceTier {
 
 // Authored charm price points per currency. USD is the source of truth for the
 // value stack (rate 1); the rest are rounded to believable local points.
+// Win-back floors are set so every purchase clears at least $9 USD profit after
+// payment processing (~2.9% + $0.30) and the AI Deepscan run (~$0.03 of Haiku
+// tokens). The old $9-equivalent win-back tiers netted ~$8.4 and are raised.
 export const PRICES: Record<Currency, PriceTier> = {
-  USD: { code: "USD", symbol: "$", price: 13, expiredPrice: 24, winbackPrice: 9, listPrice: 129, rate: 1 },
-  GBP: { code: "GBP", symbol: "£", price: 11, expiredPrice: 19, winbackPrice: 7, listPrice: 99, rate: 0.79 },
-  EUR: { code: "EUR", symbol: "€", price: 12, expiredPrice: 22, winbackPrice: 8, listPrice: 119, rate: 0.92 },
-  CAD: { code: "CAD", symbol: "CA$", price: 18, expiredPrice: 33, winbackPrice: 12, listPrice: 179, rate: 1.36 },
-  AUD: { code: "AUD", symbol: "A$", price: 19, expiredPrice: 35, winbackPrice: 13, listPrice: 189, rate: 1.52 },
+  USD: { code: "USD", symbol: "$", price: 13, expiredPrice: 24, winbackPrice: 10, listPrice: 129, rate: 1 },
+  GBP: { code: "GBP", symbol: "£", price: 11, expiredPrice: 19, winbackPrice: 8, listPrice: 99, rate: 0.79 },
+  EUR: { code: "EUR", symbol: "€", price: 12, expiredPrice: 22, winbackPrice: 9, listPrice: 119, rate: 0.92 },
+  CAD: { code: "CAD", symbol: "CA$", price: 18, expiredPrice: 33, winbackPrice: 14, listPrice: 179, rate: 1.36 },
+  AUD: { code: "AUD", symbol: "A$", price: 19, expiredPrice: 35, winbackPrice: 15, listPrice: 189, rate: 1.52 },
 };
 
 // Itemized value stack, authored in USD. Sum of `value` equals the USD stack
-// value (492); other currencies derive their stack value via stackValueFor().
+// value (571); other currencies derive their stack value via stackValueFor().
 export const INCLUDED = [
+  {
+    label: "Your AI Deepscan: a written readout of your health markers, diet, and lifestyle",
+    note: "Answer a deeper round of questions after checkout and the AI writes a marker-by-marker analysis of where you stand and what to fix first.",
+    value: 79,
+  },
   {
     label: "Your custom 90-day program, built from your scan",
     note: "Targets your highest-impact risks first, across a Foundation, Build, and Push phase.",

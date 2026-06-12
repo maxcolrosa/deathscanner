@@ -64,7 +64,7 @@ const FAQS = [
   },
   {
     q: "What do I actually get?",
-    a: "A personalized longevity readout for free, then the option to unlock a full 90-day protocol built from your exact answers.",
+    a: "A personalized longevity readout for free, then the option to unlock a full 90-day protocol built from your exact answers, including an AI Deepscan that writes a marker-by-marker readout of your health, diet, and lifestyle.",
   },
 ];
 

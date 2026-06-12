@@ -148,6 +148,23 @@ export async function markPaid(
   return (data?.length ?? 0) > 0;
 }
 
+// Persist an updated guide document on a ready order (used to attach the AI
+// Deepscan after the buyer completes the post-purchase intake). Conditional on
+// status so it can never resurrect a failed or unpaid order.
+export async function updateGuide(token: string, guide: GuideDoc): Promise<void> {
+  if (memoryEnabled()) {
+    const row = memory.get(token);
+    if (row && row.status === "ready") row.guide = guide;
+    return;
+  }
+  const { error } = await (await client())
+    .from("orders")
+    .update({ guide, updated_at: new Date().toISOString() })
+    .eq("token", token)
+    .eq("status", "ready");
+  if (error) throw new Error(error.message);
+}
+
 // Has this email already paid for a guide? Used by the drip to suppress further
 // upsell emails once someone has bought. Only paid orders carry a customer_email
 // (set by markPaid from the Stripe session), so a non-null paid_at match means a

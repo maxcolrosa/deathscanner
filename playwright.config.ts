@@ -30,6 +30,9 @@ export default defineConfig({
       // otherwise hit Resend for the test address).
       RESEND_API_KEY: "",
       EMAIL_FROM: "",
+      // Force the deterministic Deepscan engine: no real (slow, billed) AI
+      // calls from the smoke test even when .env.local has a live key.
+      ANTHROPIC_API_KEY: "",
     },
   },
 });

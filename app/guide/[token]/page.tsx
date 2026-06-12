@@ -7,6 +7,7 @@ import { verifyCheckoutSession } from "@/lib/guide/fulfill";
 import { stripeConfigured } from "@/lib/stripe/server";
 import { GuideBuildingScreen } from "@/components/guide/guide-building-screen";
 import { GuideView } from "@/components/guide/guide-view";
+import { getDeepscanQuestions } from "@/lib/deepscan/questions";
 
 export const dynamic = "force-dynamic";
 
@@ -54,7 +55,13 @@ export default async function GuideTokenPage({
   if (!order) notFound();
 
   if (order.status === "ready" && order.guide) {
-    return <GuideView guide={order.guide} token={token} />;
+    return (
+      <GuideView
+        guide={order.guide}
+        token={token}
+        deepscanQuestions={getDeepscanQuestions(order.answers)}
+      />
+    );
   }
 
   // Payment pending: verify the Stripe session inline (covers webhook latency

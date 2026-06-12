@@ -289,6 +289,41 @@ export const QUESTIONS: QuizQuestion[] = [
     ],
   },
   {
+    // Branching, female only: hormonal stage. Estrogen status genuinely shifts
+    // cardiovascular and bone risk, so this is scored (small, fixed weights).
+    id: "hormonal_female",
+    kind: "choice",
+    prompt: "Which best describes your hormonal stage right now?",
+    helper: "Estrogen protects your heart and bones. As it declines, your risk profile shifts, and the right plan shifts with it.",
+    category: "Hormonal stage",
+    recoverable: false,
+    showIf: (a) => a.sex === "female",
+    options: [
+      { value: "pre", label: "Regular cycles", yearsDelta: 0.4, detail: "Estrogen is still protecting your heart and bones." },
+      { value: "peri", label: "Perimenopause, things are changing", yearsDelta: -0.5, detail: "The hormonal transition starts shifting heart and bone risk." },
+      { value: "post", label: "Post-menopause", yearsDelta: -1.1, detail: "After menopause, heart and bone risk climb faster without countermeasures." },
+      { value: "unsure", label: "Not sure", yearsDelta: 0, detail: "Hormonal stage unconfirmed." },
+    ],
+  },
+  {
+    // Branching, male only: testosterone-pattern symptoms. Multi-select and
+    // recoverable: training, sleep, and body composition genuinely move these.
+    id: "hormonal_male",
+    kind: "choice",
+    prompt: "Over the last year, have you noticed any of these?",
+    helper: "Check all that apply. Falling testosterone shows up as lost drive, lost strength, and slow recovery, and most of it is reversible.",
+    category: "Hormonal signals",
+    recoverable: true,
+    multi: true,
+    showIf: (a) => a.sex === "male",
+    options: [
+      { value: "drive", label: "Lower drive or libido", yearsDelta: -0.5, detail: "Falling drive often tracks falling testosterone, and testosterone tracks how you live." },
+      { value: "strength", label: "Losing strength or muscle", yearsDelta: -0.6, detail: "Muscle you do not defend after 30 quietly disappears, and strength predicts survival." },
+      { value: "fatigue", label: "Tired even after a full night", yearsDelta: -0.5, detail: "Waking up tired points at recovery and hormone output running low." },
+      { value: "none", label: "None of these", yearsDelta: 0.5, detail: "No low-testosterone pattern reported.", exclusive: true },
+    ],
+  },
+  {
     // Social connection: one of the strongest, most modifiable survival
     // predictors, and self-reportable without any measurement.
     id: "social",
@@ -464,6 +499,12 @@ function deriveOutcomes(answers: Answers): { result: Outcome; theme: string; wei
   const conditions = toValues(answers.conditions);
   if (conditions.includes("prediabetes")) add("metabolic", "Pull your blood sugar back toward normal", "heart", 7);
   if (conditions.includes("highbp")) add("bp", "Bring your blood pressure down without more pills", "heart", 6);
+  // Gender-specific outcomes keyed to the hormonal follow-ups.
+  const maleSignals = toValues(answers.hormonal_male).filter((v) => v !== "none");
+  if (maleSignals.length >= 2) add("hormones", "Rebuild the drive, strength, and recovery you have been losing", "strength", 7);
+  else if (maleSignals.length === 1) add("hormones", "Reverse the early signs of falling testosterone", "strength", 5);
+  if (answers.hormonal_female === "peri" || answers.hormonal_female === "post")
+    add("hormones", "Protect your heart and bones through the hormonal shift", "heart", 6);
   if (answers.social === "lonely" || answers.social === "some")
     add("connection", "Rebuild the connections that protect your health", "energy", 5);
 
@@ -518,6 +559,10 @@ export function analysisSignals(answers: Answers): string[] {
   if (answers.social === "some" || answers.social === "lonely")
     signals.push("social isolation");
   if (answers.genetics === "poor") signals.push("family history risk");
+  if (toValues(answers.hormonal_male).some((v) => v !== "none"))
+    signals.push("low-testosterone pattern");
+  if (answers.hormonal_female === "peri" || answers.hormonal_female === "post")
+    signals.push("hormonal-stage risk shift");
   return signals;
 }
 

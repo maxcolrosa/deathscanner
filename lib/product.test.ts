@@ -9,8 +9,8 @@ import {
 } from "@/lib/product";
 
 describe("INCLUDED value stack", () => {
-  it("USD stack value is 492 (the locked anchor)", () => {
-    expect(stackValueFor("USD")).toBe(492);
+  it("USD stack value is 571 (the locked anchor)", () => {
+    expect(stackValueFor("USD")).toBe(571);
   });
 
   it("stackValueFor equals the sum of localized item values, per currency", () => {

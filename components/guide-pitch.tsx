@@ -21,6 +21,10 @@ const GENERIC_OUTCOMES: Outcome[] = [
 // claim; it answers the questions that stall a purchase.
 const PITCH_FAQS = [
   {
+    q: "What is the AI Deepscan?",
+    a: "After checkout you answer a deeper round of questions, and the AI writes a full readout of your health markers, diet, and lifestyle, matched to your plan. It is included with your purchase.",
+  },
+  {
     q: "Is this a subscription?",
     a: "No. You pay once. You get instant access and the whole kit is yours to keep, forever.",
   },
@@ -169,6 +173,40 @@ export function GuidePitch({
       ? `As much as ${formatYears(recoverableYears)} of those years are still yours to take back, and they come from the exact habits this plan is built to change.`
       : "This is the plan that pushes your date later and keeps it there.";
 
+  // Gender-keyed targeting module under the promise. Speaks to what each
+  // audience actually worries about; stays deadpan and concrete. Uses the
+  // per-gender trace tint (a secondary monitor channel color), never the
+  // brand accent or the mortality red.
+  const sex = answers?.sex;
+  const genderModule =
+    sex === "male"
+      ? {
+          eyebrow: "Calibrated: male profile",
+          line: "Built for how men lose years: heart, strength, and the slow slide in drive and recovery most men write off as age.",
+          bullets: [
+            "Strength-first training that defends muscle, and the testosterone output that depends on it",
+            "Conditioning that pulls your resting heart rate down before a doctor brings it up",
+            "Recovery rules built for long workweeks, not spa-day advice",
+          ],
+          text: "text-monitor-trace-m",
+          border: "border-monitor-trace-m/40",
+          bg: "bg-monitor-trace-m/[0.05]",
+        }
+      : sex === "female"
+        ? {
+            eyebrow: "Calibrated: female profile",
+            line: "Built for how women lose good years: muscle and bone that slip quietly, energy that frays, and a system built to protect both.",
+            bullets: [
+              "Strength training that protects bone density and lean muscle through every hormonal stage",
+              "Protein and fueling targets set for women, not scaled-down men's numbers",
+              "Recovery built for sleep that breaks up at night, not textbook sleep",
+            ],
+            text: "text-monitor-trace-f",
+            border: "border-monitor-trace-f/40",
+            bg: "bg-monitor-trace-f/[0.05]",
+          }
+        : null;
+
   return (
     <section className="border-t border-monitor-line px-6 py-20">
       <div className="mx-auto flex max-w-2xl flex-col gap-16">
@@ -191,6 +229,33 @@ export function GuidePitch({
               </>
             ) : null}
           </p>
+          {genderModule ? (
+            <div
+              className={`flex flex-col gap-3 rounded-xl border ${genderModule.border} ${genderModule.bg} p-5`}
+            >
+              <span
+                className={`font-mono text-[10px] uppercase tracking-[0.2em] ${genderModule.text}`}
+              >
+                {genderModule.eyebrow}
+              </span>
+              <p className="max-w-[54ch] text-sm leading-relaxed text-monitor-fg">
+                {genderModule.line}
+              </p>
+              <ul className="flex flex-col gap-2">
+                {genderModule.bullets.map((b) => (
+                  <li key={b} className="flex items-start gap-2.5">
+                    <span
+                      aria-hidden
+                      className={`mt-0.5 font-mono text-xs font-bold ${genderModule.text}`}
+                    >
+                      +
+                    </span>
+                    <span className="text-sm leading-snug text-monitor-muted">{b}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
         </div>
 
         {/* ── Value stack ──────────────────────────────────────────── */}

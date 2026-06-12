@@ -18,27 +18,34 @@ export default function CookiesPage() {
 
       <h2>What we use</h2>
       <p>
-        <strong>Essential only.</strong> The site needs a small amount of
-        in-browser state to function, for example to remember where you are in
-        the scan during your visit. The limited-time offer countdown runs in
-        your browser&rsquo;s memory for the current page session and is{" "}
-        <strong>not persisted</strong>; refreshing the page or opening a new
-        tab resets it.
+        <strong>Essential and functional storage only.</strong> We use a small
+        amount of first-party browser storage, none of which tracks you across
+        other websites or identifies you personally:
+      </p>
+      <p>
+        <strong>Offer timer (local storage).</strong> When your scan result is
+        shown with a launch-price countdown, the deadline is stored in your
+        browser&rsquo;s local storage. This exists so the countdown is honest:
+        it does not reset if you refresh the page or run the scan again. It
+        contains only a timestamp, no personal data and no identifier, and it
+        is never sent to us or to anyone else.
+      </p>
+      <p>
+        <strong>Access cookie.</strong> Where access to the site is restricted
+        (for example during a preview period), a cookie remembers that you
+        entered the correct access password so you are not asked again on every
+        page. It contains no personal data.
       </p>
 
       <h2>What we do not use</h2>
       <p>
-        We do not use advertising cookies, cross-site tracking pixels, or
-        profiling technologies that follow you around the web. The scan does not
-        set cookies that identify you personally.
-      </p>
-
-      <h2>Analytics</h2>
-      <p>
-        Any analytics we use are aggregate and privacy-conscious, intended only
-        to count visits and completions, not to identify individuals. Where
-        analytics tools use cookies or local storage, we configure them to
-        minimise personal data collection.
+        We do not use advertising cookies, analytics cookies, cross-site
+        tracking pixels, or profiling technologies that follow you around the
+        web. The scan does not set cookies that identify you personally.
+        Because we only use storage that is necessary for features you have
+        asked for, we do not show a cookie consent banner; if we ever introduce
+        non-essential cookies such as analytics, we will ask for your consent
+        first.
       </p>
 
       <h2>Managing storage</h2>

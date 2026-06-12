@@ -5,6 +5,8 @@ import type {
   Recipe,
   YourNumbers,
 } from "@/lib/guide/schema";
+import type { DeepscanQuestion } from "@/lib/deepscan/questions";
+import { DeepscanSection } from "@/components/guide/deepscan-section";
 
 /* ─── Design constants ───────────────────────────────────────────────────── */
 // DESIGN_VARIANCE: 8 | MOTION_INTENSITY: 6 (CSS cubic-bezier cascades)
@@ -484,7 +486,15 @@ function ExerciseLibraryCard({ entry }: { entry: ExerciseEntry }) {
 
 /* ─── Main component ─────────────────────────────────────────────────────── */
 
-export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) {
+export function GuideView({
+  guide,
+  token,
+  deepscanQuestions,
+}: {
+  guide: GuideDoc;
+  token: string;
+  deepscanQuestions: DeepscanQuestion[];
+}) {
   const n = guide.nutritionPlan;
   return (
     <>
@@ -541,6 +551,23 @@ export function GuideView({ guide, token }: { guide: GuideDoc; token: string }) 
 
           {/* Kit downloads block */}
           <DownloadKit token={token} />
+        </div>
+
+        {/* ── AI Deepscan (included with purchase) ──────────────────────── */}
+        <div
+          style={{
+            animationName: "fadeSlideIn",
+            animationDuration: "0.5s",
+            animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
+            animationFillMode: "both",
+            animationDelay: "60ms",
+          }}
+        >
+          <DeepscanSection
+            token={token}
+            questions={deepscanQuestions}
+            initial={guide.deepscan ?? null}
+          />
         </div>
 
         {/* ── Where you stand ───────────────────────────────────────────── */}

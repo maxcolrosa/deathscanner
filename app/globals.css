@@ -9,6 +9,12 @@
   --color-monitor-muted: #6b8088;
   --color-monitor-accent: #2ee6c9;
   --color-monitor-alert: #ff453a;
+  /* Per-gender trace tints: secondary channel colors used ONLY on the
+     gender-targeted result-page elements (profile chip, targeted module).
+     They read as extra monitor trace channels; teal stays the brand accent
+     and red stays reserved for mortality/risk data. */
+  --color-monitor-trace-m: #6aa6ff;
+  --color-monitor-trace-f: #e6b45a;
 
   /* shadcn/ui semantic tokens mapped to the monitor palette, so the Button
      and RadioGroup primitives render correctly after we overwrite the file

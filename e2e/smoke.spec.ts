@@ -108,4 +108,36 @@ test("buying builds and shows the generated guide", async ({ page }) => {
     expect(pdf.status()).toBe(200);
     expect(pdf.headers()["content-type"]).toContain("application/pdf");
   }
+
+  // The AI Deepscan is offered on the guide page as a step-through wizard.
+  // Begin it, answer every question (first option each), and the report
+  // renders (deterministic offline engine under e2e, since ANTHROPIC_API_KEY
+  // is forced empty in playwright.config.ts).
+  await expect(page.getByText("AI Deepscan", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: /begin my deepscan/i }).click();
+
+  for (let i = 0; i < 40; i++) {
+    const group = page.locator("[data-deepscan-question]");
+    const radio = group.getByRole("radio").first();
+    if (await radio.count()) {
+      await radio.click();
+    } else {
+      await group.getByRole("checkbox").first().click();
+    }
+
+    const run = page.getByRole("button", { name: /run my deepscan/i });
+    if (await run.count()) {
+      await run.click();
+      break;
+    }
+    await page.getByRole("button", { name: "Next", exact: true }).click();
+  }
+
+  await expect(page.getByText(/deepscan complete/i)).toBeVisible({
+    timeout: 20000,
+  });
+  await expect(page.getByText("Your markers", { exact: true })).toBeVisible();
+  await expect(page.getByText("Fix these first", { exact: true })).toBeVisible();
+  // Section action lists render ("Do this" appears once per section).
+  expect(await page.getByText("Do this", { exact: true }).count()).toBeGreaterThanOrEqual(5);
 });
