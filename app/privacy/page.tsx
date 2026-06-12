@@ -53,8 +53,9 @@ export default function PrivacyPage() {
         We do not require you to create an account. We do not sell your personal
         data, and we do not share it for anyone else&rsquo;s marketing. We share
         data only with the processors that operate the service for us (such as
-        our email and payment providers), so they can perform those functions on
-        our behalf.
+        our email provider, our payment provider, and the AI provider that
+        generates your Deepscan, described below), so they can perform those
+        functions on our behalf.
       </p>
 
       <h2>If you buy the guide</h2>
@@ -66,6 +67,36 @@ export default function PrivacyPage() {
         to deliver the product and communicate with you about your purchase.
         Our lawful basis for processing purchase-related personal data is
         performance of a contract with you.
+      </p>
+
+      <h2>Your AI Deepscan</h2>
+      <p>
+        The Second Wind Protocol includes an optional &ldquo;AI Deepscan&rdquo;.
+        If you choose to run it, you answer a further set of questions about your
+        lifestyle and self-reported wellbeing (for example your activity,
+        eating, sleep, and general wellbeing indicators such as an estimated
+        resting heart rate band, a blood-pressure band you have been told, or
+        broad symptom categories). Some of these answers may relate to your
+        health. You provide them voluntarily, and you do not have to run the
+        Deepscan to use the rest of the guide.
+      </p>
+      <p>
+        To produce your written analysis, those answers, together with your
+        earlier scan answers, are sent to a <strong>third-party AI provider</strong>{" "}
+        that processes them on our behalf to generate the report, and the
+        resulting report is then stored with your order so we can show it to you.
+        We do not use your Deepscan answers to train any AI model, and we do not
+        use them for marketing. Our lawful basis for this processing is
+        performance of our contract with you (delivering the product you bought)
+        and, to the extent any answers concern your health, your explicit consent
+        given by choosing to provide them and run the analysis. You can withdraw
+        that consent by contacting us, and you can ask us to delete your Deepscan
+        answers and report at any time.
+      </p>
+      <p>
+        The Deepscan is an educational, entertainment-oriented estimate generated
+        from what you tell us. It is not a medical test, diagnosis, or treatment
+        advice, as explained in our <a href="/terms">Terms and Conditions</a>.
       </p>
 
       <h2>Analytics</h2>
@@ -82,20 +113,21 @@ export default function PrivacyPage() {
         We retain your email and scan answers for as long as you remain on our
         list or until you ask us to delete them; when you unsubscribe we stop
         sending marketing emails and remove or anonymize the associated data. We
-        retain purchase-related personal data for as long as is necessary to
-        fulfil our contractual obligations to you and to comply with our legal
-        obligations (for example, financial record-keeping requirements). Where
-        data is held by our third-party processor, their retention policies
-        apply.
+        retain purchase-related personal data, including any Deepscan answers and
+        the report generated from them, for as long as is necessary to fulfil our
+        contractual obligations to you and to comply with our legal obligations
+        (for example, financial record-keeping requirements), or until you ask us
+        to delete it. Where data is held by our third-party processors, their
+        retention policies also apply.
       </p>
 
       <h2>International transfers</h2>
       <p>
-        Where we use third-party processors (such as payment or analytics
-        providers), your data may be processed in countries outside the UK or
-        European Economic Area. We take steps to ensure that any such transfers
-        are subject to appropriate safeguards in accordance with applicable data
-        protection law.
+        Where we use third-party processors (such as our payment, analytics, or
+        AI providers), your data may be processed in countries outside the UK or
+        European Economic Area, including the United States. We take steps to
+        ensure that any such transfers are subject to appropriate safeguards in
+        accordance with applicable data protection law.
       </p>
 
       <h2>Your rights under UK GDPR and the Data Protection Act 2018</h2>
@@ -129,9 +161,9 @@ export default function PrivacyPage() {
       </p>
       <p>
         These rights apply to the email and scan answers we store, to your
-        marketing preferences, and to any purchase data. To exercise any of
-        these rights, please contact us using the details in the Contact section
-        below.
+        marketing preferences, to any purchase data, and to any Deepscan answers
+        and report we hold. To exercise any of these rights, please contact us
+        using the details in the Contact section below.
       </p>
 
       <h2>Right to complain</h2>

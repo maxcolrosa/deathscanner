@@ -68,6 +68,27 @@ export default function TermsPage() {
         information on this site.
       </p>
 
+      <h2>The AI Deepscan</h2>
+      <p>
+        The Second Wind Protocol includes an optional feature called the
+        &ldquo;AI Deepscan&rdquo;. If you choose to use it, you answer a further
+        set of questions and a third-party artificial-intelligence service
+        generates a written analysis from the answers you give. Unlike the
+        on-screen scan output described above (the &ldquo;AI detection&rdquo;,
+        the estimated date of death, and the model confidence figure), which
+        remain fictional creative devices, the Deepscan is a genuine
+        AI-generated commentary on what you have told us.
+      </p>
+      <p>
+        It is still <strong>an educational, entertainment-oriented estimate, not
+        a medical test, diagnosis, monitoring, or treatment advice</strong>, and
+        it is only as accurate as the self-reported answers you provide. It does
+        not establish any doctor-patient relationship. The health and fitness
+        disclaimer, no-warranty, and limitation of liability sections of these
+        terms apply to the Deepscan in full. How your Deepscan answers are
+        handled is described in our <a href="/privacy">Privacy Policy</a>.
+      </p>
+
       <h2>Eligibility</h2>
       <p>
         This site and its products are intended for adults aged 18 or over. By
