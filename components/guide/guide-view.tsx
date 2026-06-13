@@ -86,7 +86,7 @@ export function GuideView({
                 {t.label}
               </Tabs.Tab>
             ))}
-            <Tabs.Indicator className="pointer-events-none absolute bottom-0 left-0 h-px w-[calc(var(--active-tab-width)*1px)] translate-x-[calc(var(--active-tab-left)*1px)] bg-monitor-accent transition-[width,transform] duration-300 ease-out motion-reduce:transition-none" />
+            <Tabs.Indicator className="pointer-events-none absolute bottom-0 left-0 h-px w-[var(--active-tab-width)] translate-x-[var(--active-tab-left)] bg-monitor-accent transition-[width,transform] duration-300 ease-out motion-reduce:transition-none" />
           </Tabs.List>
 
           <Tabs.Panel value="deepscan" keepMounted className="pt-10">
