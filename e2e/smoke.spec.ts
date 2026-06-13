@@ -112,7 +112,10 @@ test("buying builds and shows the generated guide", async ({ page }) => {
 
   // Every asset actually renders at runtime (exercises @react-pdf
   // renderToBuffer for each document, the guard against fixed-element crashes).
-  const guideUrl = page.url();
+  // Strip any "#tab" fragment the tab navigation above left on the URL, or the
+  // "/download/<asset>" path would be swallowed by the fragment and resolve to
+  // the guide page (200 text/html) instead of the download route.
+  const guideUrl = page.url().split("#")[0];
   for (const asset of ["workbook", "trackers", "quickstart"]) {
     const pdf = await page.request.get(`${guideUrl}/download/${asset}`);
     expect(pdf.status()).toBe(200);
