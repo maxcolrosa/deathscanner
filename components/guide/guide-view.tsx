@@ -1,18 +1,21 @@
+"use client";
+
+import { useRef } from "react";
+import { Tabs } from "@base-ui/react/tabs";
 import type { GuideDoc } from "@/lib/guide/schema";
 import type { DeepscanQuestion } from "@/lib/deepscan/questions";
-import { DeepscanSection } from "@/components/guide/deepscan-section";
+import { GUIDE_TABS } from "@/lib/guide/guide-tabs";
+import { useGuideTab } from "@/components/guide/use-guide-tab";
 import {
-  Section,
-  SubLabel,
-  Badge,
-  Bullets,
-  DeepDiveBlock,
-  DownloadKit,
-  YourNumbersSection,
-  WeekCard,
-  RecipeCard,
-  ExerciseLibraryCard,
-} from "@/components/guide/guide-view-parts";
+  GuideHeader,
+  DeepscanPanel,
+  StartHerePanel,
+  TrainPanel,
+  EatPanel,
+  RecoverPanel,
+  ReferencePanel,
+  TabNav,
+} from "@/components/guide/guide-panels";
 
 /* ─── Design constants ───────────────────────────────────────────────────── */
 // DESIGN_VARIANCE: 8 | MOTION_INTENSITY: 6 (CSS cubic-bezier cascades)
@@ -29,7 +32,21 @@ export function GuideView({
   token: string;
   deepscanQuestions: DeepscanQuestion[];
 }) {
-  const n = guide.nutritionPlan;
+  const [active, setActive] = useGuideTab();
+  const listRef = useRef<HTMLDivElement>(null);
+  const tabRefs = useRef<Record<string, HTMLElement | null>>({});
+
+  // Switch tab, then bring the tab bar and the freshly-active tab into view.
+  const navigate = (id: string) => {
+    setActive(id);
+    const reduce =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const behavior: ScrollBehavior = reduce ? "auto" : "smooth";
+    listRef.current?.scrollIntoView({ block: "start", behavior });
+    tabRefs.current[id]?.scrollIntoView({ inline: "center", block: "nearest" });
+  };
+
   return (
     <>
       {/* Keyframe injection: fixed pseudo-element, never repaints on scroll */}
@@ -44,547 +61,66 @@ export function GuideView({
         }
       `}</style>
 
-      <main className="mx-auto flex max-w-3xl flex-col gap-16 px-5 sm:px-6 pt-20 pb-32">
+      <main className="mx-auto flex max-w-3xl flex-col gap-10 px-5 sm:px-6 pt-20 pb-32">
+        <GuideHeader guide={guide} token={token} />
 
-        {/* ── Hero ──────────────────────────────────────────────────────── */}
-        <div
-          className="flex flex-col gap-5"
-          style={{
-            animationName: "fadeSlideIn",
-            animationDuration: "0.6s",
-            animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
-            animationFillMode: "both",
-          }}
-        >
-          {/* Eyebrow label */}
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-3">
-              <span
-                className="block h-1.5 w-1.5 rounded-full bg-monitor-accent shrink-0"
-                style={{
-                  animationName: "accentPulse",
-                  animationDuration: "2.4s",
-                  animationTimingFunction: "ease-in-out",
-                  animationIterationCount: "infinite",
+        <Tabs.Root value={active} onValueChange={(v) => navigate(String(v))}>
+          {/* Sticky numbered tab bar. Backed so scrolled content does not show
+              through; mobile scrolls horizontally with the active tab centered. */}
+          <Tabs.List
+            ref={listRef}
+            className="sticky top-0 z-20 -mx-5 sm:-mx-6 mb-2 flex items-stretch gap-1 overflow-x-auto border-b border-monitor-line bg-monitor-bg/95 px-5 sm:px-6 backdrop-blur-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
+            {GUIDE_TABS.map((t, i) => (
+              <Tabs.Tab
+                key={t.id}
+                value={t.id}
+                ref={(el: HTMLElement | null) => {
+                  tabRefs.current[t.id] = el;
                 }}
-              />
-              <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-monitor-accent">
-                Your protocol is ready
-              </span>
-            </div>
-            <div className="h-px w-12 bg-monitor-accent/50" />
-          </div>
-
-          <h1 className="text-[2.15rem] sm:text-[2.6rem] font-semibold tracking-tight leading-[1.08] text-monitor-fg max-w-[22ch]">
-            {guide.title}
-          </h1>
-
-          <p className="max-w-[58ch] text-base sm:text-lg leading-relaxed text-monitor-muted">
-            {guide.intro}
-          </p>
-
-          {/* Kit downloads block */}
-          <DownloadKit token={token} />
-        </div>
-
-        {/* ── AI Deepscan (included with purchase) ──────────────────────── */}
-        <div
-          style={{
-            animationName: "fadeSlideIn",
-            animationDuration: "0.5s",
-            animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
-            animationFillMode: "both",
-            animationDelay: "60ms",
-          }}
-        >
-          <DeepscanSection
-            token={token}
-            questions={deepscanQuestions}
-            initial={guide.deepscan ?? null}
-          />
-        </div>
-
-        {/* ── Where you stand ───────────────────────────────────────────── */}
-        <Section title="Where you stand" index={1}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-2 rounded-xl border border-monitor-line bg-monitor-panel p-5">
-              <SubLabel>Situation</SubLabel>
-              <p className="mt-1 text-sm leading-relaxed text-monitor-fg">{guide.yourSituation}</p>
-            </div>
-            <div className="flex flex-col gap-2 rounded-xl border border-monitor-line bg-monitor-panel p-5">
-              <SubLabel>Strategy</SubLabel>
-              <p className="mt-1 text-sm leading-relaxed text-monitor-muted">{guide.strategy}</p>
-            </div>
-          </div>
-        </Section>
-
-        {/* ── Your numbers ──────────────────────────────────────────────── */}
-        <Section title="Your numbers" index={2}>
-          <YourNumbersSection yourNumbers={guide.yourNumbers} />
-        </Section>
-
-        {/* ── Outcomes ──────────────────────────────────────────────────── */}
-        <Section title="What these 90 days deliver" index={3}>
-          <Bullets items={guide.outcomes} />
-        </Section>
-
-        {/* ── Risk briefings (deep dives) ───────────────────────────────── */}
-        <Section title="Your biggest risks, in depth" index={4}>
-          <p className="max-w-[58ch] text-sm leading-relaxed text-monitor-muted">
-            For each of your largest modifiable risks: what is happening, why it
-            costs you, what improves when you fix it, and exactly what to do.
-          </p>
-          <div className="flex flex-col gap-4">
-            {guide.riskBriefings.map((d) => (
-              <DeepDiveBlock key={d.heading} dive={d} />
-            ))}
-          </div>
-        </Section>
-
-        {/* ── First 7 days ──────────────────────────────────────────────── */}
-        <Section title="Start here: your first 7 days" index={5}>
-          <ol className="flex flex-col gap-0 divide-y divide-monitor-line border border-monitor-line rounded-xl overflow-hidden">
-            {guide.next7Days.map((d, i) => (
-              <li
-                key={d.day}
-                className="flex items-start gap-4 px-5 py-3.5 bg-monitor-panel transition-colors duration-200 hover:bg-monitor-accent/[0.03]"
-                style={{
-                  animationName: "fadeSlideIn",
-                  animationDuration: "0.4s",
-                  animationTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
-                  animationFillMode: "both",
-                  animationDelay: `${i * 40 + 200}ms`,
-                }}
+                className="group relative flex shrink-0 snap-start items-center gap-2 whitespace-nowrap px-3 py-3.5 text-sm font-medium text-monitor-muted transition-colors duration-200 outline-none hover:text-monitor-fg focus-visible:text-monitor-fg focus-visible:ring-1 focus-visible:ring-monitor-accent/50 rounded-sm data-[active]:text-monitor-accent"
               >
-                <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-monitor-accent w-8 shrink-0 mt-[3px]">
-                  {d.day.slice(0, 3)}
+                <span className="font-mono text-[11px] tabular-nums text-monitor-muted/50 transition-colors duration-200 group-hover:text-monitor-muted group-data-[active]:text-monitor-accent">
+                  {String(i + 1).padStart(2, "0")}
                 </span>
-                <span className="text-sm leading-relaxed text-monitor-fg">{d.action}</span>
-              </li>
+                {t.label}
+              </Tabs.Tab>
             ))}
-          </ol>
-        </Section>
+            <Tabs.Indicator className="pointer-events-none absolute bottom-0 left-0 h-px w-[calc(var(--active-tab-width)*1px)] translate-x-[calc(var(--active-tab-left)*1px)] bg-monitor-accent transition-[width,transform] duration-300 ease-out motion-reduce:transition-none" />
+          </Tabs.List>
 
-        {/* ── How your training works ───────────────────────────────────── */}
-        <Section title="How your training works" index={6}>
-          <DeepDiveBlock dive={guide.training.approach} />
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-2 rounded-xl border border-monitor-line bg-monitor-panel p-5">
-              <SubLabel>Warm up first, every session</SubLabel>
-              <ul className="mt-1 flex flex-col divide-y divide-monitor-line">
-                {guide.training.warmup.map((m) => (
-                  <li key={m.name} className="flex items-baseline justify-between gap-4 py-2">
-                    <span className="text-sm text-monitor-fg">{m.name}</span>
-                    <span className="font-mono text-[11px] text-monitor-muted shrink-0">{m.detail}</span>
-                  </li>
-                ))}
-              </ul>
+          <Tabs.Panel value="deepscan" keepMounted className="pt-10">
+            <DeepscanPanel
+              token={token}
+              questions={deepscanQuestions}
+              initial={guide.deepscan ?? null}
+            />
+            <TabNav currentId="deepscan" onNavigate={navigate} />
+          </Tabs.Panel>
+          <Tabs.Panel value="start" keepMounted className="pt-10">
+            <StartHerePanel guide={guide} />
+            <TabNav currentId="start" onNavigate={navigate} />
+          </Tabs.Panel>
+          <Tabs.Panel value="train" keepMounted className="pt-10">
+            <TrainPanel guide={guide} />
+            <TabNav currentId="train" onNavigate={navigate} />
+          </Tabs.Panel>
+          <Tabs.Panel value="eat" keepMounted className="pt-10">
+            <EatPanel guide={guide} />
+            <TabNav currentId="eat" onNavigate={navigate} />
+          </Tabs.Panel>
+          <Tabs.Panel value="recover" keepMounted className="pt-10">
+            <RecoverPanel guide={guide} />
+            <TabNav currentId="recover" onNavigate={navigate} />
+          </Tabs.Panel>
+          <Tabs.Panel value="reference" keepMounted className="pt-10">
+            <ReferencePanel guide={guide} />
+            <div className="flex flex-col gap-4 border-t border-monitor-line pt-10">
+              <div className="h-px w-6 bg-monitor-accent/40" />
+              <p className="text-base leading-relaxed text-monitor-fg max-w-[58ch]">{guide.closing}</p>
             </div>
-            <div className="flex flex-col gap-2 rounded-xl border border-monitor-line bg-monitor-panel p-5">
-              <SubLabel>How to progress</SubLabel>
-              <div className="mt-1">
-                <Bullets items={guide.training.progressionRules} />
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-col gap-1.5 rounded-xl border border-monitor-line bg-monitor-accent/[0.04] p-5">
-            <SubLabel>The deload week</SubLabel>
-            <p className="text-sm leading-relaxed text-monitor-fg">{guide.training.deload}</p>
-          </div>
-
-          {/* Sessions - shown once for the weekly plan. Run them every week across
-              the 90-day program, adding a little load or one more rep as you go.
-              The movements stay the same; the numbers climb. */}
-          <div className="flex flex-col gap-2">
-            <SubLabel>Your weekly training sessions</SubLabel>
-            <p className="text-sm leading-relaxed text-monitor-muted">
-              These are your sessions to run each week across the 90-day program. Add a little load or one more rep as you go. The movements stay the same; the numbers climb.
-            </p>
-          </div>
-          <div className="flex flex-col gap-3">
-            {guide.training.workouts.map((wo) => (
-              <div key={wo.day} className="overflow-hidden rounded-xl border border-monitor-line bg-monitor-panel">
-                <div className="flex items-center gap-3 px-5 py-3.5 border-b border-monitor-line">
-                  <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-monitor-accent/60 shrink-0 w-8">
-                    {wo.day.slice(0, 3)}
-                  </span>
-                  <span className="text-sm font-semibold text-monitor-fg">{wo.title}</span>
-                </div>
-                <div className="flex flex-col gap-2 px-5 py-4">
-                  {wo.exercises.map((ex) => (
-                    <div
-                      key={ex.name}
-                      className="grid gap-x-3 gap-y-0.5"
-                      style={{ gridTemplateColumns: "1fr auto auto" }}
-                    >
-                      <span className="text-sm text-monitor-fg col-span-1">{ex.name}</span>
-                      <div className="flex items-center gap-1.5 row-start-1 col-start-2">
-                        <Badge>{ex.sets} x {ex.reps}</Badge>
-                        <span className="font-mono text-[10px] text-monitor-muted whitespace-nowrap">
-                          {ex.rest}
-                        </span>
-                      </div>
-                      <span className="text-xs leading-relaxed text-monitor-muted/70 col-span-2 col-start-1">
-                        {ex.cues}. Progress: {ex.progression}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </Section>
-
-        {/* ── Exercise library ──────────────────────────────────────────── */}
-        <Section title="Exercise library" index={7}>
-          <p className="max-w-[58ch] text-sm leading-relaxed text-monitor-muted">
-            Detailed setup and execution cues for every movement in your plan. No guesswork on form.
-            The printable exercise library PDF in your download kit has everything in one place.
-          </p>
-          <div className="flex flex-col gap-4">
-            {guide.exerciseLibrary.map((entry) => (
-              <ExerciseLibraryCard key={entry.name} entry={entry} />
-            ))}
-          </div>
-        </Section>
-
-        {/* ── Week-by-week plan ─────────────────────────────────────────── */}
-        <Section title="Your week-by-week plan" index={8}>
-          <div className="flex flex-col gap-4">
-            {guide.weeks.map((w, i) => (
-              <WeekCard key={w.week} w={w} delay={i * 50 + 100} />
-            ))}
-          </div>
-        </Section>
-
-        {/* ── Your 90-day arc ───────────────────────────────────────────── */}
-        <Section title="Your 90-day arc" index={9}>
-          {/* Summary */}
-          <div className="flex flex-col gap-2 rounded-xl border border-monitor-accent/30 bg-monitor-accent/[0.06] p-5">
-            <SubLabel>The journey</SubLabel>
-            <p className="mt-1 text-sm leading-relaxed text-monitor-fg">{guide.programArc.summary}</p>
-          </div>
-
-          {/* Phases timeline */}
-          <div className="flex flex-col gap-2">
-            <SubLabel>Phase breakdown</SubLabel>
-            <div className="flex flex-col divide-y divide-monitor-line rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden mt-1">
-              {guide.programArc.phases.map((phase) => (
-                <div key={phase.name} className="grid grid-cols-1 sm:grid-cols-[auto_1fr_1.5fr] gap-0">
-                  <div className="px-5 py-4 sm:border-r border-b sm:border-b-0 border-monitor-line flex flex-col gap-1 sm:w-36">
-                    <span className="text-sm font-semibold text-monitor-fg">{phase.name}</span>
-                    <Badge>{phase.weeks}</Badge>
-                  </div>
-                  <div className="px-5 py-4 sm:border-r border-b sm:border-b-0 border-monitor-line flex flex-col gap-1">
-                    <SubLabel>Focus</SubLabel>
-                    <p className="text-sm leading-relaxed text-monitor-fg mt-0.5">{phase.focus}</p>
-                  </div>
-                  <div className="px-5 py-4 flex flex-col gap-1">
-                    <SubLabel>What changes</SubLabel>
-                    <p className="text-sm leading-relaxed text-monitor-muted mt-0.5">{phase.whatChanges}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Monthly reviews */}
-          <div className="flex flex-col gap-2">
-            <SubLabel>Monthly progress reviews</SubLabel>
-            <div className="flex flex-col gap-3 mt-1">
-              {guide.programArc.monthlyReviews.map((review) => (
-                <div key={review.month} className="overflow-hidden rounded-xl border border-monitor-line bg-monitor-panel">
-                  <div className="border-b border-monitor-line px-5 py-3.5">
-                    <span className="text-sm font-semibold text-monitor-fg">{review.month}</span>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-monitor-line">
-                    <div className="px-5 py-4 flex flex-col gap-2">
-                      <SubLabel>Checkpoints</SubLabel>
-                      <Bullets items={review.checkpoints} />
-                    </div>
-                    <div className="px-5 py-4 flex flex-col gap-2">
-                      <SubLabel>Adjust rules</SubLabel>
-                      <Bullets items={review.adjustRules} />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Section>
-
-        {/* ── Nutrition plan ────────────────────────────────────────────── */}
-        <Section title="Your nutrition plan" index={10}>
-          <DeepDiveBlock dive={n.philosophy} />
-
-          {/* Plate formula: visually distinct callout block */}
-          <div className="flex flex-col gap-1.5 rounded-xl border border-monitor-accent/30 bg-monitor-accent/[0.06] p-5">
-            <SubLabel>Build every plate like this</SubLabel>
-            <p className="mt-1 text-sm leading-relaxed text-monitor-fg">{n.plateFormula}</p>
-          </div>
-
-          {/* Goal-specific calibration cues */}
-          <div className="flex flex-col gap-2">
-            <SubLabel>Calibrated to your goal</SubLabel>
-            <div className="mt-1">
-              <Bullets items={n.calibration} />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1.5 rounded-xl border border-monitor-line bg-monitor-panel p-5">
-              <SubLabel>Your protein target</SubLabel>
-              <p className="text-sm leading-relaxed text-monitor-fg">{n.proteinTarget}</p>
-            </div>
-            <div className="flex flex-col gap-1.5 rounded-xl border border-monitor-line bg-monitor-panel p-5">
-              <SubLabel>Hydration</SubLabel>
-              <p className="text-sm leading-relaxed text-monitor-fg">{n.hydration}</p>
-            </div>
-          </div>
-
-          <Bullets items={n.principles} />
-
-          {/* Sample days */}
-          <div className="flex flex-col gap-4">
-            {n.sampleDays.map((day) => (
-              <div key={day.label} className="rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden">
-                <div className="px-5 pt-4 pb-3 border-b border-monitor-line">
-                  <SubLabel>{day.label}</SubLabel>
-                </div>
-                <dl className="flex flex-col divide-y divide-monitor-line">
-                  {(
-                    [
-                      ["Breakfast", day.breakfast],
-                      ["Lunch", day.lunch],
-                      ["Dinner", day.dinner],
-                      ["Snacks", day.snacks],
-                    ] as const
-                  ).map(([k, v]) => (
-                    <div key={k} className="flex gap-4 px-5 py-3.5">
-                      <dt className="w-20 shrink-0 font-mono text-[10px] uppercase tracking-[0.14em] text-monitor-accent mt-[2px]">
-                        {k}
-                      </dt>
-                      <dd className="text-sm leading-relaxed text-monitor-fg">{v}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </div>
-            ))}
-          </div>
-
-          {/* Swaps */}
-          <div className="flex flex-col gap-2">
-            <SubLabel>Swaps</SubLabel>
-            <div className="flex flex-col gap-1 mt-1">
-              {n.swaps.map((s) => (
-                <div key={s.from} className="flex items-center gap-3 text-sm">
-                  <span className="text-monitor-muted line-through">{s.from}</span>
-                  <span aria-hidden className="font-mono text-[10px] text-monitor-accent/60">
-                    {">"}
-                  </span>
-                  <span className="text-monitor-fg">{s.to}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Eating out */}
-          <div className="flex flex-col gap-2">
-            <SubLabel>Eating out without losing the week</SubLabel>
-            <div className="mt-1">
-              <Bullets items={n.eatingOut} />
-            </div>
-          </div>
-
-          {/* Staples */}
-          <div className="flex flex-col gap-2">
-            <SubLabel>Grocery staples</SubLabel>
-            <p className="text-sm leading-relaxed text-monitor-fg mt-1">
-              {n.groceryStaples.join(", ")}
-            </p>
-          </div>
-        </Section>
-
-        {/* ── Recipe bank ───────────────────────────────────────────────── */}
-        <Section title="Recipe bank" index={11}>
-          <p className="max-w-[58ch] text-sm leading-relaxed text-monitor-muted">
-            Real recipes built around your goal and dietary preferences. Calorie and protein figures are
-            per-serving estimates, not measured values. The recipe book PDF in your download kit
-            includes all recipes with the shopping list in one printable document.
-          </p>
-
-          {/* Recipes grouped by meal type */}
-          {(["breakfast", "lunch", "dinner", "snack"] as const).map((meal) => {
-            const recipes = guide.recipeBank.recipes.filter((r) => r.meal === meal);
-            if (recipes.length === 0) return null;
-            const mealLabel = meal.charAt(0).toUpperCase() + meal.slice(1);
-            return (
-              <div key={meal} className="flex flex-col gap-3">
-                <SubLabel>{mealLabel}s</SubLabel>
-                {recipes.map((recipe) => (
-                  <RecipeCard key={recipe.name} recipe={recipe} />
-                ))}
-              </div>
-            );
-          })}
-
-          {/* Shopping list by aisle */}
-          <div className="flex flex-col gap-2">
-            <SubLabel>Shopping list by aisle</SubLabel>
-            <div className="flex flex-col divide-y divide-monitor-line rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden mt-1">
-              {guide.recipeBank.shoppingList.map((aisleGroup) => (
-                <div key={aisleGroup.aisle} className="grid grid-cols-1 sm:grid-cols-[8rem_1fr] gap-0">
-                  <div className="px-5 py-3 sm:border-r border-b sm:border-b-0 border-monitor-line bg-monitor-accent/[0.03] flex items-start">
-                    <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-monitor-accent/70">{aisleGroup.aisle}</span>
-                  </div>
-                  <div className="px-5 py-3">
-                    <p className="text-xs leading-relaxed text-monitor-fg">{aisleGroup.items.join(", ")}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </Section>
-
-        {/* ── Daily blueprint ───────────────────────────────────────────── */}
-        <Section title="Your daily blueprint" index={12}>
-          <div className="rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden">
-            <ul className="flex flex-col divide-y divide-monitor-line">
-              {guide.dailyBlueprint.map((b) => (
-                <li key={b.time} className="flex items-start gap-4 px-5 py-3">
-                  <span className="font-mono text-[11px] text-monitor-accent w-16 shrink-0 mt-[2px] tabular-nums">
-                    {b.time}
-                  </span>
-                  <span className="text-sm leading-relaxed text-monitor-fg">{b.activity}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </Section>
-
-        {/* ── Sleep and stress ──────────────────────────────────────────── */}
-        <Section title="Sleep and stress recovery" index={13}>
-          <DeepDiveBlock dive={guide.sleepAndStress.briefing} />
-          <div className="flex flex-col gap-2">
-            <SubLabel>Your protocol</SubLabel>
-            <div className="mt-1">
-              <Bullets items={guide.sleepAndStress.protocol} />
-            </div>
-          </div>
-        </Section>
-
-        {/* ── 10-minute fallback ────────────────────────────────────────── */}
-        <Section title="The 10-minute fallback" index={14}>
-          <p className="text-sm leading-relaxed text-monitor-fg">{guide.tenMinutePlan.summary}</p>
-          <div className="rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden">
-            <ul className="flex flex-col divide-y divide-monitor-line">
-              {guide.tenMinutePlan.movements.map((m) => (
-                <li key={m.name} className="flex items-baseline gap-4 px-5 py-3">
-                  <span className="text-sm text-monitor-fg flex-1">{m.name}</span>
-                  <span className="font-mono text-xs text-monitor-muted shrink-0">{m.detail}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </Section>
-
-        {/* ── Progress markers ──────────────────────────────────────────── */}
-        <Section title="How to know it is working" index={15}>
-          <p className="max-w-[58ch] text-sm leading-relaxed text-monitor-muted">
-            {guide.progressMarkers.summary}
-          </p>
-          <Bullets items={guide.progressMarkers.markers} />
-        </Section>
-
-        {/* ── Troubleshooting ───────────────────────────────────────────── */}
-        <Section title="When it gets hard" index={16}>
-          <div className="flex flex-col gap-3">
-            {guide.troubleshooting.map((t) => (
-              <div
-                key={t.problem}
-                className="grid grid-cols-1 sm:grid-cols-[1fr_2fr] gap-0 rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden"
-              >
-                <div className="px-5 py-4 border-b sm:border-b-0 sm:border-r border-monitor-line bg-monitor-accent/[0.03]">
-                  <p className="text-sm font-semibold text-monitor-fg leading-snug">{t.problem}</p>
-                </div>
-                <div className="px-5 py-4">
-                  <p className="text-sm leading-relaxed text-monitor-muted">{t.fix}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Section>
-
-        {/* ── FAQs ──────────────────────────────────────────────────────── */}
-        <Section title="Common questions" index={17}>
-          <div className="flex flex-col divide-y divide-monitor-line rounded-xl border border-monitor-line bg-monitor-panel overflow-hidden">
-            {guide.faqs.map((f) => (
-              <div key={f.q} className="flex flex-col gap-1.5 px-5 py-4">
-                <p className="text-sm font-semibold text-monitor-fg">{f.q}</p>
-                <p className="text-sm leading-relaxed text-monitor-muted">{f.a}</p>
-              </div>
-            ))}
-          </div>
-        </Section>
-
-        {/* ── The science ───────────────────────────────────────────────── */}
-        <Section title="The science behind the plan" index={18}>
-          {/* Summary intro */}
-          <div className="flex flex-col gap-2 rounded-xl border border-monitor-line bg-monitor-panel p-5">
-            <SubLabel>Why these levers were chosen for you</SubLabel>
-            <p className="mt-1 text-sm leading-relaxed text-monitor-fg">{guide.scienceNotes.summary}</p>
-          </div>
-
-          {/* Per-lever entries */}
-          <div className="flex flex-col gap-3">
-            {guide.scienceNotes.entries.map((entry) => (
-              <div key={entry.lever} className="overflow-hidden rounded-xl border border-monitor-line bg-monitor-panel">
-                <div className="border-b border-monitor-line px-5 py-4">
-                  <h3 className="text-sm font-semibold text-monitor-fg">{entry.lever}</h3>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-monitor-line">
-                  <div className="px-5 py-4 flex flex-col gap-1.5">
-                    <SubLabel>Mechanism</SubLabel>
-                    <p className="text-sm leading-relaxed text-monitor-fg mt-0.5">{entry.mechanism}</p>
-                  </div>
-                  <div className="px-5 py-4 flex flex-col gap-1.5">
-                    <SubLabel>What the evidence shows</SubLabel>
-                    <p className="text-sm leading-relaxed text-monitor-muted mt-0.5">{entry.evidence}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Disclaimer in muted footnote style */}
-          <p className="text-xs leading-relaxed text-monitor-muted/50 border-t border-monitor-line pt-3">
-            {guide.scienceNotes.disclaimer}
-          </p>
-        </Section>
-
-        {/* ── Bonus playbooks ───────────────────────────────────────────── */}
-        <Section title="Bonus playbooks" index={19}>
-          <p className="max-w-[58ch] text-sm leading-relaxed text-monitor-muted">
-            Four additional playbooks covering the situations that derail most people - plateaus, travel, supplements, and keeping the results for good.
-          </p>
-          <div className="flex flex-col gap-4">
-            {guide.bonusModules.map((m) => (
-              <DeepDiveBlock key={m.heading} dive={m} />
-            ))}
-          </div>
-        </Section>
-
-        {/* ── Recalibration ─────────────────────────────────────────────── */}
-        <Section title="Weekly recalibration" index={20}>
-          <p className="text-sm leading-relaxed text-monitor-fg">{guide.recalibration}</p>
-        </Section>
-
-        {/* ── Closing ───────────────────────────────────────────────────── */}
-        <div className="flex flex-col gap-4 border-t border-monitor-line pt-10">
-          <div className="h-px w-6 bg-monitor-accent/40" />
-          <p className="text-base leading-relaxed text-monitor-fg max-w-[58ch]">{guide.closing}</p>
-        </div>
-
+          </Tabs.Panel>
+        </Tabs.Root>
       </main>
     </>
   );
