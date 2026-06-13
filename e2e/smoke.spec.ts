@@ -78,27 +78,37 @@ test("buying builds and shows the generated guide", async ({ page }) => {
     page.getByRole("heading", { name: /being written/i })
   ).toBeVisible({ timeout: 15000 });
 
-  // Then the finished guide renders. "Your week-by-week plan" is a <span> in
-  // SectionLabel, not a heading, so target it via text.
+  // Then the finished guide renders.
+  // Guide heading + download kit (persistent header) are visible immediately.
   await expect(
     page.getByRole("heading", { name: /second wind protocol/i })
   ).toBeVisible({ timeout: 20000 });
   await expect(
-    page.getByText("Your week-by-week plan", { exact: true })
-  ).toBeVisible({ timeout: 20000 });
-  // New depth sections are present.
-  await expect(page.getByText(/your biggest risks, in depth/i)).toBeVisible();
-  await expect(page.getByText("Your numbers", { exact: true })).toBeVisible();
-  // The download kit offers the workbook plus the tracker pack and quick-start.
-  await expect(
     page.getByRole("link", { name: /download your workbook pdf/i })
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 10000 });
   await expect(
     page.getByRole("link", { name: /printable tracker pack/i })
   ).toBeVisible();
   await expect(
     page.getByRole("link", { name: /one-page quick-start/i })
   ).toBeVisible();
+
+  // Six tabs render; default landing is Deepscan.
+  await expect(page.getByRole("tab")).toHaveCount(6);
+
+  // Start Here tab -> Your numbers.
+  await page.getByRole("tab", { name: /start here/i }).click();
+  await expect(page.getByText("Your numbers", { exact: true })).toBeVisible();
+
+  // Train tab -> Your week-by-week plan.
+  await page.getByRole("tab", { name: /train/i }).click();
+  await expect(
+    page.getByText("Your week-by-week plan", { exact: true })
+  ).toBeVisible();
+
+  // Reference tab -> Your biggest risks.
+  await page.getByRole("tab", { name: /reference/i }).click();
+  await expect(page.getByText(/your biggest risks, in depth/i)).toBeVisible();
 
   // Every asset actually renders at runtime (exercises @react-pdf
   // renderToBuffer for each document, the guard against fixed-element crashes).
@@ -113,6 +123,9 @@ test("buying builds and shows the generated guide", async ({ page }) => {
   // Begin it, answer every question (first option each), and the report
   // renders (deterministic offline engine under e2e, since ANTHROPIC_API_KEY
   // is forced empty in playwright.config.ts).
+
+  // Return to the Deepscan tab for the assessment flow.
+  await page.getByRole("tab", { name: /deepscan/i }).click();
   await expect(page.getByText("AI Deepscan", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: /begin my deepscan/i }).click();
 
